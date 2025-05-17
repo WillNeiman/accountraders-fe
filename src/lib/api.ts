@@ -1,3 +1,4 @@
+// api.ts
 import axios from 'axios';
 
 const API_BASE_URL = 'http://localhost:8080'; // 스프링 부트 서버 주소로 변경
@@ -10,24 +11,9 @@ export const api = axios.create({
   withCredentials: true, // CORS 요청 시 쿠키를 포함
 });
 
-interface LoginResponse {
-  tokenType: string;
-}
-
-// 쿠키에서 액세스 토큰 가져오기
-function getAccessTokenFromCookie(): string | null {
-  const cookies = document.cookie.split(';');
-  const accessTokenCookie = cookies.find(cookie => cookie.trim().startsWith('accessToken='));
-  if (accessTokenCookie) {
-    return accessTokenCookie.split('=')[1];
-  }
-  return null;
-}
-
 // API 요청 인터셉터 추가
 api.interceptors.request.use(
   (config) => {
-    // 쿠키에서 액세스 토큰을 가져와 요청 헤더에 추가
     const accessToken = getAccessTokenFromCookie();
     if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`;
@@ -72,6 +58,16 @@ api.interceptors.response.use(
   }
 );
 
+// 쿠키에서 액세스 토큰 가져오기
+function getAccessTokenFromCookie(): string | null {
+  const cookies = document.cookie.split(';');
+  const accessTokenCookie = cookies.find(cookie => cookie.trim().startsWith('accessToken='));
+  if (accessTokenCookie) {
+    return accessTokenCookie.split('=')[1];
+  }
+  return null;
+}
+
 interface LoginRequest {
   usernameOrEmail: string;
   password: string;
@@ -82,9 +78,18 @@ export async function login(credentials: LoginRequest) {
   try {
     const response = await api.post<LoginResponse>('/api/v1/auth/login', credentials);
     return response.data;
-  } catch (error) {
-    console.error('로그인 실패:', error);
-    throw error;
+  } catch (error: any) {
+    if (error.response) {
+      // 서버에서 응답이 왔지만 에러인 경우
+      const errorMessage = error.response.data?.message || '로그인에 실패했습니다.';
+      throw new Error(errorMessage);
+    } else if (error.request) {
+      // 요청은 보냈지만 응답을 받지 못한 경우
+      throw new Error('서버와의 통신에 실패했습니다. 잠시 후 다시 시도해주세요.');
+    } else {
+      // 요청 설정 중 에러가 발생한 경우
+      throw new Error('로그인 요청 중 오류가 발생했습니다.');
+    }
   }
 }
 

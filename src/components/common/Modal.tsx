@@ -1,0 +1,118 @@
+import { useEffect } from 'react';
+import styled from '@emotion/styled';
+import { colors } from '@/styles/theme/colors';
+import { spacing } from '@/styles/theme/spacing';
+import { typography } from '@/styles/theme/typography';
+import { zIndex } from '@/styles/theme/zIndex';
+import { ModalProps } from '@/types/components';
+
+const Overlay = styled.div<{ isOpen: boolean }>`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: ${props => props.isOpen ? 1 : 0};
+  visibility: ${props => props.isOpen ? 'visible' : 'hidden'};
+  transition: all 0.3s ease-in-out;
+  z-index: ${zIndex.modal};
+`;
+
+const ModalContainer = styled.div<{ size?: 'small' | 'medium' | 'large'; isOpen: boolean }>`
+  background-color: ${colors.background.default};
+  border-radius: ${spacing[4]};
+  padding: ${spacing[6]};
+  position: relative;
+  width: ${props => {
+    switch (props.size) {
+      case 'small':
+        return '400px';
+      case 'large':
+        return '800px';
+      default:
+        return '600px';
+    }
+  }};
+  max-width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  transform: ${props => props.isOpen ? 'scale(1)' : 'scale(0.9)'};
+  opacity: ${props => props.isOpen ? 1 : 0};
+  transition: all 0.3s ease-in-out;
+`;
+
+const CloseButton = styled.button`
+  position: absolute;
+  top: ${spacing[4]};
+  right: ${spacing[4]};
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: ${colors.gray[500]};
+  padding: ${spacing[2]};
+  transition: color 0.2s;
+
+  &:hover {
+    color: ${colors.gray[700]};
+  }
+`;
+
+const Title = styled.h2`
+  font-size: ${typography.fontSize.xl};
+  font-weight: ${typography.fontWeight.semibold};
+  color: ${colors.gray[900]};
+  margin-bottom: ${spacing[4]};
+`;
+
+const Modal = ({
+  isOpen,
+  onClose,
+  title,
+  children,
+  size = 'medium',
+  showCloseButton = true,
+}: ModalProps) => {
+  useEffect(() => {
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('keydown', handleEscape);
+      document.body.style.overflow = 'hidden';
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen, onClose]);
+
+  if (!isOpen) return null;
+
+  return (
+    <Overlay isOpen={isOpen} onClick={onClose}>
+      <ModalContainer
+        size={size}
+        isOpen={isOpen}
+        onClick={e => e.stopPropagation()}
+      >
+        {showCloseButton && (
+          <CloseButton onClick={onClose}>
+            ✕
+          </CloseButton>
+        )}
+        {title && <Title>{title}</Title>}
+        {children}
+      </ModalContainer>
+    </Overlay>
+  );
+};
+
+export default Modal; 

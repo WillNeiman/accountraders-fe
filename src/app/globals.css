@@ -1,29 +1,73 @@
+/* styles/globals.css 또는 src/app/globals.css */
+
+/* 1. Tailwind CSS 지시어 (가장 중요! 파일 최상단에 위치해야 합니다) */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 2. Pretendard 폰트 CDN */
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css");
+
+/* 2. 폰트 임포트 및 CSS 변수 설정
+   - Inter 폰트는 layout.tsx에서 next/font/google로 관리하는 것을 권장합니다.
+   - Geist Sans 및 Geist Mono 폰트도 layout.tsx에서 next/font를 사용하거나,
+     여기에 @font-face 또는 @import 규칙으로 추가해야 합니다.
+   - 예시 (만약 폰트 파일이 로컬에 있거나 CDN URL을 안다면):
+     @font-face {
+       font-family: 'Geist Sans';
+       src: url('/fonts/GeistVF.woff2') format('woff2-variations');
+       font-weight: 100 900;
+       font-style: normal;
+     }
+     @font-face {
+       font-family: 'Geist Mono';
+       src: url('/fonts/GeistMonoVF.woff2') format('woff2-variations');
+       font-weight: 100 900;
+       font-style: normal;
+     }
+*/
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* 기본 색상 변수 */
+  --background-default: #f8f9fa;
+  --foreground-default: #171717;
+  
+  /* 그레이 스케일 변수 */
+  --gray-rgb: 0, 0, 0;
+  --gray-alpha-200: rgba(var(--gray-rgb), 0.08);
+  --gray-alpha-100: rgba(var(--gray-rgb), 0.05);
+  
+  /* 버튼 호버 색상 */
+  --button-primary-hover: #383838;
+  --button-secondary-hover: #f2f2f2;
+
+  /* 페이지 스타일에서 사용할 폰트 변수 (실제 폰트 패밀리 값으로 정의 필요) */
+  /* 예시: layout.tsx에서 next/font로 로드하고 CSS 변수로 전달한 경우 */
+  /* --font-geist-sans: var(--geist-sans-font-family-css-var-from-next-font); */
+  /* --font-geist-mono: var(--geist-mono-font-family-css-var-from-next-font); */
+  /* 또는 직접 폰트 패밀리 지정 (폰트가 로드되었다는 가정 하에) */
+   --font-geist-sans: 'Geist Sans', sans-serif; /* Geist Sans 폰트가 로드되어야 함 */
+   --font-geist-mono: 'Geist Mono', monospace; /* Geist Mono 폰트가 로드되어야 함 */
+  --font-sans: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+/* 3. 기본 HTML 및 Body 스타일 */
 html,
 body {
   max-width: 100vw;
   overflow-x: hidden;
-}
-
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  /* font-family는 layout.tsx에서 Inter 폰트 클래스로 주로 관리됩니다.
+     페이지별로 다른 폰트를 사용한다면, 해당 페이지의 최상위 요소에 폰트 클래스를 적용합니다. */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+  font-family: var(--font-sans);
+  line-height: 1.5;
+  color: #1f2937;
+  background-color: #ffffff;
 }
 
+/* 4. 기본 리셋 스타일 */
 * {
   box-sizing: border-box;
   padding: 0;
@@ -35,8 +79,354 @@ a {
   text-decoration: none;
 }
 
+/* ==========================================================================
+   사용자 제공 페이지 스타일 시작 (Tailwind 지시어 이후에 배치)
+   ==========================================================================
+*/
+
+/* 페이지 스타일 */
+.page {
+  --gray-rgb: 0, 0, 0; /* 라이트 모드용 gray-rgb */
+  --gray-alpha-200: rgba(var(--gray-rgb), 0.08);
+  --gray-alpha-100: rgba(var(--gray-rgb), 0.05);
+
+  --button-primary-hover: #383838;
+  --button-secondary-hover: #f2f2f2;
+
+  /* 페이지 배경색은 layout.tsx의 body 또는 이 .page 클래스에서 일관되게 관리 */
+  background-color: var(--background-default); /* 예시: 기본 배경색 사용 */
+
+  display: grid;
+  grid-template-rows: 20px 1fr 20px; /* 이 값들은 Tailwind 클래스로 변환 가능: grid-rows-[20px_1fr_20px] */
+  align-items: center; /* Tailwind: items-center */
+  justify-items: center; /* Tailwind: justify-items-center */
+  min-height: 100svh; /* Tailwind: min-h-screen (svh는 정확히 일치하지 않을 수 있음, 커스텀 필요 가능) */
+  padding: 80px; /* Tailwind: p-20 (80px은 20rem에 해당, Tailwind 기본 스케일과 다를 수 있음) */
+  gap: 64px; /* Tailwind: gap-16 (64px은 16rem) */
+  font-family: var(--font-geist-sans); /* Geist Sans 폰트 적용 */
+}
+
 @media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
+  .page {
+    /* 다크 모드 시 .page 요소의 배경/텍스트 색상을 여기서 직접 설정하거나,
+       Tailwind의 dark: 접두사를 사용하여 컴포넌트에서 관리할 수 있습니다. */
+    /* background-color: #1a202c; /* 예시 다크 모드 배경 */
+    /* color: #e2e8f0; /* 예시 다크 모드 텍스트 */
+
+    --gray-rgb: 255, 255, 255; /* 다크 모드용 gray-rgb */
+    --gray-alpha-200: rgba(var(--gray-rgb), 0.145);
+    --gray-alpha-100: rgba(var(--gray-rgb), 0.06);
+
+    --button-primary-hover: #ccc;
+    --button-secondary-hover: #1a1a1a;
   }
+}
+
+.main {
+  display: flex; /* Tailwind: flex */
+  flex-direction: column; /* Tailwind: flex-col */
+  gap: 32px; /* Tailwind: gap-8 (32px은 8rem) */
+  grid-row-start: 2; /* Tailwind의 grid 기능으로 구현 가능 */
+}
+
+.main ol {
+  font-family: var(--font-geist-mono); /* Geist Mono 폰트 적용 */
+  padding-left: 0; /* Tailwind: pl-0 */
+  margin: 0; /* Tailwind: m-0 */
+  font-size: 14px; /* Tailwind: text-sm */
+  line-height: 24px; /* Tailwind: leading-6 */
+  letter-spacing: -0.01em; /* Tailwind: tracking-tight (유사값) */
+  list-style-position: inside;
+}
+
+.main li:not(:last-of-type) {
+  margin-bottom: 8px; /* Tailwind: mb-2 (8px은 2rem) */
+}
+
+.main code {
+  font-family: inherit; /* Tailwind: font-inherit (또는 특정 폰트 클래스) */
+  background: var(--gray-alpha-100);
+  padding: 2px 4px; /* Tailwind: px-1 py-0.5 (유사값) */
+  border-radius: 4px; /* Tailwind: rounded-sm (유사값) 또는 rounded */
+  font-weight: 600; /* Tailwind: font-semibold */
+}
+
+.ctas {
+  display: flex; /* Tailwind: flex */
+  gap: 16px; /* Tailwind: gap-4 */
+}
+
+.ctas a {
+  /* 이 스타일들은 Tailwind 유틸리티로 대부분 대체 가능 */
+  appearance: none;
+  border-radius: 128px; /* Tailwind: rounded-full */
+  height: 48px; /* Tailwind: h-12 */
+  padding: 0 20px; /* Tailwind: px-5 */
+  border: 1px solid transparent; /* Tailwind: border border-transparent */
+  transition:
+    background 0.2s,
+    color 0.2s,
+    border-color 0.2s; /* Tailwind: transition-colors duration-200 */
+  cursor: pointer; /* Tailwind: cursor-pointer */
+  display: flex; /* Tailwind: flex */
+  align-items: center; /* Tailwind: items-center */
+  justify-content: center; /* Tailwind: justify-center */
+  font-size: 16px; /* Tailwind: text-base */
+  line-height: 20px; /* Tailwind: leading-5 */
+  font-weight: 500; /* Tailwind: font-medium */
+}
+
+a.primary {
+  background: var(--foreground-default); /* CSS 변수 사용 또는 Tailwind 색상 클래스 */
+  color: var(--background-default); /* CSS 변수 사용 또는 Tailwind 색상 클래스 */
+  gap: 8px; /* Tailwind: gap-2 (자식 요소가 flex일 때) */
+}
+
+a.secondary {
+  border-color: var(--gray-alpha-200);
+  min-width: 158px; /* Tailwind: min-w-[158px] (커스텀 값) */
+}
+
+.footer {
+  grid-row-start: 3;
+  display: flex; /* Tailwind: flex */
+  gap: 24px; /* Tailwind: gap-6 */
+}
+
+.footer a {
+  display: flex; /* Tailwind: flex */
+  align-items: center; /* Tailwind: items-center */
+  gap: 8px; /* Tailwind: gap-2 */
+}
+
+.footer img {
+  flex-shrink: 0; /* Tailwind: flex-shrink-0 */
+}
+
+/* Enable hover only on non-touch devices */
+@media (hover: hover) and (pointer: fine) {
+  a.primary:hover {
+    background: var(--button-primary-hover);
+    border-color: transparent; /* Tailwind: hover:border-transparent */
+  }
+
+  a.secondary:hover {
+    background: var(--button-secondary-hover);
+    border-color: transparent; /* Tailwind: hover:border-transparent */
+  }
+
+  .footer a:hover {
+    text-decoration: underline; /* Tailwind: hover:underline */
+    text-underline-offset: 4px; /* Tailwind: hover:underline-offset-4 */
+  }
+}
+
+@media (max-width: 600px) {
+  .page {
+    padding: 32px; /* Tailwind: p-8 */
+    padding-bottom: 80px; /* Tailwind: pb-20 */
+  }
+
+  .main {
+    align-items: center; /* Tailwind: items-center */
+  }
+
+  .main ol {
+    text-align: center; /* Tailwind: text-center */
+  }
+
+  .ctas {
+    flex-direction: column; /* Tailwind: flex-col */
+  }
+
+  .ctas a {
+    font-size: 14px; /* Tailwind: text-sm */
+    height: 40px; /* Tailwind: h-10 */
+    padding: 0 16px; /* Tailwind: px-4 */
+  }
+
+  a.secondary {
+    min-width: auto; /* Tailwind: min-w-0 */
+  }
+
+  .footer {
+    flex-wrap: wrap; /* Tailwind: flex-wrap */
+    align-items: center; /* Tailwind: items-center */
+    justify-content: center; /* Tailwind: justify-center */
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .logo { /* .logo 클래스가 사용되는 곳이 있어야 함 */
+    filter: invert(1); /* Tailwind: dark:invert */
+  }
+}
+
+/* 로그인/로그아웃 버튼 등의 추가 스타일 */
+.loginButton, .logoutButton {
+  /* Tailwind 유틸리티로 대체하거나, @layer components로 정의 권장 */
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.loginButton {
+  background-color: #0070f3; /* Tailwind: bg-blue-600 (유사색) */
+  color: white; /* Tailwind: text-white */
+}
+
+.loginButton:hover {
+  background-color: #0051b3; /* Tailwind: hover:bg-blue-700 (유사색) */
+}
+
+.loginButton:disabled {
+  background-color: #ccc; /* Tailwind: disabled:bg-gray-300 */
+  cursor: not-allowed; /* Tailwind: disabled:cursor-not-allowed */
+}
+
+.logoutButton {
+  background-color: #ff4444; /* Tailwind: bg-red-500 (유사색) */
+  color: white; /* Tailwind: text-white */
+}
+
+.logoutButton:hover {
+  background-color: #cc0000; /* Tailwind: hover:bg-red-700 (유사색) */
+}
+
+.error {
+  color: #ff4444; /* Tailwind: text-red-500 */
+  margin-top: 10px; /* Tailwind: mt-2.5 (유사값) */
+}
+
+.result {
+  margin-top: 20px; /* Tailwind: mt-5 */
+  padding: 20px; /* Tailwind: p-5 */
+  background-color: #f5f5f5; /* Tailwind: bg-gray-100 (유사색) */
+  border-radius: 4px; /* Tailwind: rounded */
+}
+
+.result pre {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+/* ==========================================================================
+   사용자 제공 페이지 스타일 끝
+   ==========================================================================
+*/
+
+/* 컴포넌트 스타일 */
+@layer components {
+  .page-layout {
+    @apply grid min-h-screen items-center justify-items-center p-20 gap-16;
+    grid-template-rows: 20px 1fr 20px;
+  }
+  
+  .main-content {
+    @apply flex flex-col gap-8 row-start-2;
+  }
+  
+  .footer-content {
+    @apply flex gap-6 row-start-3;
+  }
+  
+  /* 반응형 스타일 */
+  @media (max-width: 600px) {
+    .page-layout {
+      @apply p-8 pb-20;
+    }
+    
+    .main-content {
+      @apply items-center text-center;
+    }
+    
+    .footer-content {
+      @apply flex-wrap items-center justify-center;
+    }
+  }
+}
+
+/* 다크 모드 이미지 필터 */
+@media (prefers-color-scheme: dark) {
+  .dark-mode-invert {
+    @apply invert;
+  }
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+h1 {
+  font-size: 2.25rem;
+}
+
+h2 {
+  font-size: 1.875rem;
+}
+
+h3 {
+  font-size: 1.5rem;
+}
+
+h4 {
+  font-size: 1.25rem;
+}
+
+h5 {
+  font-size: 1.125rem;
+}
+
+h6 {
+  font-size: 1rem;
+}
+
+/* Focus */
+:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Selection */
+::selection {
+  background-color: #bfdbfe;
+  color: #1e40af;
+}
+
+/* Utilities */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
 }

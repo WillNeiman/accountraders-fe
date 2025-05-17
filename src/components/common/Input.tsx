@@ -1,0 +1,78 @@
+import styled from '@emotion/styled';
+import { colors } from '@/styles/theme/colors';
+import { spacing } from '@/styles/theme/spacing';
+import { typography } from '@/styles/theme/typography';
+import { InputProps } from '@/types/components';
+
+const InputWrapper = styled.div<{ fullWidth?: boolean }>`
+  display: flex;
+  flex-direction: column;
+  width: ${props => props.fullWidth ? '100%' : 'auto'};
+`;
+
+const StyledInput = styled.input<InputProps>`
+  width: 100%;
+  padding: ${spacing[3]} ${spacing[4]};
+  border: 1px solid ${props => props.hasError ? colors.error.main : colors.gray[200]};
+  border-radius: ${spacing[2]};
+  font-size: ${typography.fontSize.base};
+  color: ${colors.text.primary};
+  background-color: ${colors.background.default};
+  transition: all 0.2s;
+
+  &:focus {
+    outline: none;
+    border-color: ${props => props.hasError ? colors.error.main : colors.primary[600]};
+    box-shadow: 0 0 0 2px ${props => props.hasError ? colors.error.light : colors.primary[100]};
+  }
+
+  &::placeholder {
+    color: ${colors.text.secondary};
+  }
+
+  &:disabled {
+    background-color: ${colors.gray[50]};
+    cursor: not-allowed;
+  }
+`;
+
+const Label = styled.label`
+  font-size: ${typography.fontSize.sm};
+  color: ${colors.text.primary};
+  margin-bottom: ${spacing[1]};
+`;
+
+const HelperText = styled.span<{ error?: boolean }>`
+  font-size: ${typography.fontSize.sm};
+  color: ${props => props.error ? colors.error.main : colors.text.secondary};
+  margin-top: ${spacing[1]};
+`;
+
+const Input = ({
+  label,
+  error,
+  helperText,
+  fullWidth = false,
+  className = '',
+  ...props
+}: InputProps) => {
+  const hasError = Boolean(error);
+
+  return (
+    <InputWrapper fullWidth={fullWidth}>
+      {label && <Label>{label}</Label>}
+      <StyledInput
+        className={className}
+        hasError={hasError}
+        {...props}
+      />
+      {(helperText || error) && (
+        <HelperText error={hasError}>
+          {error || helperText}
+        </HelperText>
+      )}
+    </InputWrapper>
+  );
+};
+
+export default Input; 
