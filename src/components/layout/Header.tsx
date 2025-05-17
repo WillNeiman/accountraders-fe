@@ -8,23 +8,6 @@ import styles from './Header.module.css';
 import LoginModal from '../auth/LoginModal';
 import Button from '../common/Button';
 
-interface NavLinkProps {
-  href: string;
-  children: React.ReactNode;
-  className?: string;
-  onClick?: () => void;
-}
-
-const NavLink: React.FC<NavLinkProps> = ({ href, children, className = "", onClick }) => (
-  <Link
-    href={href}
-    onClick={onClick}
-    className={`${styles.navButton} ${className}`}
-  >
-    {children}
-  </Link>
-);
-
 const Header: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);

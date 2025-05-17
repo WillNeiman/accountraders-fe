@@ -73,17 +73,32 @@ interface LoginRequest {
   password: string;
 }
 
+interface LoginResponse {
+  tokenType: string;
+}
+
+interface ApiError {
+  response?: {
+    data?: {
+      message?: string;
+    };
+  };
+  request?: unknown;
+  message?: string;
+}
+
 // 로그인 API
 export async function login(credentials: LoginRequest) {
   try {
     const response = await api.post<LoginResponse>('/api/v1/auth/login', credentials);
     return response.data;
-  } catch (error: any) {
-    if (error.response) {
+  } catch (error: unknown) {
+    const err = error as ApiError;
+    if (err.response) {
       // 서버에서 응답이 왔지만 에러인 경우
-      const errorMessage = error.response.data?.message || '로그인에 실패했습니다.';
+      const errorMessage = err.response.data?.message || '로그인에 실패했습니다.';
       throw new Error(errorMessage);
-    } else if (error.request) {
+    } else if (err.request) {
       // 요청은 보냈지만 응답을 받지 못한 경우
       throw new Error('서버와의 통신에 실패했습니다. 잠시 후 다시 시도해주세요.');
     } else {
