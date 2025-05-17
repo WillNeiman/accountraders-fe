@@ -1,10 +1,72 @@
+"use client";
+
+import { useEffect, useState } from 'react';
+import { login, logout } from '@/lib/api';
 import Image from "next/image";
 import styles from "./page.module.css";
 
 export default function Home() {
+  const [loginResult, setLoginResult] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleLogin = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const result = await login({
+        usernameOrEmail: 'testuser_alpha',
+        password: 'password12345'
+      });
+      console.log('로그인 성공:', result);
+      setLoginResult(result);
+    } catch (error) {
+      console.error('로그인 실패:', error);
+      setError('로그인에 실패했습니다.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleLogout = () => {
+    logout();
+    setLoginResult(null);
+  };
+
   return (
     <div className={styles.page}>
       <main className={styles.main}>
+        <h1>로그인 테스트</h1>
+        
+        {!loginResult ? (
+          <div>
+            <button 
+              onClick={handleLogin} 
+              disabled={isLoading}
+              className={styles.loginButton}
+            >
+              {isLoading ? '로그인 중...' : '로그인'}
+            </button>
+            {error && <p className={styles.error}>{error}</p>}
+          </div>
+        ) : (
+          <div>
+            <h2>로그인 성공!</h2>
+            <button 
+              onClick={handleLogout}
+              className={styles.logoutButton}
+            >
+              로그아웃
+            </button>
+          </div>
+        )}
+
+        {loginResult && (
+          <div className={styles.result}>
+            <h2>로그인 결과:</h2>
+            <pre>{JSON.stringify(loginResult, null, 2)}</pre>
+          </div>
+        )}
         <Image
           className={styles.logo}
           src="/next.svg"

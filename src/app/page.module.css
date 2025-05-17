@@ -166,3 +166,52 @@ a.secondary {
     filter: invert();
   }
 }
+
+.loginButton, .logoutButton {
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.loginButton {
+  background-color: #0070f3;
+  color: white;
+}
+
+.loginButton:hover {
+  background-color: #0051b3;
+}
+
+.loginButton:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.logoutButton {
+  background-color: #ff4444;
+  color: white;
+}
+
+.logoutButton:hover {
+  background-color: #cc0000;
+}
+
+.error {
+  color: #ff4444;
+  margin-top: 10px;
+}
+
+.result {
+  margin-top: 20px;
+  padding: 20px;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+}
+
+.result pre {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
