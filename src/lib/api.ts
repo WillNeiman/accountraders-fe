@@ -1,7 +1,7 @@
 // api.ts
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:8080'; // 스프링 부트 서버 주소로 변경
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080';
 
 export const api = axios.create({
   baseURL: API_BASE_URL,
