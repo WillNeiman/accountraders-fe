@@ -4,7 +4,6 @@ import Modal from '@/components/common/Modal';
 import { login } from '@/services/auth';
 import LoginContent from './LoginContent';
 import { useToast } from '@/contexts/ToastContext';
-import { AxiosError } from 'axios';
 
 interface LoginModalProps {
   isOpen: boolean;

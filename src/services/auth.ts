@@ -1,7 +1,7 @@
-import Cookies from 'js-cookie';
-import { api } from '@/lib/api';
-import { User } from '@/types/user';
 import { AxiosError } from 'axios';
+import { api } from '@/lib/api';
+import Cookies from 'js-cookie';
+import { User } from '@/types/user';
 
 interface LoginRequest {
   email: string;
@@ -19,16 +19,6 @@ interface SignupRequest {
 
 interface LoginResponse {
   tokenType: string;
-}
-
-interface ApiError {
-  response?: {
-    data?: {
-      message?: string;
-    };
-  };
-  request?: unknown;
-  message?: string;
 }
 
 // 로그인 API

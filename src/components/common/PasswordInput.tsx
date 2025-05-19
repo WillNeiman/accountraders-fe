@@ -3,7 +3,6 @@ import styled from '@emotion/styled';
 import { Eye, EyeOff } from 'lucide-react';
 import Input from './Input';
 import { colors } from '@/styles/theme/colors';
-import { spacing } from '@/styles/theme/spacing';
 
 const InputWrapper = styled.div`
   position: relative;

@@ -39,22 +39,27 @@ api.interceptors.response.use(
       if (refreshToken) {
         try {
           const response = await api.post('/api/v1/auth/refresh', { refreshToken });
-          const { accessToken } = response.data;
-          Cookies.set('accessToken', accessToken, {
+          const { accessToken: newAccessToken } = response.data;
+          Cookies.set('accessToken', newAccessToken, {
             expires: 1/24,
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'strict',
             path: '/'
           });
           
-          // 실패했던 요청 재시도
-          error.config.headers.Authorization = `Bearer ${accessToken}`;
-          return api(error.config);
-        } catch (refreshError) {
-          // 리프레시 토큰도 만료된 경우 로그아웃
-          Cookies.remove('accessToken', { path: '/' });
-          Cookies.remove('refreshToken', { path: '/' });
-          window.location.href = '/login';
+          // 원래 요청 재시도
+          const retryConfig = {
+            ...error.config,
+            headers: {
+              ...error.config.headers,
+              Authorization: `Bearer ${newAccessToken}`,
+            },
+          };
+          
+          return api(retryConfig);
+        } catch (error) {
+          removeTokens();
+          return Promise.reject(error);
         }
       }
     }
@@ -132,4 +137,16 @@ export async function fetchUser(userId: string) {
     console.error('사용자 정보 조회 실패:', error);
     throw error;
   }
-} 
+}
+
+export const removeTokens = () => {
+  Cookies.remove('accessToken', { path: '/' });
+  Cookies.remove('refreshToken', { path: '/' });
+};
+
+export const setAccessToken = (token: string) => {
+  Cookies.set('accessToken', token, {
+    expires: 1/24,
+    secure: process.env.NODE_ENV === 'production',
+  });
+}; 
