@@ -15,54 +15,54 @@ export const api = axios.create({
 // API 요청 인터셉터 추가
 api.interceptors.request.use(
   (config) => {
-    const accessToken = Cookies.get('accessToken');
-    if (accessToken) {
-      config.headers.Authorization = `Bearer ${accessToken}`;
+    const token = Cookies.get('accessToken');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
   (error) => {
-    console.error('API 요청 에러:', error);
     return Promise.reject(error);
   }
 );
 
 // API 응답 인터셉터 추가
 api.interceptors.response.use(
-  (response) => {
-    return response;
-  },
+  (response) => response,
   async (error) => {
-    if (error.response?.status === 401) {
-      // 토큰이 만료된 경우 리프레시 토큰으로 갱신 시도
+    const originalRequest = error.config;
+
+    // 액세스 토큰이 만료된 경우
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+
       const refreshToken = Cookies.get('refreshToken');
-      if (refreshToken) {
-        try {
-          const response = await api.post('/api/v1/auth/refresh', { refreshToken });
-          const { accessToken: newAccessToken } = response.data;
-          Cookies.set('accessToken', newAccessToken, {
-            expires: 1/24,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
-            path: '/'
-          });
-          
-          // 원래 요청 재시도
-          const retryConfig = {
-            ...error.config,
-            headers: {
-              ...error.config.headers,
-              Authorization: `Bearer ${newAccessToken}`,
-            },
-          };
-          
-          return api(retryConfig);
-        } catch (error) {
-          removeTokens();
-          return Promise.reject(error);
-        }
+      if (!refreshToken) {
+        removeTokens();
+        return Promise.reject(error);
+      }
+
+      try {
+        const response = await axios.post('/auth/refresh', { refreshToken });
+        const { accessToken: newAccessToken } = response.data;
+        setAccessToken(newAccessToken);
+        
+        // 원래 요청 재시도
+        const retryConfig = {
+          ...error.config,
+          headers: {
+            ...error.config.headers,
+            Authorization: `Bearer ${newAccessToken}`,
+          },
+        };
+        
+        return api(retryConfig);
+      } catch (error) {
+        removeTokens();
+        return Promise.reject(error);
       }
     }
+
     return Promise.reject(error);
   }
 );
