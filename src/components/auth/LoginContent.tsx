@@ -37,9 +37,14 @@ const Terms = styled.p`
 
 interface LoginContentProps {
   onSubmit: (email: string, password: string) => Promise<void>;
+  onSignupClick?: () => void;
 }
 
-export default function LoginContent({ onSubmit }: LoginContentProps) {
+export default function LoginContent({ onSubmit, onSignupClick }: LoginContentProps) {
+  const handleGoogleLogin = () => {
+    window.location.href = 'http://localhost:8080/oauth2/authorization/google';
+  };
+
   return (
     <Container>
       <Header>
@@ -51,7 +56,9 @@ export default function LoginContent({ onSubmit }: LoginContentProps) {
 
       <div>
         <LoginOptions>
-          <Button variant="text" size="small">이메일 가입</Button>
+          <Button variant="text" size="small" onClick={onSignupClick}>
+            이메일 가입
+          </Button>
           <Button variant="text" size="small">이메일 찾기</Button>
           <Button variant="text" size="small">비밀번호 찾기</Button>
         </LoginOptions>
@@ -60,6 +67,7 @@ export default function LoginContent({ onSubmit }: LoginContentProps) {
           variant="secondary"
           fullWidth
           style={{ marginTop: spacing[4] }}
+          onClick={handleGoogleLogin}
         >
           Google 계정으로 로그인
         </Button>

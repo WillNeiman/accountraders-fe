@@ -1,5 +1,6 @@
 // api.ts
 import axios from 'axios';
+import Cookies from 'js-cookie';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080';
 
@@ -14,11 +15,10 @@ export const api = axios.create({
 // API 요청 인터셉터 추가
 api.interceptors.request.use(
   (config) => {
-    const accessToken = getAccessTokenFromCookie();
+    const accessToken = Cookies.get('accessToken');
     if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`;
     }
-    console.log('API 요청:', config.url, config.data);
     return config;
   },
   (error) => {
@@ -30,29 +30,33 @@ api.interceptors.request.use(
 // API 응답 인터셉터 추가
 api.interceptors.response.use(
   (response) => {
-    console.log('API 응답:', response.data);
-    // 쿠키 확인
-    const cookies = response.headers['set-cookie'];
-    if (cookies) {
-      console.log('서버에서 설정한 쿠키:', cookies);
-    }
     return response;
   },
-  (error) => {
-    if (error.response) {
-      // 서버가 응답을 반환한 경우
-      console.error('API 응답 에러:', error.response.data);
-      // 에러 응답의 쿠키도 확인
-      const cookies = error.response.headers['set-cookie'];
-      if (cookies) {
-        console.log('에러 응답의 쿠키:', cookies);
+  async (error) => {
+    if (error.response?.status === 401) {
+      // 토큰이 만료된 경우 리프레시 토큰으로 갱신 시도
+      const refreshToken = Cookies.get('refreshToken');
+      if (refreshToken) {
+        try {
+          const response = await api.post('/api/v1/auth/refresh', { refreshToken });
+          const { accessToken } = response.data;
+          Cookies.set('accessToken', accessToken, {
+            expires: 1/24,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            path: '/'
+          });
+          
+          // 실패했던 요청 재시도
+          error.config.headers.Authorization = `Bearer ${accessToken}`;
+          return api(error.config);
+        } catch (refreshError) {
+          // 리프레시 토큰도 만료된 경우 로그아웃
+          Cookies.remove('accessToken', { path: '/' });
+          Cookies.remove('refreshToken', { path: '/' });
+          window.location.href = '/login';
+        }
       }
-    } else if (error.request) {
-      // 요청은 보냈지만 응답을 받지 못한 경우
-      console.error('API 요청 실패:', error.request);
-    } else {
-      // 요청 설정 중 에러가 발생한 경우
-      console.error('API 에러:', error.message);
     }
     return Promise.reject(error);
   }

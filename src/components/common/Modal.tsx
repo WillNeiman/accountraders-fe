@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import styled from '@emotion/styled';
 import { colors } from '@/styles/theme/colors';
 import { spacing } from '@/styles/theme/spacing';
@@ -22,11 +22,7 @@ const Overlay = styled.div<{ isOpen: boolean }>`
   z-index: ${zIndex.modal};
 `;
 
-const ModalContainer = styled.div<{ size?: 'small' | 'medium' | 'large'; isOpen: boolean }>`
-  background-color: ${colors.background.default};
-  border-radius: ${spacing[4]};
-  padding: ${spacing[6]};
-  position: relative;
+const ModalWrapper = styled.div<{ size?: 'small' | 'medium' | 'large' }>`
   width: ${props => {
     switch (props.size) {
       case 'small':
@@ -39,10 +35,41 @@ const ModalContainer = styled.div<{ size?: 'small' | 'medium' | 'large'; isOpen:
   }};
   max-width: 90%;
   max-height: 90vh;
+  position: relative;
+  overflow: hidden;
+  border-radius: ${spacing[4]};
+`;
+
+const ModalContainer = styled.div<{ isOpen: boolean }>`
+  background-color: ${colors.background.default};
+  padding: ${spacing[6]};
+  position: relative;
+  width: 100%;
+  height: 100%;
+  max-height: 90vh;
   overflow-y: auto;
   transform: ${props => props.isOpen ? 'scale(1)' : 'scale(0.9)'};
   opacity: ${props => props.isOpen ? 1 : 0};
   transition: all 0.3s ease-in-out;
+  user-select: text;
+  
+  /* 스크롤바 스타일링 */
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: ${colors.gray[300]};
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: ${colors.gray[400]};
+  }
 `;
 
 const CloseButton = styled.button`
@@ -76,6 +103,9 @@ const Modal = ({
   size = 'medium',
   showCloseButton = true,
 }: ModalProps) => {
+  const modalRef = useRef<HTMLDivElement>(null);
+  const isDraggingRef = useRef(false);
+
   useEffect(() => {
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
@@ -94,23 +124,41 @@ const Modal = ({
     };
   }, [isOpen, onClose]);
 
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
+      isDraggingRef.current = true;
+    }
+  };
+
+  const handleMouseUp = (e: React.MouseEvent) => {
+    if (isDraggingRef.current && modalRef.current && !modalRef.current.contains(e.target as Node)) {
+      onClose();
+    }
+    isDraggingRef.current = false;
+  };
+
   if (!isOpen) return null;
 
   return (
-    <Overlay isOpen={isOpen} onClick={onClose}>
-      <ModalContainer
-        size={size}
-        isOpen={isOpen}
-        onClick={e => e.stopPropagation()}
-      >
-        {showCloseButton && (
-          <CloseButton onClick={onClose}>
-            ✕
-          </CloseButton>
-        )}
-        {title && <Title>{title}</Title>}
-        {children}
-      </ModalContainer>
+    <Overlay 
+      isOpen={isOpen} 
+      onMouseDown={handleMouseDown}
+      onMouseUp={handleMouseUp}
+    >
+      <ModalWrapper size={size}>
+        <ModalContainer
+          ref={modalRef}
+          isOpen={isOpen}
+        >
+          {showCloseButton && (
+            <CloseButton onClick={onClose}>
+              ✕
+            </CloseButton>
+          )}
+          {title && <Title>{title}</Title>}
+          {children}
+        </ModalContainer>
+      </ModalWrapper>
     </Overlay>
   );
 };

@@ -26,11 +26,9 @@ const LoginForm = ({ onSubmit }: LoginFormProps) => {
     e.preventDefault();
     if (!isFormValid) return;
 
+    setIsLoading(true);
     try {
-      setIsLoading(true);
       await onSubmit(email, password);
-    } catch (error) {
-      console.error('Login failed:', error);
     } finally {
       setIsLoading(false);
     }

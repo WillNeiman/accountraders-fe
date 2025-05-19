@@ -6,11 +6,19 @@ import { useState, useEffect } from 'react';
 import { Menu, X } from 'lucide-react'; // lucide-react 아이콘 사용
 import styles from './Header.module.css';
 import LoginModal from '../auth/LoginModal';
+import SignupModal from '../auth/SignupModal';
 import Button from '../common/Button';
+import { getAccessToken, logout as logoutApi } from '@/services/auth';
 
 const Header: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [isSignupModalOpen, setIsSignupModalOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    setIsLoggedIn(!!getAccessToken());
+  }, []);
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -18,6 +26,33 @@ const Header: React.FC = () => {
 
   const handleLoginClick = () => {
     setIsLoginModalOpen(true);
+    setIsSignupModalOpen(false);
+  };
+
+  const handleSignupClick = () => {
+    setIsSignupModalOpen(true);
+    setIsLoginModalOpen(false);
+  };
+
+  const handleCloseLoginModal = () => {
+    setIsLoginModalOpen(false);
+  };
+
+  const handleCloseSignupModal = () => {
+    setIsSignupModalOpen(false);
+  };
+
+  // 로그인 성공 시 호출될 함수
+  const handleLoginSuccess = () => {
+    setIsLoggedIn(true);
+    setIsLoginModalOpen(false);
+  };
+
+  // 로그아웃 버튼 클릭 시
+  const handleLogout = async () => {
+    await logoutApi();
+    setIsLoggedIn(false);
+    setIsMobileMenuOpen(false);
   };
 
   useEffect(() => {
@@ -47,18 +82,26 @@ const Header: React.FC = () => {
 
             {/* 데스크탑 네비게이션 버튼 */}
             <nav className={styles.desktopNav}>
-              <Button 
-                variant="text"
-                onClick={handleLoginClick}
-              >
-                로그인
-              </Button>
-              <Button
-                variant="secondary"
-                onClick={() => window.location.href = '/signup'}
-              >
-                회원가입
-              </Button>
+              {isLoggedIn ? (
+                <Button variant="text" onClick={handleLogout}>
+                  로그아웃
+                </Button>
+              ) : (
+                <Button 
+                  variant="text"
+                  onClick={handleLoginClick}
+                >
+                  로그인
+                </Button>
+              )}
+              {!isLoggedIn && (
+                <Button
+                  variant="secondary"
+                  onClick={handleSignupClick}
+                >
+                  회원가입
+                </Button>
+              )}
             </nav>
 
             {/* 모바일 메뉴 버튼 */}
@@ -80,20 +123,28 @@ const Header: React.FC = () => {
         {isMobileMenuOpen && (
           <div className={styles.mobileMenu}>
             <nav className={styles.mobileNav}>
-              <Button 
-                variant="text"
-                onClick={handleLoginClick}
-                fullWidth
-              >
-                로그인
-              </Button>
-              <Button
-                variant="secondary"
-                onClick={() => window.location.href = '/signup'}
-                fullWidth
-              >
-                회원가입
-              </Button>
+              {isLoggedIn ? (
+                <Button variant="text" onClick={handleLogout} fullWidth>
+                  로그아웃
+                </Button>
+              ) : (
+                <Button 
+                  variant="text"
+                  onClick={handleLoginClick}
+                  fullWidth
+                >
+                  로그인
+                </Button>
+              )}
+              {!isLoggedIn && (
+                <Button
+                  variant="secondary"
+                  onClick={handleSignupClick}
+                  fullWidth
+                >
+                  회원가입
+                </Button>
+              )}
             </nav>
           </div>
         )}
@@ -101,7 +152,13 @@ const Header: React.FC = () => {
 
       <LoginModal 
         isOpen={isLoginModalOpen} 
-        onClose={() => setIsLoginModalOpen(false)} 
+        onClose={handleCloseLoginModal}
+        onSignupClick={handleSignupClick}
+        onLoginSuccess={handleLoginSuccess}
+      />
+      <SignupModal
+        isOpen={isSignupModalOpen}
+        onClose={handleCloseSignupModal}
       />
     </>
   );
