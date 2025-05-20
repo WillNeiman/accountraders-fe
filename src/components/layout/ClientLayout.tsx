@@ -1,6 +1,5 @@
 "use client";
 
-import { Inter } from "next/font/google";
 import styled from "@emotion/styled";
 import { colors } from "@/styles/theme/colors";
 import { spacing } from "@/styles/theme/spacing";
@@ -8,8 +7,6 @@ import Footer from './Footer';
 import { useState } from 'react';
 import LoginModal from '../auth/LoginModal';
 import SignupModal from '../auth/SignupModal';
-
-const inter = Inter({ subsets: ["latin"] });
 
 const HeaderContainer = styled.header`
   position: fixed;

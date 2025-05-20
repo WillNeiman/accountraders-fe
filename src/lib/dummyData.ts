@@ -14,10 +14,6 @@ const categories = ['게임', '엔터테인먼트', '교육', '음악', '요리'
 const channelNamePrefixes = ['멋진', '즐거운', '신나는', '행복한', '재미있는'];
 const channelNameSuffixes = ['채널', '스튜디오', 'TV', '방송', '미디어'];
 
-function generateRandomNumber(min: number, max: number): number {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
 function generateDummyListing(index: number): Listing {
   const categoryIndex = index % categories.length;
   const prefixIndex = index % channelNamePrefixes.length;
