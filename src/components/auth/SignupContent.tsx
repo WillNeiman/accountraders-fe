@@ -154,6 +154,7 @@ export default function SignupContent({ onSubmit }: SignupContentProps) {
         >
           {formState.isLoading ? '가입 중...' : '회원가입'}
         </Button>
+        {/* 구글 회원가입 기능 임시 중단
         <Button
           variant="secondary"
           fullWidth
@@ -161,6 +162,7 @@ export default function SignupContent({ onSubmit }: SignupContentProps) {
         >
           Google 계정으로 가입
         </Button>
+        */}
       </div>
     </Container>
   );

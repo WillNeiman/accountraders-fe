@@ -48,8 +48,8 @@ export default function LoginContent({ onSubmit, onSignupClick }: LoginContentPr
   return (
     <Container>
       <Header>
-        <Logo>ACCOUNTRADERS</Logo>
-        <Subtitle>솔로건 들어가는 자리</Subtitle>
+        <Logo>CHANNELINK</Logo>
+        <Subtitle>가장 빠른 비즈니스 채널 거래 플랫폼</Subtitle>
       </Header>
       
       <LoginForm onSubmit={onSubmit} />
@@ -57,12 +57,13 @@ export default function LoginContent({ onSubmit, onSignupClick }: LoginContentPr
       <div>
         <LoginOptions>
           <Button variant="text" size="small" onClick={onSignupClick}>
-            이메일 가입
+            이메일로 가입하기
           </Button>
           <Button variant="text" size="small">이메일 찾기</Button>
           <Button variant="text" size="small">비밀번호 찾기</Button>
         </LoginOptions>
         
+        {/* 구글 로그인 기능 임시 중단
         <Button
           variant="secondary"
           fullWidth
@@ -71,10 +72,11 @@ export default function LoginContent({ onSubmit, onSignupClick }: LoginContentPr
         >
           Google 계정으로 로그인
         </Button>
+        */}
       </div>
       
       <Terms>
-        로그인하면 이용약관 및 개인정보보호방침에 동의하는 것으로 간주합니다.
+        {/* 로그인하면 이용약관 및 개인정보보호방침에 동의하는 것으로 간주합니다. */}
       </Terms>
     </Container>
   );

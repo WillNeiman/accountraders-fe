@@ -36,13 +36,20 @@ const StrengthContainer = styled.div`
 const StrengthBar = styled.div`
   height: 4px;
   border-radius: 2px;
-  background-color: ${colors.gray[200]};
   overflow: hidden;
 `;
 
 const StrengthIndicator = styled.div<{ strength: number }>`
   height: 100%;
-  width: ${props => props.strength * 33.33}%;
+  width: ${props => {
+  switch (props.strength) {
+    case 0: return '0%';
+    case 1: return '33.33%';
+    case 2: return '66.66%';
+    case 3: return '100%';
+    default: return '0%';
+  }
+}};
   background-color: ${props => {
     switch (props.strength) {
       case 1:
@@ -55,7 +62,7 @@ const StrengthIndicator = styled.div<{ strength: number }>`
         return colors.gray[200];
     }
   }};
-  transition: all 0.3s ease;
+  transition: all 0.3s ease-in-out;
 `;
 
 const StrengthText = styled.p<{ strength: number }>`
@@ -97,8 +104,13 @@ const PasswordInput = ({
   const [showPassword, setShowPassword] = useState(false);
   
   const calculatePasswordStrength = (password: string): number => {
-    // 6자 이하면 무조건 낮음(1)
-    if (password.length <= 6) return 1;
+    if (password.length === 0) { // 입력값이 없으면 strength는 0
+      return 0;
+    }
+    // 1자 이상 6자 이하면 무조건 낮음(1)
+    if (password.length > 0 && password.length <= 6) {
+      return 1;
+    }
 
     let strength = 0;
     if (/[A-Za-z]/.test(password)) strength++; // 문자 포함
@@ -131,14 +143,16 @@ const PasswordInput = ({
           {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
         </ToggleButton>
       </InputWrapper>
-      {showStrengthBar && value.length > 0 && (
+      {showStrengthBar && (
         <StrengthContainer>
           <StrengthBar>
             <StrengthIndicator strength={strength} />
           </StrengthBar>
-          <StrengthText strength={strength}>
-            {`비밀번호 강도: ${strengthText}`}
-          </StrengthText>
+          {value.length > 0 && strengthText && (
+            <StrengthText strength={strength}>
+              {`비밀번호 강도: ${strengthText}`}
+            </StrengthText>
+          )}
         </StrengthContainer>
       )}
     </div>

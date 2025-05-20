@@ -10,24 +10,24 @@ const InputWrapper = styled.div<{ fullWidth?: boolean }>`
   width: ${props => props.fullWidth ? '100%' : 'auto'};
 `;
 
-const StyledInput = styled.input<InputProps>`
+const StyledInput = styled.input<{ error?: string }>`
   width: 100%;
   padding: ${spacing[3]} ${spacing[4]};
-  border: 1px solid ${props => props.hasError ? colors.error.main : colors.gray[200]};
+  border: 1px solid ${props => props.error ? colors.error.main : colors.gray[300]};
   border-radius: ${spacing[2]};
   font-size: ${typography.fontSize.base};
   color: ${colors.text.primary};
   background-color: ${colors.background.default};
+  outline: none;
   transition: all 0.2s;
 
-  &:focus {
-    outline: none;
-    border-color: ${props => props.hasError ? colors.error.main : colors.primary[600]};
-    box-shadow: 0 0 0 2px ${props => props.hasError ? colors.error.light : colors.primary[100]};
+  &::placeholder {
+    color: ${colors.gray[400]};
   }
 
-  &::placeholder {
-    color: ${colors.text.secondary};
+  &:focus {
+    border-color: ${props => props.error ? colors.error.main : colors.primary[500]};
+    box-shadow: 0 0 0 2px ${props => props.error ? colors.error.light : colors.primary[100]};
   }
 
   &:disabled {
@@ -63,7 +63,7 @@ const Input = ({
       {label && <Label>{label}</Label>}
       <StyledInput
         className={className}
-        hasError={hasError}
+        error={error}
         {...props}
       />
       {(helperText || error) && (

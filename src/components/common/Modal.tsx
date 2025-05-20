@@ -88,11 +88,12 @@ const CloseButton = styled.button`
   }
 `;
 
-const Title = styled.h2`
+const Title = styled.h2<{ align?: 'left' | 'center' | 'right' }>`
   font-size: ${typography.fontSize.xl};
   font-weight: ${typography.fontWeight.semibold};
   color: ${colors.gray[900]};
   margin-bottom: ${spacing[4]};
+  text-align: ${props => props.align || 'left'};
 `;
 
 const Modal = ({
@@ -102,6 +103,7 @@ const Modal = ({
   children,
   size = 'medium',
   showCloseButton = true,
+  titleAlign = 'left',
 }: ModalProps) => {
   const modalRef = useRef<HTMLDivElement>(null);
   const isDraggingRef = useRef(false);
@@ -155,7 +157,7 @@ const Modal = ({
               ✕
             </CloseButton>
           )}
-          {title && <Title>{title}</Title>}
+          {title && <Title align={titleAlign}>{title}</Title>}
           {children}
         </ModalContainer>
       </ModalWrapper>

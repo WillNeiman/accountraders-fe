@@ -42,7 +42,6 @@ export const signup = async (data: SignupRequest): Promise<void> => {
   try {
     await api.post('/api/v1/users', data);
   } catch (error) {
-    console.error('Signup failed:', error);
     throw error;
   }
 };

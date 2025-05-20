@@ -1,14 +1,16 @@
 // layout.tsx
+
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { Noto_Sans_KR } from 'next/font/google'
 import './globals.css'
 import { ToastProvider } from '@/contexts/ToastContext'
+import ClientLayout from '@/components/layout/ClientLayout'
 
-const inter = Inter({ subsets: ['latin'] })
+const notoSansKr = Noto_Sans_KR({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'AccountTraders - 계정거래 플랫폼',
-  description: '안전하고 신뢰할 수 있는 계정거래 플랫폼',
+  title: '채널링크',
+  description: '채널링크 - 계정거래 플랫폼',
 }
 
 export default function RootLayout({
@@ -18,9 +20,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko">
-      <body className={inter.className}>
+      <body className={notoSansKr.className}>
         <ToastProvider>
-          {children}
+          <ClientLayout>{children}</ClientLayout>
         </ToastProvider>
       </body>
     </html>
