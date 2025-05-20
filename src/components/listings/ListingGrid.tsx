@@ -21,14 +21,26 @@ interface ListingGridProps {
     sortBy?: 'price' | 'subscribers' | 'views' | 'recent';
   };
   onRemoveFilter: (key: string) => void;
-  showOnlyFilters?: boolean;
-  showOnlyGrid?: boolean;
 }
 
-const Container = styled.div<{ showOnlyFilters?: boolean }>`
+const Container = styled.div`
   position: relative;
-  min-height: ${props => props.showOnlyFilters ? 'auto' : '400px'};
-  padding-bottom: ${props => props.showOnlyFilters ? 0 : spacing[20]};
+  min-height: 400px;
+`;
+
+const FilterHeader = styled.div`
+  position: sticky;
+  top: 0px; // 헤더 높이만큼 아래로
+  z-index: ${zIndex.sticky};
+  display: flex;
+  align-items: center;
+  gap: ${spacing[4]};
+  padding: ${spacing[4]} 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 1) 0%,
+    rgba(255, 255, 255, 0) 100%
+  );
 `;
 
 const Grid = styled.div`
@@ -38,22 +50,13 @@ const Grid = styled.div`
   margin-top: ${spacing[4]};
 `;
 
-const FilterHeader = styled.div`
-  position: sticky;
-  top: 0;
-  z-index: ${zIndex.sticky};
-  display: flex;
-  align-items: center;
-  gap: ${spacing[4]};
-  padding-bottom: 10px;
-`;
-
 const PaginationContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
   gap: ${spacing[2]};
   margin-top: ${spacing[8]};
+  padding-bottom: ${spacing[8]};
 `;
 
 const PageButton = styled.button<{ isActive?: boolean }>`
@@ -82,9 +85,7 @@ const ListingGrid = ({
   listings, 
   onOpenFilter, 
   filters, 
-  onRemoveFilter,
-  showOnlyFilters,
-  showOnlyGrid 
+  onRemoveFilter
 }: ListingGridProps) => {
   const [currentPage, setCurrentPage] = useState(1);
   
@@ -92,52 +93,6 @@ const ListingGrid = ({
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const endIndex = startIndex + ITEMS_PER_PAGE;
   const currentListings = listings.slice(startIndex, endIndex);
-
-  if (showOnlyFilters) {
-    return (
-      <Container showOnlyFilters>
-        <FilterHeader>
-          <FilterButton onClick={onOpenFilter} size="default" />
-          <FilterTags filters={filters} onRemoveFilter={onRemoveFilter} />
-        </FilterHeader>
-      </Container>
-    );
-  }
-
-  if (showOnlyGrid) {
-    return (
-      <Container>
-        <Grid>
-          {currentListings.map((listing) => (
-            <ListingCard key={listing.listing_id} listing={listing} />
-          ))}
-        </Grid>
-        <PaginationContainer>
-          <PageButton
-            onClick={() => setCurrentPage(prev => prev - 1)}
-            disabled={currentPage === 1}
-          >
-            이전
-          </PageButton>
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-            <PageButton
-              key={page}
-              isActive={currentPage === page}
-              onClick={() => setCurrentPage(page)}
-            >
-              {page}
-            </PageButton>
-          ))}
-          <PageButton
-            onClick={() => setCurrentPage(prev => prev + 1)}
-            disabled={currentPage === totalPages}
-          >
-            다음
-          </PageButton>
-        </PaginationContainer>
-      </Container>
-    );
-  }
 
   return (
     <Container>

@@ -124,13 +124,15 @@ const SignupForm = ({ onSubmit, termsAgreed, onFormStateChange }: SignupFormProp
     e.preventDefault();
     if (!isFormValid) return;
 
-    setIsLoading(true);
     try {
+      setIsLoading(true);
       await onSubmit({
         nickname,
         email,
         password,
       });
+    } catch (error) {
+      console.error('Signup failed:', error);
     } finally {
       setIsLoading(false);
     }

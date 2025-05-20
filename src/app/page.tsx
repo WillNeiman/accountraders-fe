@@ -32,20 +32,6 @@ const Subtitle = styled.p`
   color: ${colors.text.secondary};
 `;
 
-const StickyFilterSection = styled.div`
-  position: sticky;
-  top: 0px;
-  padding-left: ${spacing[4]};
-  padding-top: ${spacing[3]};
-  padding-bottom: ${spacing[4]};
-  z-index: 50;
-  background: linear-gradient(
-    to bottom,
-    rgba(255, 255, 255, 1) 0%,
-    rgba(255, 255, 255, 0) 100%
-  );
-`;
-
 const MainContent = styled.div`
   padding: ${spacing[4]};
 `;
@@ -82,23 +68,12 @@ export default function Home() {
         <Subtitle>검증된 유튜브 채널을 안전하게 거래하세요</Subtitle>
       </PageHeader>
 
-      <StickyFilterSection>
-        <ListingGrid
-          listings={dummyListings}
-          onOpenFilter={() => setIsFilterModalOpen(true)}
-          filters={filters}
-          onRemoveFilter={handleRemoveFilter}
-          showOnlyFilters
-        />
-      </StickyFilterSection>
-
       <MainContent>
         <ListingGrid
           listings={dummyListings}
           onOpenFilter={() => setIsFilterModalOpen(true)}
           filters={filters}
           onRemoveFilter={handleRemoveFilter}
-          showOnlyGrid
         />
       </MainContent>
       

@@ -35,6 +35,7 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
       } else {
         showToast('회원가입 중 오류가 발생했습니다.');
       }
+      console.error('Signup failed:', error);
     }
   };
 
