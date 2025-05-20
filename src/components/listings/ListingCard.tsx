@@ -2,7 +2,6 @@ import styled from '@emotion/styled';
 import { colors } from '@/styles/theme/colors';
 import { typography } from '@/styles/theme/typography';
 import { spacing } from '@/styles/theme/spacing';
-import { Listing } from '@/lib/dummyData';
 
 interface ListingCardProps {
   listing: {
