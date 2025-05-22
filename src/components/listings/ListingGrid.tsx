@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react';
 import styled from '@emotion/styled';
 import { spacing } from '@/styles/theme/spacing';
-import { colors } from '@/styles/theme/colors';
-import { typography } from '@/styles/theme/typography';
 import { Listing, ListingParams } from '@/types/listings';
 import { fetchYoutubeListings } from '@/lib/api/youtubeListings';
 import ListingCard from './ListingCard';
@@ -10,7 +8,6 @@ import FilterButton from './FilterButton';
 import FilterTags from './FilterTags';
 import FilterModal from './FilterModal';
 import { theme } from '@/styles/theme';
-import { zIndex } from '@/styles/theme/zIndex';
 
 const Grid = styled.div`
   display: grid;
