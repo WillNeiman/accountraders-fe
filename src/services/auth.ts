@@ -2,6 +2,7 @@ import { AxiosError } from 'axios';
 import { apiClient } from '@/lib/api/apiClient';
 import Cookies from 'js-cookie';
 import { User } from '@/types/user';
+import { formatErrorMessage } from '@/utils/error';
 
 interface LoginRequest {
   email: string;
@@ -31,7 +32,7 @@ export const login = async (data: LoginRequest): Promise<void> => {
       if (error.response?.status === 401) {
         throw new Error('이메일 또는 비밀번호가 일치하지 않습니다.');
       }
-      throw new Error(error.response?.data?.message || '로그인 중 오류가 발생했습니다.');
+      throw new Error(formatErrorMessage(error));
     }
     throw new Error('로그인 중 오류가 발생했습니다.');
   }
@@ -42,8 +43,7 @@ export const signup = async (data: SignupRequest): Promise<void> => {
   try {
     await apiClient.post('/api/v1/users', data);
   } catch (error) {
-    console.error('Signup failed:', error);
-    throw error;
+    throw new Error(formatErrorMessage(error));
   }
 };
 
@@ -53,8 +53,7 @@ export async function getCurrentUser(): Promise<User> {
     const response = await apiClient.get<User>('/api/v1/users/me');
     return response.data;
   } catch (error) {
-    console.error('Failed to get current user:', error);
-    throw error;
+    throw new Error(formatErrorMessage(error));
   }
 }
 
@@ -64,8 +63,7 @@ export const logout = async () => {
     await apiClient.post('/api/v1/auth/logout');
     // 쿠키 삭제는 서버에서 처리
   } catch (error) {
-    console.error('Logout failed:', error);
-    throw error;
+    throw new Error(formatErrorMessage(error));
   }
 };
 

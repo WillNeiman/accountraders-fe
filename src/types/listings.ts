@@ -1,13 +1,16 @@
 export interface Listing {
-  listing_id: string;
+  listingId: string;
+  channelId: string;
+  sellerUserId: string;
   title: string;
-  asking_price: number;
-  channel: {
-    channel_name: string;
-    subscriber_count: number;
-    total_views: number;
-    thumbnail_url?: string;
-  };
+  listingDescription: string;
+  askingPrice: number;
+  currency: string;
+  status: 'ACTIVE' | 'INACTIVE' | 'SOLD';
+  expiresAt: string;
+  viewCountOnPlatform: number;
+  updatedAt: string;
+  createdAt: string;
 }
 
 export interface ListingParams {

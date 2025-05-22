@@ -33,7 +33,7 @@ const ToastContainer = styled.div<{ isClosing: boolean }>`
   position: fixed;
   left: 50%;
   transform: translate(-50%, 0);
-  background-color: ${colors.gray[800]};
+  background-color: ${colors.warning.main};
   color: white;
   padding: ${spacing[4]} ${spacing[6]};
   border-radius: ${spacing[2]};
@@ -43,6 +43,7 @@ const ToastContainer = styled.div<{ isClosing: boolean }>`
   max-width: 90%;
   width: auto;
   text-align: center;
+  white-space: pre-line;
   
   /* 데스크탑 */
   bottom: ${spacing[8]};

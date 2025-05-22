@@ -2,19 +2,10 @@ import styled from '@emotion/styled';
 import { colors } from '@/styles/theme/colors';
 import { typography } from '@/styles/theme/typography';
 import { spacing } from '@/styles/theme/spacing';
+import { Listing } from '@/types/listings';
 
 interface ListingCardProps {
-  listing: {
-    listing_id: string;
-    title: string;
-    asking_price: number;
-    channel: {
-      channel_name: string;
-      subscriber_count: number;
-      total_views: number;
-      thumbnail_url?: string;
-    };
-  };
+  listing: Listing;
 }
 
 const Card = styled.div`
@@ -176,22 +167,22 @@ const ListingCard = ({ listing }: ListingCardProps) => {
           </PlaceholderIcon>
           <PlaceholderText>채널 이미지</PlaceholderText>
         </PlaceholderContent>
-        <Badge>판매중</Badge>
+        <Badge>{listing.status === 'ACTIVE' ? '판매중' : '판매완료'}</Badge>
       </ThumbnailContainer>
       <Content>
         <Title>{listing.title}</Title>
-        <ChannelName>{listing.channel.channel_name}</ChannelName>
+        <ChannelName>{listing.listingDescription}</ChannelName>
         <Stats>
           <StatItem>
-            <StatLabel>구독자</StatLabel>
-            <StatValue>{formatNumber(listing.channel.subscriber_count)}</StatValue>
+            <StatLabel>조회수</StatLabel>
+            <StatValue>{formatNumber(listing.viewCountOnPlatform)}</StatValue>
           </StatItem>
           <StatItem>
-            <StatLabel>총 조회수</StatLabel>
-            <StatValue>{formatNumber(listing.channel.total_views)}</StatValue>
+            <StatLabel>등록일</StatLabel>
+            <StatValue>{new Date(listing.createdAt).toLocaleDateString()}</StatValue>
           </StatItem>
         </Stats>
-        <Price>{formatPrice(listing.asking_price)}</Price>
+        <Price>{formatPrice(listing.askingPrice)}</Price>
       </Content>
     </Card>
   );

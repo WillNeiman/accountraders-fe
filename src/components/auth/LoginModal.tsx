@@ -4,6 +4,7 @@ import Modal from '@/components/common/Modal';
 import { login } from '@/services/auth';
 import LoginContent from './LoginContent';
 import { useToast } from '@/contexts/ToastContext';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -14,10 +15,12 @@ interface LoginModalProps {
 
 export default function LoginModal({ isOpen, onClose, onSignupClick, onLoginSuccess }: LoginModalProps) {
   const { showToast } = useToast();
+  const { refreshUser } = useAuth();
 
   const handleLogin = async (email: string, password: string) => {
     try {
       await login({ email, password });
+      await refreshUser();
       if (onLoginSuccess) onLoginSuccess();
       onClose();
     } catch (error) {

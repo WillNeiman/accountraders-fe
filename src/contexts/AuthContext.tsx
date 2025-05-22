@@ -3,6 +3,8 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { User } from '@/types/user';
 import { getCurrentUser, logout as logoutApi, getAccessToken } from '@/services/auth';
+import { useToast } from '@/contexts/ToastContext';
+import { formatErrorMessage } from '@/utils/error';
 
 interface AuthContextType {
   user: User | null;
@@ -18,6 +20,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
+  const { showToast } = useToast();
 
   const refreshUser = useCallback(async () => {
     setIsLoading(true);
@@ -33,16 +36,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setUser(user);
     } catch (err: any) {
       setUser(null);
-      setError(null);
+      setError(err);
+      showToast(formatErrorMessage(err));
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [showToast]);
 
   const logout = useCallback(async () => {
-    await logoutApi();
-    setUser(null);
-  }, []);
+    try {
+      await logoutApi();
+      setUser(null);
+    } catch (err) {
+      showToast(formatErrorMessage(err));
+    }
+  }, [showToast]);
 
   useEffect(() => {
     refreshUser();
