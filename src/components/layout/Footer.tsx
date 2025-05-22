@@ -7,10 +7,15 @@ import { spacing } from '@/styles/theme/spacing';
 import { typography } from '@/styles/theme/typography';
 
 const FooterWrapper = styled.footer`
+  /* Layout */
   width: 100%;
-  background-color: ${colors.gray[50]};
-  border-top: 1px solid ${colors.gray[200]};
+
+  /* Box Model */
   padding: ${spacing[8]} 0;
+  border-top: 1px solid ${colors.gray[200]};
+
+  /* Visual */
+  background-color: ${colors.gray[50]};
 `;
 
 const FooterContainer = styled.div`

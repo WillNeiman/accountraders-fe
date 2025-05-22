@@ -24,23 +24,33 @@ interface ListingGridProps {
 }
 
 const Container = styled.div`
-  position: relative;
   min-height: 400px;
+  width: 100%;
+  position: relative;
 `;
 
-const FilterHeader = styled.div`
+const FilterToolbar = styled.div`
+  /* Layout */
   position: sticky;
-  top: 0px; // 헤더 높이만큼 아래로
-  z-index: ${zIndex.sticky};
+  top: 57px;
   display: flex;
   align-items: center;
   gap: ${spacing[4]};
+  width: 100%;
+
+  /* Box Model */
   padding: ${spacing[4]} 0;
+  margin-bottom: ${spacing[4]};
+
+  /* Visual */
   background: linear-gradient(
     to bottom,
-    rgba(255, 255, 255, 1) 0%,
-    rgba(255, 255, 255, 0) 100%
+    ${colors.background.default} 0%,
+    ${colors.background.default}00 100%
   );
+
+  /* Others */
+  z-index: ${zIndex.sticky};
 `;
 
 const Grid = styled.div`
@@ -60,13 +70,20 @@ const PaginationContainer = styled.div`
 `;
 
 const PageButton = styled.button<{ isActive?: boolean }>`
+  /* Box Model */
   padding: ${spacing[2]} ${spacing[4]};
   border: 1px solid ${props => props.isActive ? colors.primary[600] : colors.gray[300]};
-  background-color: ${props => props.isActive ? colors.primary[600] : 'white'};
-  color: ${props => props.isActive ? 'white' : colors.gray[700]};
   border-radius: 4px;
-  cursor: pointer;
+
+  /* Visual */
+  background-color: ${props => props.isActive ? colors.primary[600] : 'white'};
+
+  /* Typography */
   font-size: ${typography.fontSize.sm};
+  color: ${props => props.isActive ? 'white' : colors.gray[700]};
+
+  /* Others */
+  cursor: pointer;
   transition: all 0.2s;
 
   &:hover {
@@ -96,10 +113,10 @@ const ListingGrid = ({
 
   return (
     <Container>
-      <FilterHeader>
+      <FilterToolbar>
         <FilterButton onClick={onOpenFilter} size="default" />
         <FilterTags filters={filters} onRemoveFilter={onRemoveFilter} />
-      </FilterHeader>
+      </FilterToolbar>
       <Grid>
         {currentListings.map((listing) => (
           <ListingCard key={listing.listing_id} listing={listing} />

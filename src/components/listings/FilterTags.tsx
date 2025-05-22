@@ -17,20 +17,25 @@ interface FilterTagsProps {
 
 const TagsContainer = styled.div`
   display: flex;
-  flex-wrap: wrap;
   gap: ${spacing[2]};
-  align-items: center;
-  flex: 1;
 `;
 
 const Tag = styled.div`
+  /* Layout */
   display: flex;
   align-items: center;
   gap: ${spacing[2]};
+  height: 32px;
+
+  /* Box Model */
   padding: ${spacing[1.5]} ${spacing[3]};
-  background-color: ${colors.primary[50]};
   border: 1px solid ${colors.primary[100]};
   border-radius: 20px;
+
+  /* Visual */
+  background-color: ${colors.primary[50]};
+
+  /* Typography */
   font-size: ${typography.fontSize.sm};
   color: ${colors.primary[700]};
 `;

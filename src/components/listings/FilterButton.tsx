@@ -9,16 +9,26 @@ interface FilterButtonProps {
 }
 
 const Button = styled.button<{ size: 'default' | 'large' }>`
-  background-color: ${colors.primary[600]};
-  color: white;
-  border: none;
-  border-radius: 999px;
-  padding: ${props => props.size === 'large' ? spacing[3] : spacing[1.5]} ${props => props.size === 'large' ? spacing[5] : spacing[3]};
-  font-size: ${props => props.size === 'large' ? typography.fontSize.base : typography.fontSize.sm};
-  font-weight: ${typography.fontWeight.medium};
+  /* Layout */
   display: flex;
   align-items: center;
   gap: ${spacing[2]};
+  height: 32px;
+
+  /* Box Model */
+  padding: ${props => props.size === 'large' ? spacing[3] : spacing[1.5]} ${props => props.size === 'large' ? spacing[5] : spacing[3]};
+  border: none;
+  border-radius: 20px;
+
+  /* Visual */
+  background-color: ${colors.primary[600]};
+
+  /* Typography */
+  font-size: ${props => props.size === 'large' ? typography.fontSize.base : typography.fontSize.sm};
+  font-weight: ${typography.fontWeight.medium};
+  color: white;
+
+  /* Others */
   cursor: pointer;
   transition: background-color 0.2s;
 

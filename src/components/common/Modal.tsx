@@ -12,10 +12,10 @@ const Overlay = styled.div<{ isOpen: boolean }>`
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
+  background-color: ${colors.gray[900]}80;
   opacity: ${props => props.isOpen ? 1 : 0};
   visibility: ${props => props.isOpen ? 'visible' : 'hidden'};
   transition: all 0.3s ease-in-out;
@@ -73,14 +73,23 @@ const ModalContainer = styled.div<{ isOpen: boolean }>`
 `;
 
 const CloseButton = styled.button`
+  /* Layout */
   position: absolute;
   top: ${spacing[4]};
   right: ${spacing[4]};
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: ${colors.gray[500]};
+
+  /* Box Model */
   padding: ${spacing[2]};
+  border: none;
+
+  /* Visual */
+  background: none;
+
+  /* Typography */
+  color: ${colors.gray[500]};
+
+  /* Others */
+  cursor: pointer;
   transition: color 0.2s;
 
   &:hover {

@@ -5,16 +5,24 @@ import { typography } from '@/styles/theme/typography';
 import { ButtonProps } from '@/types/components';
 
 const StyledButton = styled.button<ButtonProps>`
+  /* Layout */
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-weight: ${typography.fontWeight.medium};
-  border-radius: ${spacing[2]};
-  transition: all 0.2s;
-  cursor: pointer;
-  white-space: nowrap;
-  font-family: ${typography.fontFamily.sans};
   width: ${props => props.fullWidth ? '100%' : 'auto'};
+  white-space: nowrap;
+
+  /* Box Model */
+  border-radius: ${spacing[2]};
+  border: none;
+
+  /* Typography */
+  font-family: ${typography.fontFamily.sans};
+  font-weight: ${typography.fontWeight.medium};
+
+  /* Others */
+  cursor: pointer;
+  transition: all 0.2s;
 
   /* Variants */
   ${props => {
@@ -23,7 +31,6 @@ const StyledButton = styled.button<ButtonProps>`
         return `
           background-color: ${colors.primary[600]};
           color: ${colors.background.default};
-          border: none;
           &:hover:not(:disabled) {
             background-color: ${colors.primary[700]};
           }
@@ -32,7 +39,6 @@ const StyledButton = styled.button<ButtonProps>`
         return `
           background-color: ${colors.gray[100]};
           color: ${colors.gray[800]};
-          border: none;
           &:hover:not(:disabled) {
             background-color: ${colors.gray[200]};
           }
@@ -41,7 +47,6 @@ const StyledButton = styled.button<ButtonProps>`
         return `
           background: none;
           color: ${colors.gray[700]};
-          border: none;
           padding: ${spacing[1]} ${spacing[2]};
           &:hover:not(:disabled) {
             color: ${colors.gray[500]};

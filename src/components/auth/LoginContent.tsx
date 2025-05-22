@@ -2,36 +2,49 @@ import styled from '@emotion/styled';
 import { spacing } from '@/styles/theme/spacing';
 import LoginForm from './LoginForm';
 import Button from '../common/Button';
+import { colors } from '@/styles/theme/colors';
+import { typography } from '@/styles/theme/typography';
 
 const Container = styled.div`
+  /* Layout */
   display: flex;
   flex-direction: column;
   gap: ${spacing[6]};
 `;
 
 const Header = styled.div`
+  /* Typography */
   text-align: center;
 `;
 
 const Logo = styled.h1`
-  font-size: 24px;
-  font-weight: bold;
+  /* Typography */
+  font-size: ${typography.fontSize['2xl']};
+  font-weight: ${typography.fontWeight.bold};
+  color: ${colors.text.primary};
+
+  /* Box Model */
   margin-bottom: ${spacing[2]};
 `;
 
 const Subtitle = styled.p`
-  color: #666;
+  /* Typography */
+  color: ${colors.text.secondary};
 `;
 
 const LoginOptions = styled.div`
+  /* Layout */
   display: flex;
   justify-content: space-between;
+
+  /* Box Model */
   margin-top: ${spacing[2]};
 `;
 
 const Terms = styled.p`
-  font-size: 14px;
-  color: #666;
+  /* Typography */
+  font-size: ${typography.fontSize.sm};
+  color: ${colors.text.secondary};
   text-align: center;
 `;
 
