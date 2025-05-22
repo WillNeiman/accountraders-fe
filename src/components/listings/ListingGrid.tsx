@@ -105,6 +105,9 @@ const GridContainer = styled.div`
   flex-direction: column;
   gap: ${theme.spacing[4]};
   padding: ${theme.spacing[4]};
+  max-width: 1280px;
+  margin: 0 auto;
+  width: 100%;
 `;
 
 const LoadingMessage = styled.div`
@@ -170,7 +173,7 @@ export const ListingGrid = () => {
       </div>
       <Grid>
         {listings.map((listing) => (
-          <ListingCard key={listing.listing_id} listing={listing} />
+          <ListingCard key={listing.listingId} listing={listing} />
         ))}
       </Grid>
       <FilterModal
