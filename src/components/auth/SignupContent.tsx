@@ -93,7 +93,7 @@ export default function SignupContent({ onSubmit }: SignupContentProps) {
   return (
     <Container>
       <Header>
-        <Logo>ACCOUNTRADERS</Logo>
+        <Logo>CHANNELINK</Logo>
         <Subtitle>회원가입</Subtitle>
       </Header>
       <SignupForm 

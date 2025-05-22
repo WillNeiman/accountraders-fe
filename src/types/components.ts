@@ -5,6 +5,10 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'text' | 'outline';
   size?: 'small' | 'medium' | 'large';
   fullWidth?: boolean;
+  isLoading?: boolean;
+  leftIcon?: ReactNode;
+  rightIcon?: ReactNode;
+  loadingText?: string;
 }
 
 // Input 컴포넌트 타입
@@ -14,6 +18,14 @@ export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   helperText?: string;
   fullWidth?: boolean;
   hasError?: boolean;
+  validateOnBlur?: boolean;
+  validateOnChange?: boolean;
+  mask?: string;
+  maskPlaceholder?: string;
+  autoComplete?: string;
+  leftIcon?: ReactNode;
+  rightIcon?: ReactNode;
+  onValidation?: (value: string) => boolean | string;
 }
 
 // Modal 컴포넌트 타입

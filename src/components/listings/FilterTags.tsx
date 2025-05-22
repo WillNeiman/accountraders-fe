@@ -2,17 +2,11 @@ import styled from '@emotion/styled';
 import { colors } from '@/styles/theme/colors';
 import { typography } from '@/styles/theme/typography';
 import { spacing } from '@/styles/theme/spacing';
+import { ListingParams } from '@/types/listings';
 
 interface FilterTagsProps {
-  filters: {
-    category?: string;
-    minPrice?: number;
-    maxPrice?: number;
-    minSubscribers?: number;
-    maxSubscribers?: number;
-    sortBy?: 'price' | 'subscribers' | 'views' | 'recent';
-  };
-  onRemoveFilter: (key: string) => void;
+  filters: ListingParams;
+  onRemoveFilter: (key: keyof ListingParams) => void;
 }
 
 const TagsContainer = styled.div`
@@ -134,7 +128,7 @@ const FilterTags = ({ filters, onRemoveFilter }: FilterTagsProps) => {
       {tags.map(({ key, label }) => (
         <Tag key={key}>
           {label}
-          <RemoveButton onClick={() => onRemoveFilter(key)} type="button">
+          <RemoveButton onClick={() => onRemoveFilter(key as keyof ListingParams)} type="button">
             <svg
               viewBox="0 0 24 24"
               fill="none"

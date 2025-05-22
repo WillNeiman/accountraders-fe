@@ -1,5 +1,5 @@
 import { AxiosError } from 'axios';
-import { api } from '@/lib/api';
+import { apiClient } from '@/lib/api/apiClient';
 import Cookies from 'js-cookie';
 import { User } from '@/types/user';
 
@@ -24,7 +24,7 @@ interface LoginResponse {
 // 로그인 API
 export const login = async (data: LoginRequest): Promise<void> => {
   try {
-    await api.post<LoginResponse>('/api/v1/auth/login', data);
+    await apiClient.post('/api/v1/auth/login', data);
     // 서버가 Set-Cookie 헤더를 통해 토큰을 설정하므로 추가 작업 불필요
   } catch (error) {
     if (error instanceof AxiosError) {
@@ -40,7 +40,7 @@ export const login = async (data: LoginRequest): Promise<void> => {
 // 회원가입 API
 export const signup = async (data: SignupRequest): Promise<void> => {
   try {
-    await api.post('/api/v1/users', data);
+    await apiClient.post('/api/v1/users', data);
   } catch (error) {
     console.error('Signup failed:', error);
     throw error;
@@ -50,7 +50,7 @@ export const signup = async (data: SignupRequest): Promise<void> => {
 // 현재 로그인한 사용자 정보 가져오기
 export async function getCurrentUser(): Promise<User> {
   try {
-    const response = await api.get<User>('/api/v1/auth/me');
+    const response = await apiClient.get<User>('/api/v1/users/me');
     return response.data;
   } catch (error) {
     console.error('Failed to get current user:', error);
@@ -61,7 +61,7 @@ export async function getCurrentUser(): Promise<User> {
 // 로그아웃
 export const logout = async () => {
   try {
-    await api.post('/api/v1/auth/logout');
+    await apiClient.post('/api/v1/auth/logout');
     // 쿠키 삭제는 서버에서 처리
   } catch (error) {
     console.error('Logout failed:', error);
@@ -70,6 +70,9 @@ export const logout = async () => {
 };
 
 // 현재 액세스 토큰 가져오기 (get만 남김)
-export const getAccessToken = () => Cookies.get('accessToken');
+export const getAccessToken = () => {
+  if (typeof window === 'undefined') return undefined;
+  return Cookies.get('accessToken');
+};
 
 export const isAuthenticated = () => !!getAccessToken(); 

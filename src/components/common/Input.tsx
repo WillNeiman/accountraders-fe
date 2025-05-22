@@ -3,19 +3,41 @@ import { colors } from '@/styles/theme/colors';
 import { spacing } from '@/styles/theme/spacing';
 import { typography } from '@/styles/theme/typography';
 import { InputProps } from '@/types/components';
+import { useState, useId } from 'react';
 
 const InputWrapper = styled.div<{ fullWidth?: boolean }>`
+  /* Layout */
   display: flex;
   flex-direction: column;
   width: ${props => props.fullWidth ? '100%' : 'auto'};
+  position: relative;
 `;
 
-const StyledInput = styled.input<{ error?: string }>`
+const InputContainer = styled.div`
+  /* Layout */
+  display: flex;
+  align-items: center;
+  position: relative;
+`;
+
+const StyledInput = styled.input<{ error?: string; hasLeftIcon?: boolean; hasRightIcon?: boolean }>`
   /* Layout */
   width: 100%;
 
   /* Box Model */
-  padding: ${spacing[3]} ${spacing[4]};
+  padding: ${props => {
+    const basePadding = `${spacing[3]} ${spacing[4]}`;
+    if (props.hasLeftIcon && props.hasRightIcon) {
+      return `${spacing[3]} ${spacing[10]}`;
+    }
+    if (props.hasLeftIcon) {
+      return `${spacing[3]} ${spacing[4]} ${spacing[3]} ${spacing[10]}`;
+    }
+    if (props.hasRightIcon) {
+      return `${spacing[3]} ${spacing[10]} ${spacing[3]} ${spacing[4]}`;
+    }
+    return basePadding;
+  }};
   border: 1px solid ${props => props.error ? colors.error.main : colors.gray[300]};
   border-radius: ${spacing[2]};
 
@@ -28,7 +50,7 @@ const StyledInput = styled.input<{ error?: string }>`
   color: ${colors.text.primary};
 
   /* Others */
-  transition: all 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s;
 
   &::placeholder {
     color: ${colors.gray[400]};
@@ -43,18 +65,45 @@ const StyledInput = styled.input<{ error?: string }>`
     background-color: ${colors.gray[50]};
     cursor: not-allowed;
   }
+
+  /* Responsive */
+  @media (max-width: 640px) {
+    font-size: ${typography.fontSize.sm};
+    padding: ${spacing[2]} ${spacing[3]};
+  }
 `;
 
 const Label = styled.label`
+  /* Typography */
   font-size: ${typography.fontSize.sm};
   color: ${colors.text.primary};
+  font-weight: ${typography.fontWeight.medium};
+
+  /* Box Model */
   margin-bottom: ${spacing[1]};
 `;
 
 const HelperText = styled.span<{ error?: boolean }>`
+  /* Typography */
   font-size: ${typography.fontSize.sm};
   color: ${props => props.error ? colors.error.main : colors.text.secondary};
+
+  /* Box Model */
   margin-top: ${spacing[1]};
+`;
+
+const IconWrapper = styled.div<{ position: 'left' | 'right' }>`
+  /* Layout */
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  ${props => props.position === 'left' ? 'left' : 'right'}: ${spacing[3]};
+  top: 50%;
+  transform: translateY(-50%);
+
+  /* Typography */
+  color: ${colors.gray[500]};
 `;
 
 const Input = ({
@@ -63,21 +112,72 @@ const Input = ({
   helperText,
   fullWidth = false,
   className = '',
+  validateOnBlur = false,
+  validateOnChange = false,
+  onValidation,
+  leftIcon,
+  rightIcon,
+  id,
   ...props
 }: InputProps) => {
-  const hasError = Boolean(error);
+  const [localError, setLocalError] = useState<string | undefined>(error);
+  const inputId = useId();
+  const helperId = useId();
+  const hasError = Boolean(localError);
+
+  const handleValidation = (value: string) => {
+    if (onValidation) {
+      const result = onValidation(value);
+      if (typeof result === 'string') {
+        setLocalError(result);
+      } else if (!result) {
+        setLocalError('유효하지 않은 입력입니다');
+      } else {
+        setLocalError(undefined);
+      }
+    }
+  };
+
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    if (validateOnBlur) {
+      handleValidation(e.target.value);
+    }
+    props.onBlur?.(e);
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (validateOnChange) {
+      handleValidation(e.target.value);
+    }
+    props.onChange?.(e);
+  };
 
   return (
     <InputWrapper fullWidth={fullWidth}>
-      {label && <Label>{label}</Label>}
-      <StyledInput
-        className={className}
-        error={error}
-        {...props}
-      />
-      {(helperText || error) && (
-        <HelperText error={hasError}>
-          {error || helperText}
+      {label && (
+        <Label htmlFor={id || inputId}>
+          {label}
+        </Label>
+      )}
+      <InputContainer>
+        {leftIcon && <IconWrapper position="left">{leftIcon}</IconWrapper>}
+        <StyledInput
+          id={id || inputId}
+          className={className}
+          error={localError}
+          hasLeftIcon={Boolean(leftIcon)}
+          hasRightIcon={Boolean(rightIcon)}
+          aria-invalid={hasError}
+          aria-describedby={helperId}
+          onBlur={handleBlur}
+          onChange={handleChange}
+          {...props}
+        />
+        {rightIcon && <IconWrapper position="right">{rightIcon}</IconWrapper>}
+      </InputContainer>
+      {(helperText || localError) && (
+        <HelperText id={helperId} error={hasError}>
+          {localError || helperText}
         </HelperText>
       )}
     </InputWrapper>

@@ -4,10 +4,11 @@ import styled from "@emotion/styled";
 import { colors } from "@/styles/theme/colors";
 import { spacing } from "@/styles/theme/spacing";
 import Footer from './Footer';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import LoginModal from '../auth/LoginModal';
 import SignupModal from '../auth/SignupModal';
 import { zIndex } from "@/styles/theme/zIndex";
+import { useAuth } from '@/contexts/AuthContext';
 
 const HeaderContainer = styled.header`
   position: fixed;
@@ -85,6 +86,12 @@ export default function ClientLayout({
 }) {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isSignupModalOpen, setIsSignupModalOpen] = useState(false);
+  const { user, isLoading, logout } = useAuth();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <>
@@ -92,8 +99,19 @@ export default function ClientLayout({
         <Nav>
           <Logo href="/">CHANNELINK</Logo>
           <NavLinks>
-            <NavLink onClick={() => setIsLoginModalOpen(true)}>로그인</NavLink>
-            <NavLink onClick={() => setIsSignupModalOpen(true)}>회원가입</NavLink>
+            {!mounted ? null : isLoading ? (
+              <span>로딩중...</span>
+            ) : user ? (
+              <>
+                <span>{user.nickname}님</span>
+                <NavLink onClick={logout}>로그아웃</NavLink>
+              </>
+            ) : (
+              <>
+                <NavLink onClick={() => setIsLoginModalOpen(true)}>로그인</NavLink>
+                <NavLink onClick={() => setIsSignupModalOpen(true)}>회원가입</NavLink>
+              </>
+            )}
           </NavLinks>
         </Nav>
       </HeaderContainer>

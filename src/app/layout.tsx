@@ -5,6 +5,7 @@ import { Noto_Sans_KR } from 'next/font/google'
 import './globals.css'
 import { ToastProvider } from '@/contexts/ToastContext'
 import ClientLayout from '@/components/layout/ClientLayout'
+import { AuthProvider } from '@/contexts/AuthContext'
 
 const notoSansKr = Noto_Sans_KR({ subsets: ['latin'] })
 
@@ -19,10 +20,15 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="ko">
+    <html 
+    lang="ko"
+    suppressHydrationWarning
+    >
       <body className={notoSansKr.className}>
         <ToastProvider>
-          <ClientLayout>{children}</ClientLayout>
+          <AuthProvider>
+            <ClientLayout>{children}</ClientLayout>
+          </AuthProvider>
         </ToastProvider>
       </body>
     </html>
