@@ -11,14 +11,23 @@ const InputWrapper = styled.div<{ fullWidth?: boolean }>`
 `;
 
 const StyledInput = styled.input<{ error?: string }>`
+  /* Layout */
   width: 100%;
+
+  /* Box Model */
   padding: ${spacing[3]} ${spacing[4]};
   border: 1px solid ${props => props.error ? colors.error.main : colors.gray[300]};
   border-radius: ${spacing[2]};
-  font-size: ${typography.fontSize.base};
-  color: ${colors.text.primary};
+
+  /* Visual */
   background-color: ${colors.background.default};
   outline: none;
+
+  /* Typography */
+  font-size: ${typography.fontSize.base};
+  color: ${colors.text.primary};
+
+  /* Others */
   transition: all 0.2s;
 
   &::placeholder {

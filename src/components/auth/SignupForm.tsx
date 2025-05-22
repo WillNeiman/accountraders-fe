@@ -4,17 +4,22 @@ import Input from '@/components/common/Input';
 import PasswordInput from '@/components/common/PasswordInput';
 import { spacing } from '@/styles/theme/spacing';
 import { colors } from '@/styles/theme/colors';
+import { typography } from '@/styles/theme/typography';
 
 const Form = styled.form`
+  /* Layout */
   display: flex;
   flex-direction: column;
   gap: ${spacing[2]};
 `;
 
 const FormGroup = styled.div`
+  /* Layout */
   display: flex;
   flex-direction: column;
   position: relative;
+
+  /* Box Model */
   height: 75px;
 
   &.password-group {
@@ -24,27 +29,37 @@ const FormGroup = styled.div`
 `;
 
 const LabelContainer = styled.div`
+  /* Layout */
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2px;
+
+  /* Box Model */
+  margin-bottom: ${spacing[0.5]};
 `;
 
 const Label = styled.label`
-  font-size: 14px;
-  color: #333;
-  font-weight: 500;
+  /* Layout */
   display: flex;
   align-items: center;
+
+  /* Typography */
+  font-size: ${typography.fontSize.sm};
+  color: ${colors.text.primary};
+  font-weight: ${typography.fontWeight.medium};
 `;
 
 const RequiredMark = styled.span`
-  color: #ff4444;
-  margin-left: 4px;
+  /* Box Model */
+  margin-left: ${spacing[1]};
+
+  /* Typography */
+  color: ${colors.error.main};
 `;
 
 const ValidationMessage = styled.span<{ isValid?: boolean; isError?: boolean }>`
-  font-size: 13px;
+  /* Typography */
+  font-size: ${typography.fontSize.xs};
   color: ${props => {
     if (props.isError) return colors.error.main;
     return props.isValid ? colors.success.main : colors.gray[500];

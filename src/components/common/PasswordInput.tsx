@@ -3,25 +3,38 @@ import styled from '@emotion/styled';
 import { Eye, EyeOff } from 'lucide-react';
 import Input from './Input';
 import { colors } from '@/styles/theme/colors';
+import { spacing } from '@/styles/theme/spacing';
 
 const InputWrapper = styled.div`
+  /* Layout */
   position: relative;
+
+  /* Box Model */
   width: 100%;
 `;
 
 const ToggleButton = styled.button`
+  /* Layout */
   position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 4px;
-  color: ${colors.gray[500]};
   display: flex;
   align-items: center;
   justify-content: center;
+  right: ${spacing[3]};
+  top: 50%;
+  transform: translateY(-50%);
+
+  /* Box Model */
+  padding: ${spacing[1]};
+
+  /* Visual */
+  background: none;
+  border: none;
+
+  /* Typography */
+  color: ${colors.gray[500]};
+
+  /* Others */
+  cursor: pointer;
 
   &:hover {
     color: ${colors.gray[700]};
@@ -29,27 +42,34 @@ const ToggleButton = styled.button`
 `;
 
 const StrengthContainer = styled.div`
-  margin-top: 4px;
-  margin-bottom: -8px;
+  /* Box Model */
+  margin-top: ${spacing[1]};
+  margin-bottom: -${spacing[2]};
 `;
 
 const StrengthBar = styled.div`
-  height: 4px;
-  border-radius: 2px;
+  /* Box Model */
+  height: ${spacing[1]};
+  border-radius: ${spacing[0.5]};
+
+  /* Visual */
   overflow: hidden;
 `;
 
 const StrengthIndicator = styled.div<{ strength: number }>`
+  /* Box Model */
   height: 100%;
   width: ${props => {
-  switch (props.strength) {
-    case 0: return '0%';
-    case 1: return '33.33%';
-    case 2: return '66.66%';
-    case 3: return '100%';
-    default: return '0%';
-  }
-}};
+    switch (props.strength) {
+      case 0: return '0%';
+      case 1: return '33.33%';
+      case 2: return '66.66%';
+      case 3: return '100%';
+      default: return '0%';
+    }
+  }};
+
+  /* Visual */
   background-color: ${props => {
     switch (props.strength) {
       case 1:
@@ -62,11 +82,16 @@ const StrengthIndicator = styled.div<{ strength: number }>`
         return colors.gray[200];
     }
   }};
+
+  /* Others */
   transition: all 0.3s ease-in-out;
 `;
 
 const StrengthText = styled.p<{ strength: number }>`
+  /* Box Model */
   margin: 4px 0 0;
+
+  /* Typography */
   font-size: 12px;
   color: ${props => {
     switch (props.strength) {

@@ -40,7 +40,7 @@ const FilterSection = styled.div`
   }
 `;
 
-const FilterHeader = styled.div`
+const FilterSectionHeader = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -55,13 +55,20 @@ const FilterTitle = styled.h3`
 `;
 
 const Select = styled.select`
+  /* Layout */
   width: 100%;
+
+  /* Box Model */
   padding: ${spacing[1.5]} ${spacing[2]};
   border: 1px solid ${colors.gray[300]};
   border-radius: 4px;
+
+  /* Visual */
+  background-color: white;
+
+  /* Typography */
   font-size: ${typography.fontSize.sm};
   color: ${colors.text.primary};
-  background-color: white;
 
   &:focus {
     outline: none;
@@ -202,12 +209,12 @@ const FilterModal = ({ isOpen, onClose, onFilterChange, initialFilters = {} }: F
         </FilterSection>
 
         <FilterSection>
-          <FilterHeader>
+          <FilterSectionHeader>
             <FilterTitle>가격 범위</FilterTitle>
             {(errors.minPrice || errors.maxPrice) && (
               <ErrorMessage>{errors.minPrice || errors.maxPrice}</ErrorMessage>
             )}
-          </FilterHeader>
+          </FilterSectionHeader>
           <RangeInputContainer>
             <RangeInput
               type="number"
@@ -236,12 +243,12 @@ const FilterModal = ({ isOpen, onClose, onFilterChange, initialFilters = {} }: F
         </FilterSection>
 
         <FilterSection>
-          <FilterHeader>
+          <FilterSectionHeader>
             <FilterTitle>구독자 수</FilterTitle>
             {(errors.minSubscribers || errors.maxSubscribers) && (
               <ErrorMessage>{errors.minSubscribers || errors.maxSubscribers}</ErrorMessage>
             )}
-          </FilterHeader>
+          </FilterSectionHeader>
           <RangeInputContainer>
             <RangeInput
               type="number"

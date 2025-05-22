@@ -11,28 +11,37 @@ import { useState } from 'react';
 import { generateDummyListings } from '@/lib/dummyData';
 
 const PageContainer = styled.div`
+  /* Box Model */
   max-width: 1280px;
   margin: 0 auto;
 `;
 
 const PageHeader = styled.div`
+  /* Box Model */
   padding: ${spacing[6]} ${spacing[4]};
+
+  /* Visual */
   background: white;
 `;
 
 const Title = styled.h1`
+  /* Typography */
   font-size: ${typography.fontSize['2xl']};
   font-weight: ${typography.fontWeight.bold};
   color: ${colors.text.primary};
+
+  /* Box Model */
   margin-bottom: ${spacing[2]};
 `;
 
 const Subtitle = styled.p`
+  /* Typography */
   font-size: ${typography.fontSize.lg};
   color: ${colors.text.secondary};
 `;
 
-const MainContent = styled.div`
+const PageContent = styled.div`
+  /* Box Model */
   padding: ${spacing[4]};
 `;
 
@@ -68,14 +77,14 @@ export default function Home() {
         <Subtitle>검증된 유튜브 채널을 안전하게 거래하세요</Subtitle>
       </PageHeader>
 
-      <MainContent>
+      <PageContent>
         <ListingGrid
           listings={dummyListings}
           onOpenFilter={() => setIsFilterModalOpen(true)}
           filters={filters}
           onRemoveFilter={handleRemoveFilter}
         />
-      </MainContent>
+      </PageContent>
       
       <FilterModal
         isOpen={isFilterModalOpen}

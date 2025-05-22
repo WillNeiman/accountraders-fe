@@ -18,16 +18,23 @@ interface ListingCardProps {
 }
 
 const Card = styled.div`
+  /* Layout */
+  overflow: hidden;
+
+  /* Box Model */
   border: 1px solid ${colors.gray[200]};
   border-radius: 12px;
-  overflow: hidden;
-  transition: transform 0.2s, box-shadow 0.2s;
+
+  /* Visual */
   background: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+  /* Others */
   cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
 
   &:hover {
     transform: translateY(-4px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   }
 `;
 

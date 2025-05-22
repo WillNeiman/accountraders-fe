@@ -7,6 +7,7 @@ import Footer from './Footer';
 import { useState } from 'react';
 import LoginModal from '../auth/LoginModal';
 import SignupModal from '../auth/SignupModal';
+import { zIndex } from "@/styles/theme/zIndex";
 
 const HeaderContainer = styled.header`
   position: fixed;
@@ -16,7 +17,7 @@ const HeaderContainer = styled.header`
   background: white;
   padding: ${spacing[4]};
   border-bottom: 1px solid ${colors.gray[200]};
-  z-index: 30;
+  z-index: ${zIndex.fixed};
 `;
 
 const Nav = styled.nav`
@@ -56,10 +57,25 @@ const NavLink = styled.button`
 const HEADER_HEIGHT = '57px'; // 헤더 높이
 
 const Main = styled.main<{ hasHeader: boolean }>`
+  /* Layout */
+  display: flex;
+  flex-direction: column;
+  position: relative;
+
+  /* Box Model */
   margin-top: ${props => props.hasHeader ? HEADER_HEIGHT : '0'};
-  height: ${props => props.hasHeader ? `calc(100vh - ${HEADER_HEIGHT})` : '100vh'};
+  min-height: ${props => props.hasHeader ? `calc(100vh - ${HEADER_HEIGHT})` : '100vh'};
+
+  /* Others */
   overflow-y: auto;
-  /* Footer가 Main 외부에 있다면 Footer 높이만큼 padding-bottom 추가 고려 */
+`;
+
+const LayoutContent = styled.div`
+  /* Layout */
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  flex: 1;
 `;
 
 export default function ClientLayout({
@@ -81,8 +97,12 @@ export default function ClientLayout({
           </NavLinks>
         </Nav>
       </HeaderContainer>
-      <Main hasHeader>{children}</Main>
-      <Footer />
+      <Main hasHeader>
+        <LayoutContent>
+          {children}
+        </LayoutContent>
+        <Footer />
+      </Main>
       <LoginModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
       <SignupModal isOpen={isSignupModalOpen} onClose={() => setIsSignupModalOpen(false)} />
     </>

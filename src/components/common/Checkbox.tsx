@@ -1,53 +1,79 @@
 import styled from '@emotion/styled';
 import React from 'react';
+import { colors } from '@/styles/theme/colors';
+import { spacing } from '@/styles/theme/spacing';
+import { typography } from '@/styles/theme/typography';
 
 const CheckboxContainer = styled.label`
+  /* Layout */
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: ${spacing[2]};
+
+  /* Others */
   cursor: pointer;
   user-select: none;
 `;
 
 const HiddenCheckbox = styled.input`
+  /* Layout */
   position: absolute;
-  opacity: 0;
-  cursor: pointer;
+
+  /* Box Model */
   height: 0;
   width: 0;
+
+  /* Visual */
+  opacity: 0;
+
+  /* Others */
+  cursor: pointer;
 `;
 
 const StyledCheckbox = styled.div<{ checked: boolean }>`
+  /* Layout */
   display: inline-block;
-  width: 20px;
-  height: 20px;
-  background: ${props => props.checked ? '#0070f3' : '#fff'};
-  border: 2px solid ${props => props.checked ? '#0070f3' : '#ddd'};
-  border-radius: 4px;
-  transition: all 150ms;
   position: relative;
 
+  /* Box Model */
+  width: 20px;
+  height: 20px;
+  border: 2px solid ${props => props.checked ? colors.primary[600] : colors.gray[300]};
+  border-radius: ${spacing[1]};
+
+  /* Visual */
+  background: ${props => props.checked ? colors.primary[600] : colors.background.default};
+
+  /* Others */
+  transition: all 150ms;
+
   &:hover {
-    border-color: ${props => props.checked ? '#0070f3' : '#999'};
+    border-color: ${props => props.checked ? colors.primary[600] : colors.gray[400]};
   }
 
   &::after {
-    content: '';
+    /* Layout */
     position: absolute;
     display: ${props => props.checked ? 'block' : 'none'};
     left: 6px;
     top: 2px;
+
+    /* Box Model */
     width: 5px;
     height: 10px;
-    border: solid white;
+    border: solid ${colors.background.default};
     border-width: 0 2px 2px 0;
+
+    /* Others */
+    content: '';
     transform: rotate(45deg);
   }
 `;
 
 const Label = styled.span`
-  font-size: 14px;
-  color: #333;
+  /* Typography */
+  font-size: ${typography.fontSize.sm};
+  color: ${colors.text.primary};
 `;
 
 interface CheckboxProps {
