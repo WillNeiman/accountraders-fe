@@ -18,10 +18,6 @@ interface SignupRequest {
   profilePictureUrl?: string;
 }
 
-interface LoginResponse {
-  tokenType: string;
-}
-
 // 로그인 API
 export const login = async (data: LoginRequest): Promise<void> => {
   try {

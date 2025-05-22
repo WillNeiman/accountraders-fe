@@ -34,9 +34,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
       const user = await getCurrentUser();
       setUser(user);
-    } catch (err: any) {
+    } catch (err: Error | unknown) {
       setUser(null);
-      setError(err);
+      setError(err instanceof Error ? err : new Error('알 수 없는 오류가 발생했습니다.'));
       showToast(formatErrorMessage(err));
     } finally {
       setIsLoading(false);
