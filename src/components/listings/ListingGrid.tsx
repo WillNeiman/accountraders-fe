@@ -12,93 +12,11 @@ import FilterModal from './FilterModal';
 import { theme } from '@/styles/theme';
 import { zIndex } from '@/styles/theme/zIndex';
 
-interface ListingGridProps {
-  listings: Listing[];
-  onOpenFilter: () => void;
-  filters: {
-    category?: string;
-    minPrice?: number;
-    maxPrice?: number;
-    minSubscribers?: number;
-    maxSubscribers?: number;
-    sortBy?: 'price' | 'subscribers' | 'views' | 'recent';
-  };
-  onRemoveFilter: (key: string) => void;
-}
-
-const Container = styled.div`
-  min-height: 400px;
-  width: 100%;
-  position: relative;
-`;
-
-const FilterToolbar = styled.div`
-  /* Layout */
-  position: sticky;
-  top: 57px;
-  display: flex;
-  align-items: center;
-  gap: ${spacing[4]};
-  width: 100%;
-
-  /* Box Model */
-  padding: ${spacing[4]} 0;
-  margin-bottom: ${spacing[4]};
-
-  /* Visual */
-  background: linear-gradient(
-    to bottom,
-    ${colors.background.default} 0%,
-    ${colors.background.default}00 100%
-  );
-
-  /* Others */
-  z-index: ${zIndex.sticky};
-`;
-
 const Grid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: ${spacing[4]};
 `;
-
-const PaginationContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: ${spacing[2]};
-  margin-top: ${spacing[8]};
-  padding-bottom: ${spacing[8]};
-`;
-
-const PageButton = styled.button<{ isActive?: boolean }>`
-  /* Box Model */
-  padding: ${spacing[2]} ${spacing[4]};
-  border: 1px solid ${props => props.isActive ? colors.primary[600] : colors.gray[300]};
-  border-radius: 4px;
-
-  /* Visual */
-  background-color: ${props => props.isActive ? colors.primary[600] : 'white'};
-
-  /* Typography */
-  font-size: ${typography.fontSize.sm};
-  color: ${props => props.isActive ? 'white' : colors.gray[700]};
-
-  /* Others */
-  cursor: pointer;
-  transition: all 0.2s;
-
-  &:hover {
-    background-color: ${props => props.isActive ? colors.primary[700] : colors.gray[100]};
-  }
-
-  &:disabled {
-    cursor: not-allowed;
-    opacity: 0.5;
-  }
-`;
-
-const ITEMS_PER_PAGE = 16;
 
 const GridContainer = styled.div`
   display: flex;
@@ -161,7 +79,7 @@ export const ListingGrid = () => {
 
   return (
     <GridContainer>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div style={{ display: 'flex', gap: theme.spacing[4], alignItems: 'center' }}>
         <FilterButton onClick={() => setIsFilterModalOpen(true)} />
         <FilterTags filters={filters} onRemoveFilter={(key: keyof ListingParams) => {
           setFilters(prev => {
