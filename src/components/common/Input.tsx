@@ -1,9 +1,9 @@
+import { memo, useCallback, useState, useId } from 'react';
 import styled from '@emotion/styled';
 import { colors } from '@/styles/theme/colors';
 import { spacing } from '@/styles/theme/spacing';
 import { typography } from '@/styles/theme/typography';
 import { InputProps } from '@/types/components';
-import { useState, useId } from 'react';
 
 const InputWrapper = styled.div<{ fullWidth?: boolean }>`
   /* Layout */
@@ -106,7 +106,7 @@ const IconWrapper = styled.div<{ position: 'left' | 'right' }>`
   color: ${colors.gray[500]};
 `;
 
-const Input = ({
+const Input = memo(({
   label,
   error,
   helperText,
@@ -118,6 +118,8 @@ const Input = ({
   leftIcon,
   rightIcon,
   id,
+  onBlur,
+  onChange,
   ...props
 }: InputProps) => {
   const [localError, setLocalError] = useState<string | undefined>(error);
@@ -125,7 +127,7 @@ const Input = ({
   const helperId = useId();
   const hasError = Boolean(localError);
 
-  const handleValidation = (value: string) => {
+  const handleValidation = useCallback((value: string) => {
     if (onValidation) {
       const result = onValidation(value);
       if (typeof result === 'string') {
@@ -136,21 +138,21 @@ const Input = ({
         setLocalError(undefined);
       }
     }
-  };
+  }, [onValidation]);
 
-  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+  const handleBlur = useCallback((e: React.FocusEvent<HTMLInputElement>) => {
     if (validateOnBlur) {
       handleValidation(e.target.value);
     }
-    props.onBlur?.(e);
-  };
+    onBlur?.(e);
+  }, [validateOnBlur, handleValidation, onBlur]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     if (validateOnChange) {
       handleValidation(e.target.value);
     }
-    props.onChange?.(e);
-  };
+    onChange?.(e);
+  }, [validateOnChange, handleValidation, onChange]);
 
   return (
     <InputWrapper fullWidth={fullWidth}>
@@ -182,6 +184,8 @@ const Input = ({
       )}
     </InputWrapper>
   );
-};
+});
+
+Input.displayName = 'Input';
 
 export default Input; 

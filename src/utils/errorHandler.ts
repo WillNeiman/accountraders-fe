@@ -1,0 +1,37 @@
+import { useToast } from '@/contexts/ToastContext';
+
+export class AppError extends Error {
+  constructor(
+    message: string,
+    public code?: string,
+    public status?: number
+  ) {
+    super(message);
+    this.name = 'AppError';
+  }
+}
+
+export const handleError = (error: unknown) => {
+  const { showToast } = useToast();
+  
+  if (error instanceof AppError) {
+    showToast(error.message);
+  } else if (error instanceof Error) {
+    showToast('알 수 없는 오류가 발생했습니다');
+  } else {
+    showToast('알 수 없는 오류가 발생했습니다');
+  }
+};
+
+export const withErrorHandling = <T extends (...args: any[]) => Promise<any>>(
+  fn: T
+): ((...args: Parameters<T>) => Promise<ReturnType<T>>) => {
+  return async (...args: Parameters<T>) => {
+    try {
+      return await fn(...args);
+    } catch (error) {
+      handleError(error);
+      throw error;
+    }
+  };
+}; 

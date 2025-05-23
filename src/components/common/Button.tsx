@@ -1,3 +1,4 @@
+import { forwardRef, memo, useCallback } from 'react';
 import styled from '@emotion/styled';
 import { colors } from '@/styles/theme/colors';
 import { spacing } from '@/styles/theme/spacing';
@@ -129,7 +130,7 @@ const StyledButton = styled.button<ButtonProps>`
   }
 `;
 
-const Button = ({
+const Button = memo(forwardRef<HTMLButtonElement, ButtonProps>(({
   children,
   variant = 'primary',
   size = 'medium',
@@ -140,12 +141,20 @@ const Button = ({
   loadingText,
   className = '',
   disabled,
+  onClick,
   ...props
-}: ButtonProps) => {
+}, ref) => {
+  const handleClick = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+    if (!isLoading && !disabled && onClick) {
+      onClick(e);
+    }
+  }, [isLoading, disabled, onClick]);
+
   const content = isLoading ? loadingText || children : children;
   
   return (
     <StyledButton
+      ref={ref}
       variant={variant}
       size={size}
       fullWidth={fullWidth}
@@ -153,6 +162,7 @@ const Button = ({
       className={className}
       disabled={disabled || isLoading}
       aria-busy={isLoading}
+      onClick={handleClick}
       {...props}
     >
       {!isLoading && leftIcon}
@@ -160,6 +170,8 @@ const Button = ({
       {!isLoading && rightIcon}
     </StyledButton>
   );
-};
+}));
+
+Button.displayName = 'Button';
 
 export default Button; 

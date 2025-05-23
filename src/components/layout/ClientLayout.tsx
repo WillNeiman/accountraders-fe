@@ -1,13 +1,13 @@
 "use client";
 
+import { memo, useCallback, useState, useEffect } from 'react';
 import styled from "@emotion/styled";
 import { colors } from "@/styles/theme/colors";
 import { spacing } from "@/styles/theme/spacing";
+import { zIndex } from "@/styles/theme/zIndex";
 import Footer from './Footer';
-import { useState, useEffect } from 'react';
 import LoginModal from '../auth/LoginModal';
 import SignupModal from '../auth/SignupModal';
-import { zIndex } from "@/styles/theme/zIndex";
 import { useAuth } from '@/contexts/AuthContext';
 
 const HeaderContainer = styled.header`
@@ -79,11 +79,7 @@ const LayoutContent = styled.div`
   flex: 1;
 `;
 
-export default function ClientLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+const Header = memo(() => {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isSignupModalOpen, setIsSignupModalOpen] = useState(false);
   const { user, isLoading, logout } = useAuth();
@@ -93,36 +89,68 @@ export default function ClientLayout({
     setMounted(true);
   }, []);
 
+  const handleLoginClick = useCallback(() => {
+    setIsLoginModalOpen(true);
+  }, []);
+
+  const handleSignupClick = useCallback(() => {
+    setIsSignupModalOpen(true);
+  }, []);
+
+  const handleLoginClose = useCallback(() => {
+    setIsLoginModalOpen(false);
+  }, []);
+
+  const handleSignupClose = useCallback(() => {
+    setIsSignupModalOpen(false);
+  }, []);
+
+  return (
+    <HeaderContainer>
+      <Nav>
+        <Logo href="/">CHANNELINK</Logo>
+        <NavLinks>
+          {!mounted ? null : isLoading ? (
+            <span>로딩중...</span>
+          ) : user ? (
+            <>
+              <span>{user.nickname}님</span>
+              <NavLink onClick={logout}>로그아웃</NavLink>
+            </>
+          ) : (
+            <>
+              <NavLink onClick={handleLoginClick}>로그인</NavLink>
+              <NavLink onClick={handleSignupClick}>회원가입</NavLink>
+            </>
+          )}
+        </NavLinks>
+      </Nav>
+      <LoginModal isOpen={isLoginModalOpen} onClose={handleLoginClose} />
+      <SignupModal isOpen={isSignupModalOpen} onClose={handleSignupClose} />
+    </HeaderContainer>
+  );
+});
+
+Header.displayName = 'Header';
+
+const ClientLayout = memo(({
+  children,
+}: {
+  children: React.ReactNode
+}) => {
   return (
     <>
-      <HeaderContainer>
-        <Nav>
-          <Logo href="/">CHANNELINK</Logo>
-          <NavLinks>
-            {!mounted ? null : isLoading ? (
-              <span>로딩중...</span>
-            ) : user ? (
-              <>
-                <span>{user.nickname}님</span>
-                <NavLink onClick={logout}>로그아웃</NavLink>
-              </>
-            ) : (
-              <>
-                <NavLink onClick={() => setIsLoginModalOpen(true)}>로그인</NavLink>
-                <NavLink onClick={() => setIsSignupModalOpen(true)}>회원가입</NavLink>
-              </>
-            )}
-          </NavLinks>
-        </Nav>
-      </HeaderContainer>
+      <Header />
       <Main hasHeader>
         <LayoutContent>
           {children}
         </LayoutContent>
         <Footer />
       </Main>
-      <LoginModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
-      <SignupModal isOpen={isSignupModalOpen} onClose={() => setIsSignupModalOpen(false)} />
     </>
   );
-} 
+});
+
+ClientLayout.displayName = 'ClientLayout';
+
+export default ClientLayout; 
