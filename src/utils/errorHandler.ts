@@ -23,9 +23,9 @@ export const handleError = (error: unknown) => {
   }
 };
 
-export const withErrorHandling = <T extends (...args: any[]) => Promise<any>>(
+export const withErrorHandling = <T extends (...args: unknown[]) => Promise<unknown>>(
   fn: T
-): ((...args: Parameters<T>) => Promise<ReturnType<T>>) => {
+): ((...args: Parameters<T>) => Promise<unknown>) => {
   return async (...args: Parameters<T>) => {
     try {
       return await fn(...args);

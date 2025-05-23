@@ -1,5 +1,4 @@
 import { Component, ErrorInfo, ReactNode } from 'react';
-import { useToast } from '@/contexts/ToastContext';
 
 interface Props {
   children: ReactNode;
@@ -32,8 +31,6 @@ class ErrorBoundary extends Component<Props, State> {
 }
 
 const ErrorFallback = () => {
-  const { showToast } = useToast();
-
   const handleRetry = () => {
     window.location.reload();
   };
