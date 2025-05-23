@@ -56,28 +56,6 @@ const FilterTitle = styled.h3`
   text-align: left;
 `;
 
-const Select = styled.select`
-  /* Layout */
-  width: 100%;
-
-  /* Box Model */
-  padding: ${spacing[1.5]} ${spacing[2]};
-  border: 1px solid ${colors.gray[300]};
-  border-radius: 4px;
-
-  /* Visual */
-  background-color: white;
-
-  /* Typography */
-  font-size: ${typography.fontSize.sm};
-  color: ${colors.text.primary};
-
-  &:focus {
-    outline: none;
-    border-color: ${colors.primary[500]};
-  }
-`;
-
 const RangeInputContainer = styled.div`
   display: flex;
   gap: ${spacing[2]};
@@ -269,7 +247,6 @@ const FilterModal = ({ isOpen, onClose, onFilterChange, initialFilters = {} }: F
   const [localFilters, setLocalFilters] = useState<FilterValues>(initialFilters);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [categories, setCategories] = useState<YoutubeCategory[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -299,13 +276,9 @@ const FilterModal = ({ isOpen, onClose, onFilterChange, initialFilters = {} }: F
 
   const loadCategories = async () => {
     try {
-      setIsLoading(true);
-      const data = await fetchYoutubeCategories();
-      setCategories(data);
+      setCategories(await fetchYoutubeCategories());
     } catch (error) {
       console.error('Failed to load categories:', error);
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -372,7 +345,7 @@ const FilterModal = ({ isOpen, onClose, onFilterChange, initialFilters = {} }: F
 
   const handleSortChange = (field: string, direction: string) => {
     setLocalFilters(prev => {
-      let newSorts = (prev.sort || []).filter(sort => !sort.startsWith(field));
+      const newSorts = (prev.sort || []).filter(sort => !sort.startsWith(field));
       if (direction) {
         newSorts.push(`${field},${direction}`);
       }
