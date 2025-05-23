@@ -102,18 +102,21 @@ const MobileMenuOverlay = styled.div<{ isOpen: boolean }>`
 `;
 
 const MobileMenu = styled.div<{ isOpen: boolean }>`
-  display: ${({ isOpen }) => (isOpen ? 'flex' : 'none')};
-  flex-direction: column;
-  position: fixed;
-  top: 0;
-  right: 0;
-  width: 240px;
-  height: 100vh;
-  background: #fff;
-  padding: ${spacing[6]};
-  box-shadow: -2px 0 8px rgba(0,0,0,0.1);
-  z-index: ${zIndex.modal + 1};
-  gap: ${spacing[4]};
+  display: none;
+  @media (max-width: 767px) {
+    display: ${({ isOpen }) => (isOpen ? 'flex' : 'none')};
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 240px;
+    height: 100vh;
+    background: #fff;
+    padding: ${spacing[6]};
+    box-shadow: -2px 0 8px rgba(0,0,0,0.1);
+    z-index: ${zIndex.modal + 1};
+    gap: ${spacing[4]};
+  }
 `;
 
 // ClientLayout.tsx 예시 (필요시 적용)
@@ -167,18 +170,6 @@ const Header = memo(() => {
   const [isSignupModalOpen, setIsSignupModalOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, isLoading, logout } = useAuth();
-  const [mounted, setMounted] = useState(false);
-  const isMobile = useMediaQuery('sm');
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (!isMobile) {
-      setIsMenuOpen(false);
-    }
-  }, [isMobile]);
 
   const handleLoginClick = useCallback(() => {
     setIsLoginModalOpen(true);
@@ -213,8 +204,15 @@ const Header = memo(() => {
     <HeaderContainer role="banner">
       <Nav role="navigation" aria-label="메인 네비게이션">
         <Logo href="/" aria-label="홈으로 이동">CHANNELINK</Logo>
+        <MenuButton 
+          onClick={toggleMenu}
+          aria-label={isMenuOpen ? "메뉴 닫기" : "메뉴 열기"}
+          aria-expanded={isMenuOpen}
+        >
+          {isMenuOpen ? '✕' : '☰'}
+        </MenuButton>
         <NavLinks>
-          {!mounted ? null : isLoading ? (
+          {isLoading ? (
             <span>로딩중...</span>
           ) : user ? (
             <>
@@ -246,48 +244,41 @@ const Header = memo(() => {
             </>
           )}
         </NavLinks>
-        <MenuButton 
-          onClick={toggleMenu}
-          aria-label={isMenuOpen ? "메뉴 닫기" : "메뉴 열기"}
-          aria-expanded={isMenuOpen}
-        >
-          {isMenuOpen ? '✕' : '☰'}
-        </MenuButton>
+        <MobileMenuOverlay isOpen={isMenuOpen} onClick={() => setIsMenuOpen(false)} />
+        <MobileMenu isOpen={isMenuOpen}>
+          {isLoading ? (
+            <span>로딩중...</span>
+          ) : user ? (
+            <>
+              <span aria-label={`${user.nickname}님`}>{user.nickname}님</span>
+              <NavLink 
+                onClick={() => { setIsMenuOpen(false); logout(); }}
+                onKeyDown={(e) => handleKeyDown(e, () => { setIsMenuOpen(false); logout(); })}
+                aria-label="로그아웃"
+              >
+                로그아웃
+              </NavLink>
+            </>
+          ) : (
+            <>
+              <NavLink 
+                onClick={() => { setIsMenuOpen(false); handleLoginClick(); }}
+                onKeyDown={(e) => handleKeyDown(e, () => { setIsMenuOpen(false); handleLoginClick(); })}
+                aria-label="로그인"
+              >
+                로그인
+              </NavLink>
+              <NavLink 
+                onClick={() => { setIsMenuOpen(false); handleSignupClick(); }}
+                onKeyDown={(e) => handleKeyDown(e, () => { setIsMenuOpen(false); handleSignupClick(); })}
+                aria-label="회원가입"
+              >
+                회원가입
+              </NavLink>
+            </>
+          )}
+        </MobileMenu>
       </Nav>
-      <MobileMenuOverlay isOpen={isMenuOpen} onClick={() => setIsMenuOpen(false)} />
-      <MobileMenu isOpen={isMenuOpen}>
-        {!mounted ? null : isLoading ? (
-          <span>로딩중...</span>
-        ) : user ? (
-          <>
-            <span aria-label={`${user.nickname}님`}>{user.nickname}님</span>
-            <NavLink 
-              onClick={() => { setIsMenuOpen(false); logout(); }}
-              onKeyDown={(e) => handleKeyDown(e, () => { setIsMenuOpen(false); logout(); })}
-              aria-label="로그아웃"
-            >
-              로그아웃
-            </NavLink>
-          </>
-        ) : (
-          <>
-            <NavLink 
-              onClick={() => { setIsMenuOpen(false); handleLoginClick(); }}
-              onKeyDown={(e) => handleKeyDown(e, () => { setIsMenuOpen(false); handleLoginClick(); })}
-              aria-label="로그인"
-            >
-              로그인
-            </NavLink>
-            <NavLink 
-              onClick={() => { setIsMenuOpen(false); handleSignupClick(); }}
-              onKeyDown={(e) => handleKeyDown(e, () => { setIsMenuOpen(false); handleSignupClick(); })}
-              aria-label="회원가입"
-            >
-              회원가입
-            </NavLink>
-          </>
-        )}
-      </MobileMenu>
       <LoginModal isOpen={isLoginModalOpen} onClose={handleLoginClose} />
       <SignupModal isOpen={isSignupModalOpen} onClose={handleSignupClose} />
     </HeaderContainer>

@@ -1,5 +1,3 @@
-import { useToast } from '@/contexts/ToastContext';
-
 export class AppError extends Error {
   constructor(
     message: string,
@@ -11,9 +9,7 @@ export class AppError extends Error {
   }
 }
 
-export const handleError = (error: unknown) => {
-  const { showToast } = useToast();
-  
+export const handleError = (error: unknown, showToast: (msg: string) => void) => {
   if (error instanceof AppError) {
     showToast(error.message);
   } else if (error instanceof Error) {
@@ -30,7 +26,10 @@ export const withErrorHandling = <T extends (...args: unknown[]) => Promise<unkn
     try {
       return await fn(...args);
     } catch (error) {
-      handleError(error);
+      handleError(error, (msg) => {
+        // This is a placeholder for the showToast function
+        // You might want to implement this function to actually show the toast
+      });
       throw error;
     }
   };
