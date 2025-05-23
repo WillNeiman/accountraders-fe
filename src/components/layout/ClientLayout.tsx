@@ -1,6 +1,6 @@
 "use client";
 
-import { memo, useCallback, useState, useEffect } from 'react';
+import { memo, useCallback, useState, useEffect, KeyboardEvent } from 'react';
 import styled from "@emotion/styled";
 import { colors } from "@/styles/theme/colors";
 import { spacing } from "@/styles/theme/spacing";
@@ -33,6 +33,11 @@ const Logo = styled.a`
   font-weight: bold;
   color: ${colors.text.primary};
   text-decoration: none;
+  
+  &:focus-visible {
+    outline: 2px solid ${colors.primary[500]};
+    outline-offset: 2px;
+  }
 `;
 
 const NavLinks = styled.div`
@@ -51,6 +56,11 @@ const NavLink = styled.button`
   
   &:hover {
     color: ${colors.text.primary};
+  }
+
+  &:focus-visible {
+    outline: 2px solid ${colors.primary[500]};
+    outline-offset: 2px;
   }
 `;
 
@@ -105,22 +115,47 @@ const Header = memo(() => {
     setIsSignupModalOpen(false);
   }, []);
 
+  const handleKeyDown = useCallback((e: KeyboardEvent<HTMLButtonElement>, action: () => void) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      action();
+    }
+  }, []);
+
   return (
-    <HeaderContainer>
-      <Nav>
-        <Logo href="/">CHANNELINK</Logo>
+    <HeaderContainer role="banner">
+      <Nav role="navigation" aria-label="메인 네비게이션">
+        <Logo href="/" aria-label="홈으로 이동">CHANNELINK</Logo>
         <NavLinks>
           {!mounted ? null : isLoading ? (
             <span>로딩중...</span>
           ) : user ? (
             <>
-              <span>{user.nickname}님</span>
-              <NavLink onClick={logout}>로그아웃</NavLink>
+              <span aria-label={`${user.nickname}님`}>{user.nickname}님</span>
+              <NavLink 
+                onClick={logout}
+                onKeyDown={(e) => handleKeyDown(e, logout)}
+                aria-label="로그아웃"
+              >
+                로그아웃
+              </NavLink>
             </>
           ) : (
             <>
-              <NavLink onClick={handleLoginClick}>로그인</NavLink>
-              <NavLink onClick={handleSignupClick}>회원가입</NavLink>
+              <NavLink 
+                onClick={handleLoginClick}
+                onKeyDown={(e) => handleKeyDown(e, handleLoginClick)}
+                aria-label="로그인"
+              >
+                로그인
+              </NavLink>
+              <NavLink 
+                onClick={handleSignupClick}
+                onKeyDown={(e) => handleKeyDown(e, handleSignupClick)}
+                aria-label="회원가입"
+              >
+                회원가입
+              </NavLink>
             </>
           )}
         </NavLinks>
@@ -141,7 +176,7 @@ const ClientLayout = memo(({
   return (
     <>
       <Header />
-      <Main hasHeader>
+      <Main hasHeader role="main">
         <LayoutContent>
           {children}
         </LayoutContent>

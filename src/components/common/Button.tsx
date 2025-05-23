@@ -1,4 +1,4 @@
-import { forwardRef, memo, useCallback } from 'react';
+import { forwardRef, memo, useCallback, KeyboardEvent } from 'react';
 import styled from '@emotion/styled';
 import { colors } from '@/styles/theme/colors';
 import { spacing } from '@/styles/theme/spacing';
@@ -142,6 +142,7 @@ const Button = memo(forwardRef<HTMLButtonElement, ButtonProps>(({
   className = '',
   disabled,
   onClick,
+  onKeyDown,
   ...props
 }, ref) => {
   const handleClick = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
@@ -149,6 +150,23 @@ const Button = memo(forwardRef<HTMLButtonElement, ButtonProps>(({
       onClick(e);
     }
   }, [isLoading, disabled, onClick]);
+
+  const handleKeyDown = useCallback((e: KeyboardEvent<HTMLButtonElement>) => {
+    if (disabled || isLoading) return;
+
+    // Enter 또는 Space 키를 눌렀을 때 클릭 이벤트 발생
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      if (onClick) {
+        onClick(e as unknown as React.MouseEvent<HTMLButtonElement>);
+      }
+    }
+
+    // 사용자 정의 키보드 이벤트 핸들러가 있다면 실행
+    if (onKeyDown) {
+      onKeyDown(e);
+    }
+  }, [disabled, isLoading, onClick, onKeyDown]);
 
   const content = isLoading ? loadingText || children : children;
   
@@ -163,6 +181,9 @@ const Button = memo(forwardRef<HTMLButtonElement, ButtonProps>(({
       disabled={disabled || isLoading}
       aria-busy={isLoading}
       onClick={handleClick}
+      onKeyDown={handleKeyDown}
+      role="button"
+      tabIndex={disabled ? -1 : 0}
       {...props}
     >
       {!isLoading && leftIcon}
