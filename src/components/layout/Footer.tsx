@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { colors } from '@/styles/theme/colors';
 import { spacing } from '@/styles/theme/spacing';
 import { typography } from '@/styles/theme/typography';
+import { mediaQueries } from '@/styles/theme/breakpoints';
 
 const FooterWrapper = styled.footer`
   /* Layout */
@@ -23,8 +24,8 @@ const FooterContainer = styled.div`
   margin: 0 auto;
   padding: 0 ${spacing[4]};
 
-  @media (max-width: 768px) {
-    padding: 0 ${spacing[4]};
+  ${mediaQueries.md} {
+    padding: 0 ${spacing[6]};
   }
 `;
 

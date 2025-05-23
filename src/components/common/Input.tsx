@@ -4,6 +4,7 @@ import { colors } from '@/styles/theme/colors';
 import { spacing } from '@/styles/theme/spacing';
 import { typography } from '@/styles/theme/typography';
 import { InputProps } from '@/types/components';
+import { mediaQueries } from '@/styles/theme/breakpoints';
 
 const InputWrapper = styled.div<{ fullWidth?: boolean }>`
   /* Layout */
@@ -46,7 +47,7 @@ const StyledInput = styled.input<{ error?: string; hasLeftIcon?: boolean; hasRig
   outline: none;
 
   /* Typography */
-  font-size: ${typography.fontSize.base};
+  font-size: ${typography.fontSize.sm};
   color: ${colors.text.primary};
 
   /* Others */
@@ -67,9 +68,9 @@ const StyledInput = styled.input<{ error?: string; hasLeftIcon?: boolean; hasRig
   }
 
   /* Responsive */
-  @media (max-width: 640px) {
-    font-size: ${typography.fontSize.sm};
-    padding: ${spacing[2]} ${spacing[3]};
+  ${mediaQueries.sm} {
+    font-size: ${typography.fontSize.base};
+    padding: ${spacing[3]} ${spacing[4]};
   }
 `;
 

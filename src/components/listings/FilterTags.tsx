@@ -92,7 +92,7 @@ const FilterTags = ({ filters, onRemoveFilter }: FilterTagsProps) => {
   if (filters.category && filters.category !== '') {
     tags.push({
       key: 'category',
-      label: `카테고리: ${categoryMap[filters.category] || filters.category}`,
+      label: categoryMap[filters.category] || filters.category,
     });
   }
 
@@ -102,7 +102,7 @@ const FilterTags = ({ filters, onRemoveFilter }: FilterTagsProps) => {
       : filters.minPrice
         ? `${formatPrice(filters.minPrice)} 이상`
         : `${formatPrice(filters.maxPrice!)} 이하`;
-    tags.push({ key: 'price', label: `가격: ${priceLabel}` });
+    tags.push({ key: 'price', label: priceLabel });
   }
 
   if (filters.minSubscribers || filters.maxSubscribers) {
@@ -111,13 +111,13 @@ const FilterTags = ({ filters, onRemoveFilter }: FilterTagsProps) => {
       : filters.minSubscribers
         ? `${formatNumber(filters.minSubscribers)} 이상`
         : `${formatNumber(filters.maxSubscribers!)} 이하`;
-    tags.push({ key: 'subscribers', label: `구독자: ${subsLabel}` });
+    tags.push({ key: 'subscribers', label: subsLabel });
   }
 
   if (filters.sortBy) {
     tags.push({
       key: 'sortBy',
-      label: `정렬: ${sortByMap[filters.sortBy]}`,
+      label: sortByMap[filters.sortBy],
     });
   }
 

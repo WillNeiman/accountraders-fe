@@ -5,6 +5,8 @@ import styled from "@emotion/styled";
 import { colors } from "@/styles/theme/colors";
 import { spacing } from "@/styles/theme/spacing";
 import { zIndex } from "@/styles/theme/zIndex";
+import { mediaQueries } from "@/styles/theme/breakpoints";
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import Footer from './Footer';
 import LoginModal from '../auth/LoginModal';
 import SignupModal from '../auth/SignupModal';
@@ -33,6 +35,11 @@ const Logo = styled.a`
   font-weight: bold;
   color: ${colors.text.primary};
   text-decoration: none;
+  font-size: 1.25rem;
+  
+  ${mediaQueries.md} {
+    font-size: 1.5rem;
+  }
   
   &:focus-visible {
     outline: 2px solid ${colors.primary[500]};
@@ -40,9 +47,23 @@ const Logo = styled.a`
   }
 `;
 
-const NavLinks = styled.div`
+const NavLinks = styled.div<{ isOpen: boolean }>`
   display: flex;
   gap: ${spacing[4]};
+  
+  ${mediaQueries.sm} {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 280px;
+    background: white;
+    padding: ${spacing[6]};
+    flex-direction: column;
+    transform: translateX(${props => props.isOpen ? '0' : '100%'});
+    transition: transform 0.3s ease-in-out;
+    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
+  }
 `;
 
 const NavLink = styled.button`
@@ -64,6 +85,39 @@ const NavLink = styled.button`
   }
 `;
 
+const MenuButton = styled.button`
+  display: none;
+  background: none;
+  border: none;
+  padding: ${spacing[2]};
+  cursor: pointer;
+  color: ${colors.text.primary};
+  
+  ${mediaQueries.sm} {
+    display: block;
+  }
+  
+  &:focus-visible {
+    outline: 2px solid ${colors.primary[500]};
+    outline-offset: 2px;
+  }
+`;
+
+const Overlay = styled.div<{ isOpen: boolean }>`
+  display: none;
+  
+  ${mediaQueries.sm} {
+    display: ${props => props.isOpen ? 'block' : 'none'};
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: ${zIndex.modal};
+  }
+`;
+
 // ClientLayout.tsx 예시 (필요시 적용)
 const HEADER_HEIGHT = '57px'; // 헤더 높이
 
@@ -76,9 +130,18 @@ const Main = styled.main<{ hasHeader: boolean }>`
   /* Box Model */
   margin-top: ${props => props.hasHeader ? HEADER_HEIGHT : '0'};
   min-height: ${props => props.hasHeader ? `calc(100vh - ${HEADER_HEIGHT})` : '100vh'};
+  padding: ${spacing[4]};
 
   /* Others */
   overflow-y: auto;
+
+  ${mediaQueries.md} {
+    padding: ${spacing[6]};
+  }
+
+  ${mediaQueries.lg} {
+    padding: ${spacing[8]};
+  }
 `;
 
 const LayoutContent = styled.div`
@@ -87,24 +150,46 @@ const LayoutContent = styled.div`
   flex-direction: column;
   position: relative;
   flex: 1;
+  max-width: 1280px;
+  width: 100%;
+  margin: 0 auto;
+  gap: ${spacing[6]};
+
+  ${mediaQueries.md} {
+    gap: ${spacing[8]};
+  }
+
+  ${mediaQueries.lg} {
+    gap: ${spacing[10]};
+  }
 `;
 
 const Header = memo(() => {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isSignupModalOpen, setIsSignupModalOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, isLoading, logout } = useAuth();
   const [mounted, setMounted] = useState(false);
+  const isMobile = useMediaQuery('sm');
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
+  useEffect(() => {
+    if (!isMobile) {
+      setIsMenuOpen(false);
+    }
+  }, [isMobile]);
+
   const handleLoginClick = useCallback(() => {
     setIsLoginModalOpen(true);
+    setIsMenuOpen(false);
   }, []);
 
   const handleSignupClick = useCallback(() => {
     setIsSignupModalOpen(true);
+    setIsMenuOpen(false);
   }, []);
 
   const handleLoginClose = useCallback(() => {
@@ -122,11 +207,22 @@ const Header = memo(() => {
     }
   }, []);
 
+  const toggleMenu = useCallback(() => {
+    setIsMenuOpen(prev => !prev);
+  }, []);
+
   return (
     <HeaderContainer role="banner">
       <Nav role="navigation" aria-label="메인 네비게이션">
         <Logo href="/" aria-label="홈으로 이동">CHANNELINK</Logo>
-        <NavLinks>
+        <MenuButton 
+          onClick={toggleMenu}
+          aria-label={isMenuOpen ? "메뉴 닫기" : "메뉴 열기"}
+          aria-expanded={isMenuOpen}
+        >
+          {isMenuOpen ? '✕' : '☰'}
+        </MenuButton>
+        <NavLinks isOpen={isMenuOpen}>
           {!mounted ? null : isLoading ? (
             <span>로딩중...</span>
           ) : user ? (
@@ -160,6 +256,7 @@ const Header = memo(() => {
           )}
         </NavLinks>
       </Nav>
+      <Overlay isOpen={isMenuOpen} onClick={() => setIsMenuOpen(false)} />
       <LoginModal isOpen={isLoginModalOpen} onClose={handleLoginClose} />
       <SignupModal isOpen={isSignupModalOpen} onClose={handleSignupClose} />
     </HeaderContainer>
