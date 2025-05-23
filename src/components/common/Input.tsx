@@ -1,9 +1,10 @@
+import { memo, useCallback, useState, useId, KeyboardEvent } from 'react';
 import styled from '@emotion/styled';
 import { colors } from '@/styles/theme/colors';
 import { spacing } from '@/styles/theme/spacing';
 import { typography } from '@/styles/theme/typography';
 import { InputProps } from '@/types/components';
-import { useState, useId } from 'react';
+import { mediaQueries } from '@/styles/theme/breakpoints';
 
 const InputWrapper = styled.div<{ fullWidth?: boolean }>`
   /* Layout */
@@ -46,7 +47,7 @@ const StyledInput = styled.input<{ error?: string; hasLeftIcon?: boolean; hasRig
   outline: none;
 
   /* Typography */
-  font-size: ${typography.fontSize.base};
+  font-size: ${typography.fontSize.sm};
   color: ${colors.text.primary};
 
   /* Others */
@@ -67,9 +68,9 @@ const StyledInput = styled.input<{ error?: string; hasLeftIcon?: boolean; hasRig
   }
 
   /* Responsive */
-  @media (max-width: 640px) {
-    font-size: ${typography.fontSize.sm};
-    padding: ${spacing[2]} ${spacing[3]};
+  ${mediaQueries.sm} {
+    font-size: ${typography.fontSize.base};
+    padding: ${spacing[3]} ${spacing[4]};
   }
 `;
 
@@ -106,7 +107,7 @@ const IconWrapper = styled.div<{ position: 'left' | 'right' }>`
   color: ${colors.gray[500]};
 `;
 
-const Input = ({
+const Input = memo(({
   label,
   error,
   helperText,
@@ -118,6 +119,11 @@ const Input = ({
   leftIcon,
   rightIcon,
   id,
+  onBlur,
+  onChange,
+  onKeyDown,
+  disabled,
+  required,
   ...props
 }: InputProps) => {
   const [localError, setLocalError] = useState<string | undefined>(error);
@@ -125,7 +131,7 @@ const Input = ({
   const helperId = useId();
   const hasError = Boolean(localError);
 
-  const handleValidation = (value: string) => {
+  const handleValidation = useCallback((value: string) => {
     if (onValidation) {
       const result = onValidation(value);
       if (typeof result === 'string') {
@@ -136,27 +142,37 @@ const Input = ({
         setLocalError(undefined);
       }
     }
-  };
+  }, [onValidation]);
 
-  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+  const handleBlur = useCallback((e: React.FocusEvent<HTMLInputElement>) => {
     if (validateOnBlur) {
       handleValidation(e.target.value);
     }
-    props.onBlur?.(e);
-  };
+    onBlur?.(e);
+  }, [validateOnBlur, handleValidation, onBlur]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     if (validateOnChange) {
       handleValidation(e.target.value);
     }
-    props.onChange?.(e);
-  };
+    onChange?.(e);
+  }, [validateOnChange, handleValidation, onChange]);
+
+  const handleKeyDown = useCallback((e: KeyboardEvent<HTMLInputElement>) => {
+    if (disabled) return;
+
+    // 사용자 정의 키보드 이벤트 핸들러가 있다면 실행
+    if (onKeyDown) {
+      onKeyDown(e);
+    }
+  }, [disabled, onKeyDown]);
 
   return (
     <InputWrapper fullWidth={fullWidth}>
       {label && (
         <Label htmlFor={id || inputId}>
           {label}
+          {required && <span aria-hidden="true"> *</span>}
         </Label>
       )}
       <InputContainer>
@@ -169,8 +185,14 @@ const Input = ({
           hasRightIcon={Boolean(rightIcon)}
           aria-invalid={hasError}
           aria-describedby={helperId}
+          aria-required={required}
+          aria-disabled={disabled}
           onBlur={handleBlur}
           onChange={handleChange}
+          onKeyDown={handleKeyDown}
+          disabled={disabled}
+          required={required}
+          tabIndex={disabled ? -1 : 0}
           {...props}
         />
         {rightIcon && <IconWrapper position="right">{rightIcon}</IconWrapper>}
@@ -182,6 +204,8 @@ const Input = ({
       )}
     </InputWrapper>
   );
-};
+});
+
+Input.displayName = 'Input';
 
 export default Input; 

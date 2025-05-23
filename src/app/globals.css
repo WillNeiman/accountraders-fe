@@ -334,17 +334,19 @@ a.secondary {
   }
   
   /* 반응형 스타일 */
-  @media (max-width: 600px) {
+  @media (min-width: 640px) {
     .page-layout {
-      @apply p-8 pb-20;
+      padding: 80px;
     }
     
     .main-content {
-      @apply items-center text-center;
+      align-items: flex-start;
+      text-align: left;
     }
     
     .footer-content {
-      @apply flex-wrap items-center justify-center;
+      flex-wrap: nowrap;
+      justify-content: flex-start;
     }
   }
 }

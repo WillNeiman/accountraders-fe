@@ -177,12 +177,11 @@ const Component = styled.div`
 ### 4.1 브레이크포인트
 ```typescript
 const breakpoints = {
-  xs: '320px',  // 작은 모바일
   sm: '640px',  // 모바일
   md: '768px',  // 태블릿
   lg: '1024px', // 작은 데스크탑
   xl: '1280px', // 데스크탑
-  '2xl': '1536px', // 큰 데스크탑
+  '2xl': '1536px', // 와이드 데스크탑
 } as const;
 ```
 

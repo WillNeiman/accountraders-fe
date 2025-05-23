@@ -8,11 +8,13 @@ import FilterButton from './FilterButton';
 import FilterTags from './FilterTags';
 import FilterModal from './FilterModal';
 import { theme } from '@/styles/theme';
+import { mediaQueries } from '@/styles/theme/breakpoints';
 
 const Grid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, 280px); 
   gap: ${spacing[4]};
+  justify-content: center; 
 `;
 
 const GridContainer = styled.div`
@@ -23,6 +25,26 @@ const GridContainer = styled.div`
   max-width: 1280px;
   margin: 0 auto;
   width: 100%;
+
+  ${mediaQueries.sm} {
+    padding: ${theme.spacing[6]};
+  }
+
+  ${mediaQueries.lg} {
+    padding: ${theme.spacing[8]};
+  }
+`;
+
+const FilterContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: ${theme.spacing[4]};
+  align-items: flex-start;
+  
+  ${mediaQueries.md} {
+    flex-direction: row;
+    align-items: center;
+  }
 `;
 
 const LoadingMessage = styled.div`
@@ -76,7 +98,7 @@ export const ListingGrid = () => {
 
   return (
     <GridContainer>
-      <div style={{ display: 'flex', gap: theme.spacing[4], alignItems: 'center' }}>
+      <FilterContainer>
         <FilterButton onClick={() => setIsFilterModalOpen(true)} />
         <FilterTags filters={filters} onRemoveFilter={(key: keyof ListingParams) => {
           setFilters(prev => {
@@ -85,7 +107,7 @@ export const ListingGrid = () => {
             return newFilters;
           });
         }} />
-      </div>
+      </FilterContainer>
       <Grid>
         {listings.map((listing) => (
           <ListingCard key={listing.listingId} listing={listing} />

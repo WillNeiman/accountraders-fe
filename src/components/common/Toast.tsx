@@ -6,6 +6,8 @@ import { keyframes } from '@emotion/react';
 import { colors } from '@/styles/theme/colors';
 import { spacing } from '@/styles/theme/spacing';
 import { zIndex } from '@/styles/theme/zIndex';
+import { mediaQueries } from '@/styles/theme/breakpoints';
+import { typography } from '@/styles/theme/typography';
 
 const slideIn = keyframes`
   from {
@@ -35,34 +37,28 @@ const ToastContainer = styled.div<{ isClosing: boolean }>`
   transform: translate(-50%, 0);
   background-color: ${colors.warning.main};
   color: white;
-  padding: ${spacing[4]} ${spacing[6]};
+  padding: ${spacing[3]} ${spacing[4]};
   border-radius: ${spacing[2]};
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   z-index: ${zIndex.toast};
   animation: ${props => props.isClosing ? slideOut : slideIn} 0.3s ease-in-out forwards;
-  max-width: 90%;
+  max-width: calc(100% - ${spacing[4]} * 2);
   width: auto;
   text-align: center;
   white-space: pre-line;
-  
-  /* 데스크탑 */
-  bottom: ${spacing[8]};
+  bottom: ${spacing[4]};
+  font-size: 14px;
   
   /* 개발자 도구가 열려있을 때를 포함한 반응형 처리 */
   @media (max-height: 800px) {
     bottom: ${spacing[4]};
   }
   
-  /* 모바일 */
-  @media (max-width: 768px) {
-    bottom: ${spacing[4]};
-    max-width: calc(100% - ${spacing[4]} * 2);
-    padding: ${spacing[3]} ${spacing[4]};
-    font-size: 14px;
-  }
-  
-  @media (min-width: 769px) {
+  ${mediaQueries.md} {
+    bottom: ${spacing[8]};
     max-width: 400px;
+    padding: ${spacing[4]} ${spacing[6]};
+    font-size: ${typography.fontSize.base};
   }
 `;
 

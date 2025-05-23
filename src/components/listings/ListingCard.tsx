@@ -2,6 +2,7 @@ import styled from '@emotion/styled';
 import { colors } from '@/styles/theme/colors';
 import { typography } from '@/styles/theme/typography';
 import { spacing } from '@/styles/theme/spacing';
+import { mediaQueries } from '@/styles/theme/breakpoints';
 import { Listing } from '@/types/listings';
 
 interface ListingCardProps {
@@ -11,6 +12,8 @@ interface ListingCardProps {
 const Card = styled.div`
   /* Layout */
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 
   /* Box Model */
   border: 1px solid ${colors.gray[200]};
@@ -32,11 +35,14 @@ const Card = styled.div`
 const ThumbnailContainer = styled.div`
   position: relative;
   width: 100%;
-  height: 180px;
+  padding-top: 56.25%; /* 16:9 비율 */
   background: ${colors.gray[100]};
 `;
 
 const PlaceholderContent = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
   background: ${colors.gray[100]};
@@ -77,11 +83,18 @@ const Badge = styled.span`
 `;
 
 const Content = styled.div`
-  padding: ${spacing[4]};
+  padding: ${spacing[3]};
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  
+  ${mediaQueries.md} {
+    padding: ${spacing[4]};
+  }
 `;
 
 const Title = styled.h3`
-  font-size: ${typography.fontSize.lg};
+  font-size: ${typography.fontSize.base};
   font-weight: ${typography.fontWeight.bold};
   color: ${colors.text.primary};
   margin-bottom: ${spacing[2]};
@@ -89,18 +102,31 @@ const Title = styled.h3`
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  
+  ${mediaQueries.md} {
+    font-size: ${typography.fontSize.lg};
+  }
 `;
 
 const ChannelName = styled.p`
-  font-size: ${typography.fontSize.base};
+  font-size: ${typography.fontSize.sm};
   color: ${colors.text.secondary};
   margin-bottom: ${spacing[2]};
+  
+  ${mediaQueries.md} {
+    font-size: ${typography.fontSize.base};
+  }
 `;
 
 const Stats = styled.div`
   display: flex;
-  gap: ${spacing[4]};
-  margin-bottom: ${spacing[3]};
+  gap: ${spacing[3]};
+  margin-bottom: ${spacing[2]};
+  
+  ${mediaQueries.md} {
+    gap: ${spacing[4]};
+    margin-bottom: ${spacing[3]};
+  }
 `;
 
 const StatItem = styled.div`
@@ -110,20 +136,33 @@ const StatItem = styled.div`
 `;
 
 const StatLabel = styled.span`
-  font-size: ${typography.fontSize.sm};
+  font-size: ${typography.fontSize.xs};
   color: ${colors.text.secondary};
+  
+  ${mediaQueries.md} {
+    font-size: ${typography.fontSize.sm};
+  }
 `;
 
 const StatValue = styled.span`
-  font-size: ${typography.fontSize.base};
+  font-size: ${typography.fontSize.sm};
   font-weight: ${typography.fontWeight.medium};
   color: ${colors.text.primary};
+  
+  ${mediaQueries.md} {
+    font-size: ${typography.fontSize.base};
+  }
 `;
 
 const Price = styled.div`
-  font-size: ${typography.fontSize.xl};
+  font-size: ${typography.fontSize.lg};
   font-weight: ${typography.fontWeight.bold};
   color: ${colors.primary[600]};
+  margin-top: auto;
+  
+  ${mediaQueries.md} {
+    font-size: ${typography.fontSize.xl};
+  }
 `;
 
 const formatNumber = (num: number) => {

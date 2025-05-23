@@ -12,8 +12,12 @@ const Button = styled.button<{ size: 'default' | 'large' }>`
   /* Layout */
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: ${spacing[2]};
   height: 32px;
+  width: auto;
+  align-self: flex-start;
+  margin-left: ${spacing[5]};
 
   /* Box Model */
   padding: ${props => props.size === 'large' ? spacing[3] : spacing[1.5]} ${props => props.size === 'large' ? spacing[5] : spacing[3]};
