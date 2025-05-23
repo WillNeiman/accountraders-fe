@@ -5,8 +5,6 @@ import { ListingGrid } from '@/components/listings/ListingGrid';
 
 export default function Home() {
   return (
-    <main>
-      <ListingGrid />
-    </main>
+    <ListingGrid />
   );
 }

@@ -47,22 +47,11 @@ const Logo = styled.a`
   }
 `;
 
-const NavLinks = styled.div<{ isOpen: boolean }>`
+const NavLinks = styled.div`
   display: flex;
   gap: ${spacing[4]};
-  
-  ${mediaQueries.sm} {
-    position: fixed;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    width: 280px;
-    background: white;
-    padding: ${spacing[6]};
-    flex-direction: column;
-    transform: translateX(${props => props.isOpen ? '0' : '100%'});
-    transition: transform 0.3s ease-in-out;
-    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
+  @media (max-width: 767px) {
+    display: none;
   }
 `;
 
@@ -92,30 +81,39 @@ const MenuButton = styled.button`
   padding: ${spacing[2]};
   cursor: pointer;
   color: ${colors.text.primary};
-  
-  ${mediaQueries.sm} {
+  @media (max-width: 767px) {
     display: block;
   }
-  
   &:focus-visible {
     outline: 2px solid ${colors.primary[500]};
     outline-offset: 2px;
   }
 `;
 
-const Overlay = styled.div<{ isOpen: boolean }>`
-  display: none;
-  
-  ${mediaQueries.sm} {
-    display: ${props => props.isOpen ? 'block' : 'none'};
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: ${zIndex.modal};
-  }
+const MobileMenuOverlay = styled.div<{ isOpen: boolean }>`
+  display: ${({ isOpen }) => (isOpen ? 'block' : 'none')};
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: ${zIndex.modal};
+`;
+
+const MobileMenu = styled.div<{ isOpen: boolean }>`
+  display: ${({ isOpen }) => (isOpen ? 'flex' : 'none')};
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 240px;
+  height: 100vh;
+  background: #fff;
+  padding: ${spacing[6]};
+  box-shadow: -2px 0 8px rgba(0,0,0,0.1);
+  z-index: ${zIndex.modal + 1};
+  gap: ${spacing[4]};
 `;
 
 // ClientLayout.tsx 예시 (필요시 적용)
@@ -215,14 +213,7 @@ const Header = memo(() => {
     <HeaderContainer role="banner">
       <Nav role="navigation" aria-label="메인 네비게이션">
         <Logo href="/" aria-label="홈으로 이동">CHANNELINK</Logo>
-        <MenuButton 
-          onClick={toggleMenu}
-          aria-label={isMenuOpen ? "메뉴 닫기" : "메뉴 열기"}
-          aria-expanded={isMenuOpen}
-        >
-          {isMenuOpen ? '✕' : '☰'}
-        </MenuButton>
-        <NavLinks isOpen={isMenuOpen}>
+        <NavLinks>
           {!mounted ? null : isLoading ? (
             <span>로딩중...</span>
           ) : user ? (
@@ -255,8 +246,48 @@ const Header = memo(() => {
             </>
           )}
         </NavLinks>
+        <MenuButton 
+          onClick={toggleMenu}
+          aria-label={isMenuOpen ? "메뉴 닫기" : "메뉴 열기"}
+          aria-expanded={isMenuOpen}
+        >
+          {isMenuOpen ? '✕' : '☰'}
+        </MenuButton>
       </Nav>
-      <Overlay isOpen={isMenuOpen} onClick={() => setIsMenuOpen(false)} />
+      <MobileMenuOverlay isOpen={isMenuOpen} onClick={() => setIsMenuOpen(false)} />
+      <MobileMenu isOpen={isMenuOpen}>
+        {!mounted ? null : isLoading ? (
+          <span>로딩중...</span>
+        ) : user ? (
+          <>
+            <span aria-label={`${user.nickname}님`}>{user.nickname}님</span>
+            <NavLink 
+              onClick={() => { setIsMenuOpen(false); logout(); }}
+              onKeyDown={(e) => handleKeyDown(e, () => { setIsMenuOpen(false); logout(); })}
+              aria-label="로그아웃"
+            >
+              로그아웃
+            </NavLink>
+          </>
+        ) : (
+          <>
+            <NavLink 
+              onClick={() => { setIsMenuOpen(false); handleLoginClick(); }}
+              onKeyDown={(e) => handleKeyDown(e, () => { setIsMenuOpen(false); handleLoginClick(); })}
+              aria-label="로그인"
+            >
+              로그인
+            </NavLink>
+            <NavLink 
+              onClick={() => { setIsMenuOpen(false); handleSignupClick(); }}
+              onKeyDown={(e) => handleKeyDown(e, () => { setIsMenuOpen(false); handleSignupClick(); })}
+              aria-label="회원가입"
+            >
+              회원가입
+            </NavLink>
+          </>
+        )}
+      </MobileMenu>
       <LoginModal isOpen={isLoginModalOpen} onClose={handleLoginClose} />
       <SignupModal isOpen={isSignupModalOpen} onClose={handleSignupClose} />
     </HeaderContainer>

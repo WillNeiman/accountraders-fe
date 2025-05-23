@@ -12,17 +12,9 @@ import { mediaQueries } from '@/styles/theme/breakpoints';
 
 const Grid = styled.div`
   display: grid;
-  grid-template-columns: repeat(1, 320px);
+  grid-template-columns: repeat(auto-fit, 280px); 
   gap: ${spacing[4]};
-  justify-content: center;
-  
-  ${mediaQueries.sm} {
-    grid-template-columns: repeat(3, 300px);
-  }
-  
-  ${mediaQueries.lg} {
-    grid-template-columns: repeat(4, 300px);
-  }
+  justify-content: center; 
 `;
 
 const GridContainer = styled.div`
@@ -47,6 +39,7 @@ const FilterContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: ${theme.spacing[4]};
+  align-items: flex-start;
   
   ${mediaQueries.md} {
     flex-direction: row;
