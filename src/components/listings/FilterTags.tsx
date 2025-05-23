@@ -127,8 +127,6 @@ const FilterTags = ({ filters, onRemoveFilter }: FilterTagsProps) => {
           {label}
           <RemoveButton onClick={() => {
             if (key.startsWith('sort-')) {
-              const sortValue = key.replace('sort-', '');
-              const field = sortValue.split(',')[0];
               onRemoveFilter('sort');
             } else {
               onRemoveFilter(key as keyof ListingParams);
