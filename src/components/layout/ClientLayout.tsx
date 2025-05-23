@@ -1,12 +1,11 @@
 "use client";
 
-import { memo, useCallback, useState, useEffect, KeyboardEvent } from 'react';
+import { memo, useCallback, useState, KeyboardEvent } from 'react';
 import styled from "@emotion/styled";
 import { colors } from "@/styles/theme/colors";
 import { spacing } from "@/styles/theme/spacing";
 import { zIndex } from "@/styles/theme/zIndex";
 import { mediaQueries } from "@/styles/theme/breakpoints";
-import { useMediaQuery } from '@/hooks/useMediaQuery';
 import Footer from './Footer';
 import LoginModal from '../auth/LoginModal';
 import SignupModal from '../auth/SignupModal';

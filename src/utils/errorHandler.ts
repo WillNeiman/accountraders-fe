@@ -26,10 +26,7 @@ export const withErrorHandling = <T extends (...args: unknown[]) => Promise<unkn
     try {
       return await fn(...args);
     } catch (error) {
-      handleError(error, (msg) => {
-        // This is a placeholder for the showToast function
-        // You might want to implement this function to actually show the toast
-      });
+      handleError(error, () => {});
       throw error;
     }
   };
