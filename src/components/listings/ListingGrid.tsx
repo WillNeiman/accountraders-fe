@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useEffect } from 'react';
 import styled from '@emotion/styled';
 import { spacing } from '@/styles/theme/spacing';
@@ -64,14 +66,16 @@ export const ListingGrid = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
-  const [filters, setFilters] = useState<ListingParams>({});
+  const [filters, setFilters] = useState<ListingParams>({
+    sort: ['createdAt,desc']
+  });
 
   useEffect(() => {
     const loadListings = async () => {
       try {
         setIsLoading(true);
         const response = await fetchYoutubeListings(filters);
-        setListings(response.listings ?? []);
+        setListings(response.content ?? []);
       } catch (err) {
         setError(err as Error);
         setListings([]);
@@ -88,6 +92,20 @@ export const ListingGrid = () => {
     setIsFilterModalOpen(false);
   };
 
+  const handleRemoveFilter = (key: keyof ListingParams) => {
+    setFilters(prev => {
+      const newFilters = { ...prev };
+      delete newFilters[key];
+      
+      // 기본 정렬값 유지
+      if (!newFilters.sort) {
+        newFilters.sort = ['createdAt,desc'];
+      }
+      
+      return newFilters;
+    });
+  };
+
   if (isLoading) {
     return <LoadingMessage>로딩 중...</LoadingMessage>;
   }
@@ -100,13 +118,7 @@ export const ListingGrid = () => {
     <GridContainer>
       <FilterContainer>
         <FilterButton onClick={() => setIsFilterModalOpen(true)} />
-        <FilterTags filters={filters} onRemoveFilter={(key: keyof ListingParams) => {
-          setFilters(prev => {
-            const newFilters = { ...prev };
-            delete newFilters[key];
-            return newFilters;
-          });
-        }} />
+        <FilterTags filters={filters} onRemoveFilter={handleRemoveFilter} />
       </FilterContainer>
       <Grid>
         {listings.map((listing) => (

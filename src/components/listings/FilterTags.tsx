@@ -12,6 +12,7 @@ interface FilterTagsProps {
 const TagsContainer = styled.div`
   display: flex;
   gap: ${spacing[2]};
+  flex-wrap: wrap;
 `;
 
 const Tag = styled.div`
@@ -63,36 +64,24 @@ const formatPrice = (price: number) => {
 };
 
 const formatNumber = (num: number) => {
-  if (num >= 1000000) {
-    return `${(num / 1000000).toFixed(1)}M`;
-  }
-  if (num >= 1000) {
-    return `${(num / 1000).toFixed(1)}K`;
-  }
-  return num.toString();
+  return new Intl.NumberFormat('ko-KR').format(num);
 };
 
-const categoryMap: Record<string, string> = {
-  game: '게임',
-  entertainment: '엔터테인먼트',
-  education: '교육',
-  music: '음악',
-};
-
-const sortByMap: Record<string, string> = {
-  recent: '최신순',
-  price: '가격순',
-  subscribers: '구독자순',
-  views: '조회수순',
+const sortMap: Record<string, string> = {
+  'createdAt,desc': '최신순',
+  'askingPrice,asc': '가격 낮은순',
+  'askingPrice,desc': '가격 높은순',
+  'subscriberCount,desc': '구독자 많은순',
+  'viewCountOnPlatform,desc': '조회수 많은순',
 };
 
 const FilterTags = ({ filters, onRemoveFilter }: FilterTagsProps) => {
   const tags = [];
 
-  if (filters.category && filters.category !== '') {
+  if (filters.categoryIds && filters.categoryIds.length > 0) {
     tags.push({
-      key: 'category',
-      label: categoryMap[filters.category] || filters.category,
+      key: 'categoryIds',
+      label: `카테고리 ${filters.categoryIds.length}개 선택`,
     });
   }
 
@@ -114,10 +103,11 @@ const FilterTags = ({ filters, onRemoveFilter }: FilterTagsProps) => {
     tags.push({ key: 'subscribers', label: subsLabel });
   }
 
-  if (filters.sortBy) {
+  if (filters.sort && filters.sort.length > 0) {
+    const sortLabel = sortMap[filters.sort[0]] || filters.sort[0];
     tags.push({
-      key: 'sortBy',
-      label: sortByMap[filters.sortBy],
+      key: 'sort',
+      label: sortLabel,
     });
   }
 
@@ -128,7 +118,7 @@ const FilterTags = ({ filters, onRemoveFilter }: FilterTagsProps) => {
       {tags.map(({ key, label }) => (
         <Tag key={key}>
           {label}
-          <RemoveButton onClick={() => onRemoveFilter(key as keyof ListingParams)} type="button">
+          <RemoveButton onClick={() => onRemoveFilter(key as keyof ListingParams)}>
             <svg
               viewBox="0 0 24 24"
               fill="none"

@@ -5,6 +5,7 @@ import { spacing } from '@/styles/theme/spacing';
 import Modal from '@/components/common/Modal';
 import Button from '@/components/common/Button';
 import { useState, useEffect } from 'react';
+import { fetchYoutubeCategories, YoutubeCategory } from '@/lib/api/youtubeCategories';
 
 interface FilterModalProps {
   isOpen: boolean;
@@ -14,12 +15,12 @@ interface FilterModalProps {
 }
 
 interface FilterValues {
-  category?: string;
+  categoryIds?: string[];
   minPrice?: number;
   maxPrice?: number;
   minSubscribers?: number;
   maxSubscribers?: number;
-  sortBy?: 'price' | 'subscribers' | 'views' | 'recent';
+  sort?: string[];
 }
 
 type NumericFilterKey = 'minPrice' | 'maxPrice' | 'minSubscribers' | 'maxSubscribers';
@@ -132,13 +133,28 @@ const ErrorMessage = styled.p`
 const FilterModal = ({ isOpen, onClose, onFilterChange, initialFilters = {} }: FilterModalProps) => {
   const [localFilters, setLocalFilters] = useState<FilterValues>(initialFilters);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [categories, setCategories] = useState<YoutubeCategory[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
       setLocalFilters(initialFilters);
       setErrors({});
+      loadCategories();
     }
   }, [isOpen, initialFilters]);
+
+  const loadCategories = async () => {
+    try {
+      setIsLoading(true);
+      const data = await fetchYoutubeCategories();
+      setCategories(data);
+    } catch (error) {
+      console.error('Failed to load categories:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const validateAndUpdate = (key: NumericFilterKey, value: number | undefined, minKey: NumericFilterKey, maxKey: NumericFilterKey) => {
     const newFilters = { ...localFilters };
@@ -172,13 +188,11 @@ const FilterModal = ({ isOpen, onClose, onFilterChange, initialFilters = {} }: F
 
   const handleReset = () => {
     setLocalFilters({
-      category: '',
-      sortBy: 'recent'
+      sort: ['createdAt,desc']
     });
     setErrors({});
     onFilterChange({
-      category: '',
-      sortBy: 'recent'
+      sort: ['createdAt,desc']
     });
   };
 
@@ -189,23 +203,50 @@ const FilterModal = ({ isOpen, onClose, onFilterChange, initialFilters = {} }: F
     }
   };
 
+  const handleCategoryChange = (categoryId: string) => {
+    setLocalFilters(prev => {
+      const currentCategoryIds = prev.categoryIds || [];
+      const newCategoryIds = currentCategoryIds.includes(categoryId)
+        ? currentCategoryIds.filter(id => id !== categoryId)
+        : [...currentCategoryIds, categoryId];
+      
+      return {
+        ...prev,
+        categoryIds: newCategoryIds.length > 0 ? newCategoryIds : undefined
+      };
+    });
+  };
+
+  const handleSortChange = (value: string) => {
+    setLocalFilters(prev => ({
+      ...prev,
+      sort: [value]
+    }));
+  };
+
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="small" title="필터" titleAlign="center">
       <ModalContent>
         <FilterSection>
           <FilterTitle>카테고리</FilterTitle>
-          <Select
-            value={localFilters.category || ''}
-            onChange={(e) => {
-              setLocalFilters({ ...localFilters, category: e.target.value });
-            }}
-          >
-            <option value="">전체</option>
-            <option value="game">게임</option>
-            <option value="entertainment">엔터테인먼트</option>
-            <option value="education">교육</option>
-            <option value="music">음악</option>
-          </Select>
+          {isLoading ? (
+            <div>카테고리 로딩 중...</div>
+          ) : (
+            <div>
+              {categories.map(category => (
+                <div key={category.categoryId}>
+                  <label>
+                    <input
+                      type="checkbox"
+                      checked={localFilters.categoryIds?.includes(category.categoryId) || false}
+                      onChange={() => handleCategoryChange(category.categoryId)}
+                    />
+                    {category.categoryName}
+                  </label>
+                </div>
+              ))}
+            </div>
+          )}
         </FilterSection>
 
         <FilterSection>
@@ -279,15 +320,14 @@ const FilterModal = ({ isOpen, onClose, onFilterChange, initialFilters = {} }: F
         <FilterSection>
           <FilterTitle>정렬</FilterTitle>
           <Select
-            value={localFilters.sortBy || 'recent'}
-            onChange={(e) => {
-              setLocalFilters({ ...localFilters, sortBy: e.target.value as FilterValues['sortBy'] });
-            }}
+            value={localFilters.sort?.[0] || 'createdAt,desc'}
+            onChange={(e) => handleSortChange(e.target.value)}
           >
-            <option value="recent">최신순</option>
-            <option value="price">가격순</option>
-            <option value="subscribers">구독자순</option>
-            <option value="views">조회수순</option>
+            <option value="createdAt,desc">최신순</option>
+            <option value="askingPrice,asc">가격 낮은순</option>
+            <option value="askingPrice,desc">가격 높은순</option>
+            <option value="subscriberCount,desc">구독자 많은순</option>
+            <option value="viewCountOnPlatform,desc">조회수 많은순</option>
           </Select>
         </FilterSection>
 

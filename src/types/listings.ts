@@ -6,7 +6,7 @@ export interface Listing {
   listingDescription: string;
   askingPrice: number;
   currency: string;
-  status: 'ACTIVE' | 'INACTIVE' | 'SOLD';
+  status: 'ACTIVE' | 'INACTIVE' | 'SOLD' | 'PENDING_SALE';
   expiresAt: string;
   viewCountOnPlatform: number;
   updatedAt: string;
@@ -14,19 +14,40 @@ export interface Listing {
 }
 
 export interface ListingParams {
-  category?: string;
+  categoryIds?: string[];
   minPrice?: number;
   maxPrice?: number;
   minSubscribers?: number;
   maxSubscribers?: number;
-  sortBy?: 'price' | 'subscribers' | 'views' | 'recent';
+  sort?: string[];
   page?: number;
-  limit?: number;
+  size?: number;
 }
 
-export interface ListingResponse {
-  listings: Listing[];
-  total: number;
-  page: number;
-  limit: number;
-} 
+export interface PageableResponse<T> {
+  content: T[];
+  pageable: {
+    pageNumber: number;
+    pageSize: number;
+    sort: {
+      empty: boolean;
+      sorted: boolean;
+      unsorted: boolean;
+    };
+  };
+  totalElements: number;
+  totalPages: number;
+  last: boolean;
+  size: number;
+  number: number;
+  sort: {
+    empty: boolean;
+    sorted: boolean;
+    unsorted: boolean;
+  };
+  numberOfElements: number;
+  first: boolean;
+  empty: boolean;
+}
+
+export type ListingResponse = PageableResponse<Listing>; 
