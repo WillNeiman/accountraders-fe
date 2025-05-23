@@ -69,10 +69,13 @@ const formatNumber = (num: number) => {
 
 const sortMap: Record<string, string> = {
   'createdAt,desc': '최신순',
-  'askingPrice,asc': '가격 낮은순',
+  'createdAt,asc': '오래된순',
   'askingPrice,desc': '가격 높은순',
+  'askingPrice,asc': '가격 낮은순',
   'subscriberCount,desc': '구독자 많은순',
+  'subscriberCount,asc': '구독자 적은순',
   'viewCountOnPlatform,desc': '조회수 많은순',
+  'viewCountOnPlatform,asc': '조회수 적은순',
 };
 
 const FilterTags = ({ filters, onRemoveFilter }: FilterTagsProps) => {
@@ -104,10 +107,14 @@ const FilterTags = ({ filters, onRemoveFilter }: FilterTagsProps) => {
   }
 
   if (filters.sort && filters.sort.length > 0) {
-    const sortLabel = sortMap[filters.sort[0]] || filters.sort[0];
-    tags.push({
-      key: 'sort',
-      label: sortLabel,
+    filters.sort.forEach(sort => {
+      const sortLabel = sortMap[sort];
+      if (sortLabel) {
+        tags.push({
+          key: `sort-${sort}`,
+          label: sortLabel,
+        });
+      }
     });
   }
 
@@ -118,7 +125,15 @@ const FilterTags = ({ filters, onRemoveFilter }: FilterTagsProps) => {
       {tags.map(({ key, label }) => (
         <Tag key={key}>
           {label}
-          <RemoveButton onClick={() => onRemoveFilter(key as keyof ListingParams)}>
+          <RemoveButton onClick={() => {
+            if (key.startsWith('sort-')) {
+              const sortValue = key.replace('sort-', '');
+              const field = sortValue.split(',')[0];
+              onRemoveFilter('sort');
+            } else {
+              onRemoveFilter(key as keyof ListingParams);
+            }
+          }}>
             <svg
               viewBox="0 0 24 24"
               fill="none"
