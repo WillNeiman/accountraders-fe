@@ -24,8 +24,6 @@ interface FilterValues {
   sort?: string[];
 }
 
-type NumericFilterKey = 'minPrice' | 'maxPrice' | 'minSubscribers' | 'maxSubscribers';
-
 const ModalContent = styled.div`
   padding: ${spacing[4]};
   width: 100%;
@@ -56,13 +54,6 @@ const FilterTitle = styled.h3`
   text-align: left;
 `;
 
-const RangeInputContainer = styled.div`
-  display: flex;
-  gap: ${spacing[2]};
-  align-items: center;
-  width: 100%;
-`;
-
 const RangeInput = styled.input`
   flex: 1;
   min-width: 0;
@@ -87,12 +78,6 @@ const RangeInput = styled.input`
   &[type=number] {
     -moz-appearance: textfield;
   }
-`;
-
-const Divider = styled.span`
-  color: ${colors.gray[400]};
-  font-size: ${typography.fontSize.sm};
-  flex: none;
 `;
 
 const ButtonContainer = styled.div`
@@ -304,36 +289,6 @@ const FilterModal = ({ isOpen, onClose, onFilterChange, initialFilters = {} }: F
     } catch (error) {
       console.error('Failed to load categories:', error);
     }
-  };
-
-  const validateAndUpdate = (key: NumericFilterKey, value: number | undefined, minKey: NumericFilterKey, maxKey: NumericFilterKey) => {
-    const newFilters = { ...localFilters };
-    const newErrors = { ...errors };
-    
-    if (value !== undefined && value < 0) {
-      newErrors[key] = '0보다 작은 값은 입력할 수 없습니다';
-      return;
-    }
-    
-    if (key.startsWith('min')) {
-      const maxValue = newFilters[maxKey] as number | undefined;
-      if (value !== undefined && maxValue !== undefined && value > maxValue) {
-        newErrors[key] = '최소값은 최대값보다 클 수 없습니다';
-      } else {
-        delete newErrors[key];
-      }
-    } else {
-      const minValue = newFilters[minKey] as number | undefined;
-      if (value !== undefined && minValue !== undefined && value < minValue) {
-        newErrors[key] = '최대값은 최소값보다 작을 수 없습니다';
-      } else {
-        delete newErrors[key];
-      }
-    }
-
-    newFilters[key] = value;
-    setLocalFilters(newFilters);
-    setErrors(newErrors);
   };
 
   const handleReset = () => {
