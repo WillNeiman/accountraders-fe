@@ -69,7 +69,7 @@ export default function MyPage() {
   const { showToast } = useToast();
 
   // 실제 onUpdate는 API 연동 필요. 임시로 토스트만 띄움
-  const handleAccountUpdate = async (data: Partial<User>) => {
+  const handleAccountUpdate = async (_data: Partial<User>) => {
     showToast('계정 정보 업데이트(임시)', 3000);
   };
 

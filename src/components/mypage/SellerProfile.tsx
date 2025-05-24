@@ -131,7 +131,7 @@ export default function SellerProfile() {
         setFormData({
           businessRegistrationNumber: data.businessRegistrationNumber || '',
         });
-      } catch (error) {
+      } catch {
         showToast('판매자 프로필을 불러오는데 실패했습니다.', 3000);
       }
     };
@@ -150,7 +150,7 @@ export default function SellerProfile() {
       setProfileData(data);
       showToast('판매자 프로필이 성공적으로 업데이트되었습니다.', 3000);
       setIsEditing(false);
-    } catch (error) {
+    } catch {
       showToast('판매자 프로필 업데이트에 실패했습니다.', 3000);
     }
   };

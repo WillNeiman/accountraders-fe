@@ -148,7 +148,7 @@ interface Transaction {
 
 export default function TransactionHistory() {
   const [activeFilter, setActiveFilter] = useState<TransactionStatus>('all');
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [transactions] = useState<Transaction[]>([]);
 
   const filters: { label: string; value: TransactionStatus }[] = [
     { label: '전체', value: 'all' },
