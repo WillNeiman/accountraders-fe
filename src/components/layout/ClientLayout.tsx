@@ -1,6 +1,6 @@
 "use client";
 
-import { memo, useCallback, useState, KeyboardEvent } from 'react';
+import { memo, useCallback, useState, KeyboardEvent, useEffect } from 'react';
 import styled from "@emotion/styled";
 import { colors } from "@/styles/theme/colors";
 import { spacing } from "@/styles/theme/spacing";
@@ -286,23 +286,29 @@ const Header = memo(() => {
 
 Header.displayName = 'Header';
 
-const ClientLayout = memo(({
-  children,
-}: {
-  children: React.ReactNode
-}) => {
+const ClientLayout = ({ children }: { children: React.ReactNode }) => {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return null;
+  }
+
   return (
     <>
       <Header />
-      <Main hasHeader role="main">
+      <Main hasHeader={true}>
         <LayoutContent>
           {children}
         </LayoutContent>
-        <Footer />
       </Main>
+      <Footer />
     </>
   );
-});
+};
 
 ClientLayout.displayName = 'ClientLayout';
 
