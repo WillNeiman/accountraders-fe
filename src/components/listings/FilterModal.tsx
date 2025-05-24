@@ -109,26 +109,6 @@ const ErrorMessage = styled.p`
   margin-left: ${spacing[2]};
 `;
 
-const SortOption = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${spacing[2]};
-  margin-bottom: ${spacing[2]};
-
-  &:last-child {
-    margin-bottom: 0;
-  }
-`;
-
-const SortLabel = styled.label`
-  display: flex;
-  align-items: center;
-  gap: ${spacing[2]};
-  cursor: pointer;
-  font-size: ${typography.fontSize.sm};
-  color: ${colors.text.primary};
-`;
-
 const SortDirection = styled.select`
   width: 136px;
   min-width: 120px;
@@ -153,12 +133,6 @@ const SortDirection = styled.select`
     min-width: 0;
   }
 `;
-
-const mainSortFields = [
-  { value: 'askingPrice', label: '가격' },
-  { value: 'subscriberCount', label: '구독자 수' },
-  { value: 'viewCountOnPlatform', label: '조회수' },
-];
 
 const DropdownContainer = styled.div`
   position: relative;
@@ -265,9 +239,6 @@ const FilterModal = ({ isOpen, onClose, onFilterChange, initialFilters = {} }: F
   const [categories, setCategories] = useState<YoutubeCategory[]>([]);
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const [createdAtDirection, setCreatedAtDirection] = useState('desc');
-  const [mainSort, setMainSort] = useState<string>('');
-  const [mainSortDirection, setMainSortDirection] = useState('desc');
   const [sortField, setSortField] = useState('createdAt');
   const [sortDirection, setSortDirection] = useState('desc');
 
@@ -294,20 +265,6 @@ const FilterModal = ({ isOpen, onClose, onFilterChange, initialFilters = {} }: F
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [isCategoryOpen]);
-
-  useEffect(() => {
-    if (initialFilters.sort) {
-      const createdAt = initialFilters.sort.find(s => s.startsWith('createdAt'));
-      const main = initialFilters.sort.find(s => !s.startsWith('createdAt'));
-      setCreatedAtDirection(createdAt ? createdAt.split(',')[1] : 'desc');
-      setMainSort(main ? main.split(',')[0] : '');
-      setMainSortDirection(main ? main.split(',')[1] : 'desc');
-    } else {
-      setCreatedAtDirection('desc');
-      setMainSort('');
-      setMainSortDirection('desc');
-    }
-  }, [initialFilters.sort, isOpen]);
 
   useEffect(() => {
     if (initialFilters.sort) {
