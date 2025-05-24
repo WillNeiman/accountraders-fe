@@ -1,6 +1,5 @@
 import { AxiosError } from 'axios';
 import { apiClient } from '@/lib/api/apiClient';
-import Cookies from 'js-cookie';
 import { User } from '@/types/user';
 import { formatErrorMessage } from '@/utils/error';
 
@@ -65,7 +64,8 @@ export const logout = async () => {
 
 // 현재 액세스 토큰 가져오기 (get만 남김)
 export const getAccessToken = () => {
-  return undefined;
+  if (typeof window === 'undefined') return undefined;
+  return true;
 };
 
 export const isAuthenticated = async () => {

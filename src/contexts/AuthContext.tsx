@@ -28,8 +28,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       try {
         const userData = await getCurrentUser();
         setUser(userData);
+        setError(null);
       } catch (err) {
         setUser(null);
+        setError(err instanceof Error ? err : new Error('인증 확인 중 오류가 발생했습니다.'));
       } finally {
         setIsLoading(false);
       }
@@ -39,12 +41,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const login = useCallback((userData: User) => {
     setUser(userData);
+    setError(null);
   }, []);
 
   const logout = useCallback(async () => {
     try {
       await logoutApi();
       setUser(null);
+      setError(null);
     } catch (err) {
       showToast(formatErrorMessage(err));
     }
