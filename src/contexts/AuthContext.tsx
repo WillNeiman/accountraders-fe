@@ -1,8 +1,8 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { User } from '@/types/user';
-import { getCurrentUser, logout as logoutApi, getAccessToken } from '@/services/auth';
+import { getCurrentUser, logout as logoutApi } from '@/services/auth';
 import { useToast } from '@/contexts/ToastContext';
 import { formatErrorMessage } from '@/utils/error';
 
@@ -10,7 +10,7 @@ interface AuthContextType {
   user: User | null;
   isLoading: boolean;
   error: Error | null;
-  refreshUser: () => Promise<void>;
+  login: (userData: User) => void;
   logout: () => Promise<void>;
 }
 
@@ -22,33 +22,24 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [error, setError] = useState<Error | null>(null);
   const { showToast } = useToast();
 
-  const refreshUser = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const accessToken = getAccessToken();
-      if (!accessToken) {
-        setUser(null);
-        setIsLoading(false);
-        return;
-      }
-      
+  // 페이지 로드 시 사용자 정보 확인
+  useEffect(() => {
+    const checkAuth = async () => {
       try {
-        const user = await getCurrentUser();
-        setUser(user);
+        const userData = await getCurrentUser();
+        setUser(userData);
       } catch (err) {
-        // 토큰이 있지만 사용자 정보를 가져오지 못한 경우
-        console.error('Failed to fetch user data:', err);
         setUser(null);
+      } finally {
+        setIsLoading(false);
       }
-    } catch (err: Error | unknown) {
-      setUser(null);
-      setError(err instanceof Error ? err : new Error('알 수 없는 오류가 발생했습니다.'));
-      showToast(formatErrorMessage(err));
-    } finally {
-      setIsLoading(false);
-    }
-  }, [showToast]);
+    };
+    checkAuth();
+  }, []);
+
+  const login = useCallback((userData: User) => {
+    setUser(userData);
+  }, []);
 
   const logout = useCallback(async () => {
     try {
@@ -59,12 +50,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }, [showToast]);
 
-  useEffect(() => {
-    refreshUser();
-  }, [refreshUser]);
-
   return (
-    <AuthContext.Provider value={{ user, isLoading, error, refreshUser, logout }}>
+    <AuthContext.Provider value={{ user, isLoading, error, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

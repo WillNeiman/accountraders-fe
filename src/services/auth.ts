@@ -65,11 +65,14 @@ export const logout = async () => {
 
 // 현재 액세스 토큰 가져오기 (get만 남김)
 export const getAccessToken = () => {
-  if (typeof window === 'undefined') return undefined;
-  const token = Cookies.get('accessToken');
-  console.log('Current cookies:', Cookies.get()); // 모든 쿠키 확인
-  console.log('Access token:', token); // accessToken 값 확인
-  return token;
+  return undefined;
 };
 
-export const isAuthenticated = () => !!getAccessToken(); 
+export const isAuthenticated = async () => {
+  try {
+    await getCurrentUser();
+    return true;
+  } catch {
+    return false;
+  }
+}; 
