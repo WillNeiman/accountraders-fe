@@ -1,8 +1,13 @@
+"use client";
+
+import { memo, useCallback, useMemo } from 'react';
 import styled from '@emotion/styled';
 import { colors } from '@/styles/theme/colors';
 import { typography } from '@/styles/theme/typography';
 import { spacing } from '@/styles/theme/spacing';
 import { ListingParams } from '@/types/listings';
+import { SORT_OPTIONS, DEFAULT_SORT } from '@/constants/filters';
+import { formatPrice, formatNumber } from '@/utils/formatters';
 
 interface FilterTagsProps {
   filters: ListingParams;
@@ -10,13 +15,13 @@ interface FilterTagsProps {
   categories: { categoryId: string; categoryName: string }[];
 }
 
-const TagsContainer = styled.div`
+const FilterTagsContainer = styled.div`
   display: flex;
   gap: ${spacing[2]};
   flex-wrap: wrap;
 `;
 
-const Tag = styled.div`
+const FilterTag = styled.div`
   /* Layout */
   display: flex;
   align-items: center;
@@ -37,14 +42,21 @@ const Tag = styled.div`
 `;
 
 const RemoveButton = styled.button`
+  /* Layout */
   display: flex;
   align-items: center;
   justify-content: center;
+  
+  /* Box Model */
+  padding: 0;
+  
+  /* Visual */
   background: none;
   border: none;
-  padding: 0;
-  cursor: pointer;
   color: ${colors.primary[400]};
+  
+  /* Others */
+  cursor: pointer;
   
   &:hover {
     color: ${colors.primary[600]};
@@ -56,107 +68,131 @@ const RemoveButton = styled.button`
   }
 `;
 
-const formatPrice = (price: number) => {
-  return new Intl.NumberFormat('ko-KR', {
-    style: 'currency',
-    currency: 'KRW',
-    maximumFractionDigits: 0,
-  }).format(price);
-};
+const FilterTags = memo(({ filters, onRemoveFilter, categories }: FilterTagsProps) => {
+  const handleRemoveFilter = useCallback((key: keyof ListingParams, value?: string) => {
+    onRemoveFilter(key, value);
+  }, [onRemoveFilter]);
 
-const formatNumber = (num: number) => {
-  return new Intl.NumberFormat('ko-KR').format(num);
-};
+  const handleKeyPress = useCallback((e: React.KeyboardEvent, key: keyof ListingParams, value?: string) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      handleRemoveFilter(key, value);
+    }
+  }, [handleRemoveFilter]);
 
-const sortMap: Record<string, string> = {
-  'createdAt,desc': '최신순',
-  'createdAt,asc': '오래된순',
-  'askingPrice,desc': '가격 높은순',
-  'askingPrice,asc': '가격 낮은순',
-  'subscriberCount,desc': '구독자 많은순',
-  'subscriberCount,asc': '구독자 적은순',
-  'viewCountOnPlatform,desc': '조회수 많은순',
-  'viewCountOnPlatform,asc': '조회수 적은순',
-};
+  const tags = useMemo(() => {
+    const result: { key: string; label: string; value?: string; isDefault?: boolean }[] = [];
 
-const FilterTags = ({ filters, onRemoveFilter, categories }: FilterTagsProps) => {
-  const tags: { key: string; label: string; value?: string }[] = [];
+    if (filters.categoryIds && filters.categoryIds.length > 0) {
+      filters.categoryIds.forEach(id => {
+        const cat = categories.find(c => c.categoryId === id);
+        if (cat) {
+          result.push({
+            key: `categoryId-${id}`,
+            label: cat.categoryName,
+            value: id,
+          });
+        }
+      });
+    }
 
-  if (filters.categoryIds && filters.categoryIds.length > 0) {
-    filters.categoryIds.forEach(id => {
-      const cat = categories.find(c => c.categoryId === id);
-      if (cat) {
-        tags.push({
-          key: `categoryId-${id}`,
-          label: cat.categoryName,
-          value: id,
-        });
-      }
-    });
-  }
+    if (filters.minPrice || filters.maxPrice) {
+      const priceLabel = filters.minPrice && filters.maxPrice
+        ? `${formatPrice(filters.minPrice)} - ${formatPrice(filters.maxPrice)}`
+        : filters.minPrice
+          ? `${formatPrice(filters.minPrice)} 이상`
+          : `${formatPrice(filters.maxPrice!)} 이하`;
+      result.push({ key: 'price', label: priceLabel, value: undefined });
+    }
 
-  if (filters.minPrice || filters.maxPrice) {
-    const priceLabel = filters.minPrice && filters.maxPrice
-      ? `${formatPrice(filters.minPrice)} - ${formatPrice(filters.maxPrice)}`
-      : filters.minPrice
-        ? `${formatPrice(filters.minPrice)} 이상`
-        : `${formatPrice(filters.maxPrice!)} 이하`;
-    tags.push({ key: 'price', label: priceLabel, value: undefined });
-  }
+    if (filters.minSubscribers || filters.maxSubscribers) {
+      const subsLabel = filters.minSubscribers && filters.maxSubscribers
+        ? `${formatNumber(filters.minSubscribers)} - ${formatNumber(filters.maxSubscribers)}`
+        : filters.minSubscribers
+          ? `${formatNumber(filters.minSubscribers)} 이상`
+          : `${formatNumber(filters.maxSubscribers!)} 이하`;
+      result.push({ key: 'subscribers', label: subsLabel, value: undefined });
+    }
 
-  if (filters.minSubscribers || filters.maxSubscribers) {
-    const subsLabel = filters.minSubscribers && filters.maxSubscribers
-      ? `${formatNumber(filters.minSubscribers)} - ${formatNumber(filters.maxSubscribers)}`
-      : filters.minSubscribers
-        ? `${formatNumber(filters.minSubscribers)} 이상`
-        : `${formatNumber(filters.maxSubscribers!)} 이하`;
-    tags.push({ key: 'subscribers', label: subsLabel, value: undefined });
-  }
+    if (filters.sort && filters.sort.length > 0) {
+      filters.sort.forEach(sort => {
+        const sortLabel = SORT_OPTIONS[sort];
+        if (sortLabel) {
+          result.push({
+            key: `sort-${sort}`,
+            label: sortLabel,
+            isDefault: sort === DEFAULT_SORT && filters.sort?.length === 1
+          });
+        }
+      });
+    }
 
-  if (filters.sort && filters.sort.length > 0) {
-    filters.sort.forEach(sort => {
-      const sortLabel = sortMap[sort];
-      if (sortLabel) {
-        tags.push({
-          key: `sort-${sort}`,
-          label: sortLabel,
-        });
-      }
-    });
-  }
+    return result;
+  }, [filters, categories]);
 
   if (tags.length === 0) return null;
 
   return (
-    <TagsContainer>
-      {tags.map(({ key, label, value }) => (
-        <Tag key={key}>
+    <FilterTagsContainer role="list">
+      {tags.map(({ key, label, value, isDefault }) => (
+        <FilterTag key={key} role="listitem">
           {label}
-          <RemoveButton onClick={() => {
-            if (key.startsWith('categoryId-')) {
-              onRemoveFilter('categoryIds', value);
-            } else if (key.startsWith('sort-')) {
-              onRemoveFilter('sort');
-            } else {
-              onRemoveFilter(key as keyof ListingParams);
-            }
-          }}>
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
+          {!isDefault && (
+            <RemoveButton
+              onClick={() => {
+                if (key.startsWith('categoryId-')) {
+                  handleRemoveFilter('categoryIds', value);
+                } else if (key.startsWith('sort-')) {
+                  handleRemoveFilter('sort');
+                } else if (key === 'price') {
+                  handleRemoveFilter('minPrice');
+                  handleRemoveFilter('maxPrice');
+                } else if (key === 'subscribers') {
+                  handleRemoveFilter('minSubscribers');
+                  handleRemoveFilter('maxSubscribers');
+                } else {
+                  handleRemoveFilter(key as keyof ListingParams);
+                }
+              }}
+              onKeyPress={(e) => {
+                if (key.startsWith('categoryId-')) {
+                  handleKeyPress(e, 'categoryIds', value);
+                } else if (key.startsWith('sort-')) {
+                  handleKeyPress(e, 'sort');
+                } else if (key === 'price') {
+                  handleKeyPress(e, 'minPrice');
+                  handleKeyPress(e, 'maxPrice');
+                } else if (key === 'subscribers') {
+                  handleKeyPress(e, 'minSubscribers');
+                  handleKeyPress(e, 'maxSubscribers');
+                } else {
+                  handleKeyPress(e, key as keyof ListingParams);
+                }
+              }}
+              aria-label={`${label} 필터 제거`}
+              role="button"
+              tabIndex={0}
             >
-              <line x1="18" y1="6" x2="6" y2="18" />
-              <line x1="6" y1="6" x2="18" y2="18" />
-            </svg>
-          </RemoveButton>
-        </Tag>
+              <span className="sr-only">{label} 필터 제거</span>
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </RemoveButton>
+          )}
+        </FilterTag>
       ))}
-    </TagsContainer>
+    </FilterTagsContainer>
   );
-};
+});
+
+FilterTags.displayName = 'FilterTags';
 
 export default FilterTags; 
