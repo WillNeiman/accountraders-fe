@@ -1,20 +1,10 @@
 'use client'
 
-import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import LoginModal from '@/components/auth/LoginModal'
-import { useAuth } from '@/contexts/AuthContext'
 
 export default function LoginPage() {
   const router = useRouter()
-  const { user } = useAuth()
-
-  useEffect(() => {
-    // 이미 로그인된 사용자는 홈으로 리다이렉트
-    if (user) {
-      router.push('/')
-    }
-  }, [user, router])
 
   return (
     <LoginModal 
