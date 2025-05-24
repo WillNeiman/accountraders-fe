@@ -154,43 +154,10 @@ const SortDirection = styled.select`
   }
 `;
 
-const sortOptions = [
-  {
-    field: 'createdAt',
-    label: '등록일',
-    options: [
-      { value: '', label: '선택 안 함' },
-      { value: 'desc', label: '최신순' },
-      { value: 'asc', label: '오래된순' },
-    ],
-  },
-  {
-    field: 'askingPrice',
-    label: '가격',
-    options: [
-      { value: '', label: '선택 안 함' },
-      { value: 'desc', label: '높은순' },
-      { value: 'asc', label: '낮은순' },
-    ],
-  },
-  {
-    field: 'subscriberCount',
-    label: '구독자 수',
-    options: [
-      { value: '', label: '선택 안 함' },
-      { value: 'desc', label: '많은순' },
-      { value: 'asc', label: '적은순' },
-    ],
-  },
-  {
-    field: 'viewCountOnPlatform',
-    label: '조회수',
-    options: [
-      { value: '', label: '선택 안 함' },
-      { value: 'desc', label: '많은순' },
-      { value: 'asc', label: '적은순' },
-    ],
-  },
+const mainSortFields = [
+  { value: 'askingPrice', label: '가격' },
+  { value: 'subscriberCount', label: '구독자 수' },
+  { value: 'viewCountOnPlatform', label: '조회수' },
 ];
 
 const DropdownContainer = styled.div`
@@ -243,12 +210,66 @@ const CategoryCheckbox = styled.input`
   margin: 0;
 `;
 
+const sortFieldOptions = [
+  { value: 'createdAt', label: '등록일' },
+  { value: 'askingPrice', label: '가격' },
+  { value: 'subscriberCount', label: '구독자 수' },
+  { value: 'viewCountOnPlatform', label: '조회수' },
+];
+
+const sortDirectionLabelMap: Record<string, { asc: string; desc: string }> = {
+  createdAt: { desc: '최신순', asc: '오래된순' },
+  askingPrice: { desc: '높은순', asc: '낮은순' },
+  subscriberCount: { desc: '많은순', asc: '적은순' },
+  viewCountOnPlatform: { desc: '많은순', asc: '적은순' },
+};
+
+const SortRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: ${spacing[2]};
+  margin-bottom: ${spacing[2]};
+`;
+
+const SortLabelSmall = styled.label`
+  font-size: ${typography.fontSize.sm};
+  font-weight: ${typography.fontWeight.normal};
+  color: ${colors.text.secondary};
+  margin-right: ${spacing[1]};
+`;
+
+const SortRadioGroup = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${spacing[4]};
+  width: auto;
+  flex-shrink: 0;
+`;
+
+const SortRadioLabel = styled.label`
+  display: flex;
+  align-items: center;
+  font-size: ${typography.fontSize.sm};
+  color: ${colors.text.secondary};
+  font-weight: ${typography.fontWeight.normal};
+`;
+
+const SortRadio = styled.input`
+  margin-right: ${spacing[1]};
+`;
+
 const FilterModal = ({ isOpen, onClose, onFilterChange, initialFilters = {} }: FilterModalProps) => {
   const [localFilters, setLocalFilters] = useState<FilterValues>(initialFilters);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [categories, setCategories] = useState<YoutubeCategory[]>([]);
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const [createdAtDirection, setCreatedAtDirection] = useState('desc');
+  const [mainSort, setMainSort] = useState<string>('');
+  const [mainSortDirection, setMainSortDirection] = useState('desc');
+  const [sortField, setSortField] = useState('createdAt');
+  const [sortDirection, setSortDirection] = useState('desc');
 
   useEffect(() => {
     if (isOpen) {
@@ -273,6 +294,32 @@ const FilterModal = ({ isOpen, onClose, onFilterChange, initialFilters = {} }: F
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [isCategoryOpen]);
+
+  useEffect(() => {
+    if (initialFilters.sort) {
+      const createdAt = initialFilters.sort.find(s => s.startsWith('createdAt'));
+      const main = initialFilters.sort.find(s => !s.startsWith('createdAt'));
+      setCreatedAtDirection(createdAt ? createdAt.split(',')[1] : 'desc');
+      setMainSort(main ? main.split(',')[0] : '');
+      setMainSortDirection(main ? main.split(',')[1] : 'desc');
+    } else {
+      setCreatedAtDirection('desc');
+      setMainSort('');
+      setMainSortDirection('desc');
+    }
+  }, [initialFilters.sort, isOpen]);
+
+  useEffect(() => {
+    if (initialFilters.sort) {
+      const main = initialFilters.sort[0] || 'createdAt,desc';
+      const [field, direction] = main.split(',');
+      setSortField(field || 'createdAt');
+      setSortDirection(direction || 'desc');
+    } else {
+      setSortField('createdAt');
+      setSortDirection('desc');
+    }
+  }, [initialFilters.sort, isOpen]);
 
   const loadCategories = async () => {
     try {
@@ -324,7 +371,8 @@ const FilterModal = ({ isOpen, onClose, onFilterChange, initialFilters = {} }: F
 
   const handleApply = () => {
     if (Object.keys(errors).length === 0) {
-      onFilterChange(localFilters);
+      const sort = [`${sortField},${sortDirection}`];
+      onFilterChange({ ...localFilters, sort });
       onClose();
     }
   };
@@ -341,24 +389,6 @@ const FilterModal = ({ isOpen, onClose, onFilterChange, initialFilters = {} }: F
         categoryIds: newCategoryIds.length > 0 ? newCategoryIds : undefined
       };
     });
-  };
-
-  const handleSortChange = (field: string, direction: string) => {
-    setLocalFilters(prev => {
-      const newSorts = (prev.sort || []).filter(sort => !sort.startsWith(field));
-      if (direction) {
-        newSorts.push(`${field},${direction}`);
-      }
-      return {
-        ...prev,
-        sort: newSorts.length > 0 ? newSorts : undefined,
-      };
-    });
-  };
-
-  const getSortDirection = (field: string) => {
-    const sort = localFilters.sort?.find(s => s.startsWith(field));
-    return sort ? sort.split(',')[1] : '';
   };
 
   const selectedCount = localFilters.categoryIds?.length || 0;
@@ -461,19 +491,48 @@ const FilterModal = ({ isOpen, onClose, onFilterChange, initialFilters = {} }: F
 
         <FilterSection>
           <FilterTitle>정렬</FilterTitle>
-          {sortOptions.map(option => (
-            <SortOption key={option.field}>
-              <SortLabel>{option.label}</SortLabel>
-              <SortDirection
-                value={getSortDirection(option.field)}
-                onChange={e => handleSortChange(option.field, e.target.value)}
-              >
-                {option.options.map(opt => (
-                  <option key={opt.value} value={opt.value}>{opt.label}</option>
-                ))}
-              </SortDirection>
-            </SortOption>
-          ))}
+          <SortRow>
+            <SortLabelSmall htmlFor="sortField">정렬 기준</SortLabelSmall>
+            <SortDirection
+              as="select"
+              id="sortField"
+              value={sortField}
+              onChange={e => {
+                setSortField(e.target.value);
+                setSortDirection('desc');
+              }}
+              style={{ minWidth: 110 }}
+            >
+              {sortFieldOptions.map(opt => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
+            </SortDirection>
+          </SortRow>
+          <SortRow>
+            <SortLabelSmall>정렬 방식</SortLabelSmall>
+            <SortRadioGroup>
+              <SortRadioLabel>
+                <SortRadio
+                  type="radio"
+                  name="sortDirection"
+                  value="desc"
+                  checked={sortDirection === 'desc'}
+                  onChange={() => setSortDirection('desc')}
+                />
+                {sortDirectionLabelMap[sortField].desc}
+              </SortRadioLabel>
+              <SortRadioLabel>
+                <SortRadio
+                  type="radio"
+                  name="sortDirection"
+                  value="asc"
+                  checked={sortDirection === 'asc'}
+                  onChange={() => setSortDirection('asc')}
+                />
+                {sortDirectionLabelMap[sortField].asc}
+              </SortRadioLabel>
+            </SortRadioGroup>
+          </SortRow>
         </FilterSection>
 
         <ButtonContainer>

@@ -5,6 +5,7 @@ import styled from '@emotion/styled';
 import { spacing } from '@/styles/theme/spacing';
 import { Listing, ListingParams } from '@/types/listings';
 import { fetchYoutubeListings } from '@/lib/api/youtubeListings';
+import { fetchYoutubeCategories, YoutubeCategory } from '@/lib/api/youtubeCategories';
 import ListingCard from './ListingCard';
 import FilterButton from './FilterButton';
 import FilterTags from './FilterTags';
@@ -69,6 +70,7 @@ export const ListingGrid = () => {
   const [filters, setFilters] = useState<ListingParams>({
     sort: ['createdAt,desc']
   });
+  const [categories, setCategories] = useState<YoutubeCategory[]>([]);
 
   useEffect(() => {
     const loadListings = async () => {
@@ -87,21 +89,28 @@ export const ListingGrid = () => {
     loadListings();
   }, [filters]);
 
+  useEffect(() => {
+    fetchYoutubeCategories().then(setCategories).catch(() => setCategories([]));
+  }, []);
+
   const handleFilterChange = (newFilters: ListingParams) => {
     setFilters(newFilters);
     setIsFilterModalOpen(false);
   };
 
-  const handleRemoveFilter = (key: keyof ListingParams) => {
+  const handleRemoveFilter = (key: keyof ListingParams, value?: string) => {
     setFilters(prev => {
       const newFilters = { ...prev };
-      delete newFilters[key];
-      
+      if (key === 'categoryIds' && value) {
+        newFilters.categoryIds = (newFilters.categoryIds ?? []).filter(id => id !== value);
+        if (newFilters.categoryIds.length === 0) delete newFilters.categoryIds;
+      } else {
+        delete newFilters[key];
+      }
       // 기본 정렬값 유지
       if (!newFilters.sort) {
         newFilters.sort = ['createdAt,desc'];
       }
-      
       return newFilters;
     });
   };
@@ -118,7 +127,7 @@ export const ListingGrid = () => {
     <GridContainer>
       <FilterContainer>
         <FilterButton onClick={() => setIsFilterModalOpen(true)} />
-        <FilterTags filters={filters} onRemoveFilter={handleRemoveFilter} />
+        <FilterTags filters={filters} onRemoveFilter={handleRemoveFilter} categories={categories} />
       </FilterContainer>
       <Grid>
         {listings.map((listing) => (
