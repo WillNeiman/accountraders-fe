@@ -2,10 +2,10 @@
 
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import LoginModal from '@/components/auth/LoginModal'
+import SignupModal from '@/components/auth/SignupModal'
 import { useAuth } from '@/contexts/AuthContext'
 
-export default function LoginPage() {
+export default function SignupPage() {
   const router = useRouter()
   const { user } = useAuth()
 
@@ -17,7 +17,7 @@ export default function LoginPage() {
   }, [user, router])
 
   return (
-    <LoginModal 
+    <SignupModal 
       isOpen={true} 
       onClose={() => router.push('/')}
     />

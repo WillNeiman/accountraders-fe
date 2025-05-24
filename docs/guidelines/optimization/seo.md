@@ -1,10 +1,4 @@
-# SEO 최적화 가이드라인
-
-## 관련 문서
-- [CSS 스타일링 가이드라인](../styling/css.md) - 성능 최적화 관련 내용
-- [반응형 디자인 가이드라인](../styling/responsive.md) - 이미지 최적화 관련 내용
-- [컴포넌트 구조 가이드라인](../architecture/component-route.md) - 메타데이터 구현 관련 내용
-- [프로젝트 체크리스트](../CHECKLIST.md) - 전체 체크리스트
+# SEO 가이드라인
 
 ## 1. 메타데이터 구현 전략
 
