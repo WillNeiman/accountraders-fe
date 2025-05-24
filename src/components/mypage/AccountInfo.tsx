@@ -11,10 +11,12 @@ import Input from '@/components/common/Input';
 import { useToast } from '@/contexts/ToastContext';
 
 const Section = styled.section`
-  margin-bottom: ${spacing[8]};
+  /* Layout */
+  margin-bottom: ${spacing[3]};
 `;
 
 const SectionTitle = styled.h2`
+  /* Typography */
   font-size: ${typography.fontSize.xl};
   font-weight: ${typography.fontWeight.bold};
   color: ${colors.text.primary};
@@ -22,16 +24,19 @@ const SectionTitle = styled.h2`
 `;
 
 const InfoGrid = styled.div`
+  /* Layout */
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: ${spacing[4]};
 `;
 
 const InfoItem = styled.div`
-  margin-bottom: ${spacing[4]};
+  /* Layout */
+  margin-bottom: ${spacing[1]};
 `;
 
 const Label = styled.label`
+  /* Typography */
   display: block;
   font-size: ${typography.fontSize.sm};
   font-weight: ${typography.fontWeight.medium};
@@ -40,17 +45,20 @@ const Label = styled.label`
 `;
 
 const Value = styled.div`
+  /* Typography */
   font-size: ${typography.fontSize.base};
   color: ${colors.text.primary};
+  /* Box Model */
   padding: ${spacing[3]};
   background: ${colors.background.gray};
   border-radius: ${spacing[2]};
 `;
 
 const ButtonGroup = styled.div`
+  /* Layout */
   display: flex;
   gap: ${spacing[4]};
-  margin-top: ${spacing[6]};
+  margin-bottom: ${spacing[10]};
 `;
 
 interface AccountInfoProps {
@@ -80,24 +88,6 @@ export default function AccountInfo({ userData, onUpdate }: AccountInfoProps) {
       setIsEditing(false);
     } catch (error) {
       showToast('계정 정보 업데이트에 실패했습니다.', 3000);
-    }
-  };
-
-  const handleWithdraw = async () => {
-    if (window.confirm('정말로 탈퇴하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
-      try {
-        await fetch('/api/v1/users/withdraw', {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ userId: userData.userId }),
-        });
-        showToast('계정이 성공적으로 탈퇴되었습니다.', 3000);
-        // 로그아웃 처리 및 홈페이지로 리다이렉트
-      } catch (error) {
-        showToast('계정 탈퇴에 실패했습니다.', 3000);
-      }
     }
   };
 
@@ -188,9 +178,6 @@ export default function AccountInfo({ userData, onUpdate }: AccountInfoProps) {
           <>
             <Button type="button" variant="primary" onClick={() => setIsEditing(true)}>
               수정
-            </Button>
-            <Button type="button" variant="secondary" onClick={handleWithdraw}>
-              회원 탈퇴
             </Button>
           </>
         )}
