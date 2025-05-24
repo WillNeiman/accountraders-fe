@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import styled from '@emotion/styled';
 import { colors } from '@/styles/theme/colors';
+import { getAccessToken } from '@/services/auth';
 
 const ProtectedLayoutContainer = styled.div`
   min-height: 100vh;
@@ -20,7 +21,8 @@ export default function ProtectedLayout({
   const { user, isLoading } = useAuth();
 
   useEffect(() => {
-    if (!isLoading && !user) {
+    const token = getAccessToken();
+    if (!isLoading && !user && !token) {
       router.push('/login');
     }
   }, [isLoading, user, router]);

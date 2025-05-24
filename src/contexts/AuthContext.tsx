@@ -32,8 +32,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setIsLoading(false);
         return;
       }
-      const user = await getCurrentUser();
-      setUser(user);
+      
+      try {
+        const user = await getCurrentUser();
+        setUser(user);
+      } catch (err) {
+        // 토큰이 있지만 사용자 정보를 가져오지 못한 경우
+        console.error('Failed to fetch user data:', err);
+        setUser(null);
+      }
     } catch (err: Error | unknown) {
       setUser(null);
       setError(err instanceof Error ? err : new Error('알 수 없는 오류가 발생했습니다.'));
