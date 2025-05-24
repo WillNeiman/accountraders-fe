@@ -6,7 +6,8 @@ import { ListingParams } from '@/types/listings';
 
 interface FilterTagsProps {
   filters: ListingParams;
-  onRemoveFilter: (key: keyof ListingParams) => void;
+  onRemoveFilter: (key: keyof ListingParams, value?: string) => void;
+  categories: { categoryId: string; categoryName: string }[];
 }
 
 const TagsContainer = styled.div`
@@ -78,13 +79,19 @@ const sortMap: Record<string, string> = {
   'viewCountOnPlatform,asc': '조회수 적은순',
 };
 
-const FilterTags = ({ filters, onRemoveFilter }: FilterTagsProps) => {
-  const tags = [];
+const FilterTags = ({ filters, onRemoveFilter, categories }: FilterTagsProps) => {
+  const tags: { key: string; label: string; value?: string }[] = [];
 
   if (filters.categoryIds && filters.categoryIds.length > 0) {
-    tags.push({
-      key: 'categoryIds',
-      label: `카테고리 ${filters.categoryIds.length}개 선택`,
+    filters.categoryIds.forEach(id => {
+      const cat = categories.find(c => c.categoryId === id);
+      if (cat) {
+        tags.push({
+          key: `categoryId-${id}`,
+          label: cat.categoryName,
+          value: id,
+        });
+      }
     });
   }
 
@@ -94,7 +101,7 @@ const FilterTags = ({ filters, onRemoveFilter }: FilterTagsProps) => {
       : filters.minPrice
         ? `${formatPrice(filters.minPrice)} 이상`
         : `${formatPrice(filters.maxPrice!)} 이하`;
-    tags.push({ key: 'price', label: priceLabel });
+    tags.push({ key: 'price', label: priceLabel, value: undefined });
   }
 
   if (filters.minSubscribers || filters.maxSubscribers) {
@@ -103,7 +110,7 @@ const FilterTags = ({ filters, onRemoveFilter }: FilterTagsProps) => {
       : filters.minSubscribers
         ? `${formatNumber(filters.minSubscribers)} 이상`
         : `${formatNumber(filters.maxSubscribers!)} 이하`;
-    tags.push({ key: 'subscribers', label: subsLabel });
+    tags.push({ key: 'subscribers', label: subsLabel, value: undefined });
   }
 
   if (filters.sort && filters.sort.length > 0) {
@@ -122,11 +129,13 @@ const FilterTags = ({ filters, onRemoveFilter }: FilterTagsProps) => {
 
   return (
     <TagsContainer>
-      {tags.map(({ key, label }) => (
+      {tags.map(({ key, label, value }) => (
         <Tag key={key}>
           {label}
           <RemoveButton onClick={() => {
-            if (key.startsWith('sort-')) {
+            if (key.startsWith('categoryId-')) {
+              onRemoveFilter('categoryIds', value);
+            } else if (key.startsWith('sort-')) {
               onRemoveFilter('sort');
             } else {
               onRemoveFilter(key as keyof ListingParams);

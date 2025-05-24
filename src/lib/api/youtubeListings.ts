@@ -33,9 +33,16 @@ export const fetchYoutubeListings = async (params: ListingParams): Promise<Listi
 
   // 정렬
   if (params.sort && params.sort.length > 0) {
-    params.sort.forEach(sort => {
-      queryParams.append('sort', sort);
-    });
+    const sortParams = [...params.sort];
+    const createdAtIndex = sortParams.findIndex(sort => sort.startsWith('createdAt,'));
+    
+    if (createdAtIndex !== -1) {
+      // createdAt 정렬 조건을 제거하고 마지막에 추가
+      const createdAtSort = sortParams.splice(createdAtIndex, 1)[0];
+      sortParams.push(createdAtSort);
+    }
+    
+    queryParams.append('sort', sortParams.join(','));
   }
 
   // 페이지네이션
