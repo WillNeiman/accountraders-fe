@@ -233,6 +233,26 @@ const SortRadio = styled.input`
   margin-right: ${spacing[1]};
 `;
 
+const PriceInput = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${spacing[2]};
+  position: relative;
+`;
+
+const SubscriberInput = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${spacing[2]};
+  position: relative;
+`;
+
+const UnitLabel = styled.span`
+  color: ${colors.gray[500]};
+  font-size: ${typography.fontSize.sm};
+  margin-left: ${spacing[1]};
+`;
+
 const FilterModal = ({ isOpen, onClose, onFilterChange, initialFilters = {} }: FilterModalProps) => {
   const [localFilters, setLocalFilters] = useState<FilterValues>(initialFilters);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -321,9 +341,8 @@ const FilterModal = ({ isOpen, onClose, onFilterChange, initialFilters = {} }: F
       sort: ['createdAt,desc']
     });
     setErrors({});
-    onFilterChange({
-      sort: ['createdAt,desc']
-    });
+    setSortField('createdAt');
+    setSortDirection('desc');
   };
 
   const handleApply = () => {
@@ -350,6 +369,26 @@ const FilterModal = ({ isOpen, onClose, onFilterChange, initialFilters = {} }: F
 
   const selectedCount = localFilters.categoryIds?.length || 0;
   const selectedLabel = selectedCount > 0 ? `카테고리 ${selectedCount}개 선택됨` : '카테고리 선택';
+
+  const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'min' | 'max') => {
+    const value = e.target.value.replace(/[^0-9]/g, '');
+    const numericValue = value ? parseInt(value) * 10000 : undefined;
+    
+    setLocalFilters(prev => ({
+      ...prev,
+      [type === 'min' ? 'minPrice' : 'maxPrice']: numericValue
+    }));
+  };
+
+  const handleSubscriberChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'min' | 'max') => {
+    const value = e.target.value.replace(/[^0-9]/g, '');
+    const numericValue = value ? parseInt(value) * 1000 : undefined;
+    
+    setLocalFilters(prev => ({
+      ...prev,
+      [type === 'min' ? 'minSubscribers' : 'maxSubscribers']: numericValue
+    }));
+  };
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="small" title="필터" titleAlign="center">
@@ -380,70 +419,60 @@ const FilterModal = ({ isOpen, onClose, onFilterChange, initialFilters = {} }: F
 
         <FilterSection>
           <FilterSectionHeader>
-            <FilterTitle>가격 범위</FilterTitle>
+            <FilterTitle>
+              가격 범위
+              <UnitLabel>(만원)</UnitLabel>
+            </FilterTitle>
             {(errors.minPrice || errors.maxPrice) && (
               <ErrorMessage>{errors.minPrice || errors.maxPrice}</ErrorMessage>
             )}
           </FilterSectionHeader>
-          <RangeInputContainer>
+          <PriceInput>
             <RangeInput
-              type="number"
+              type="text"
               placeholder="최소"
-              value={localFilters.minPrice || ''}
-              onChange={(e) => validateAndUpdate(
-                'minPrice',
-                e.target.value ? Number(e.target.value) : undefined,
-                'minPrice',
-                'maxPrice'
-              )}
+              value={localFilters.minPrice ? (localFilters.minPrice / 10000).toString() : ''}
+              onChange={(e) => handlePriceChange(e, 'min')}
+              aria-label="최소 가격"
             />
-            <Divider>~</Divider>
+            <span>~</span>
             <RangeInput
-              type="number"
+              type="text"
               placeholder="최대"
-              value={localFilters.maxPrice || ''}
-              onChange={(e) => validateAndUpdate(
-                'maxPrice',
-                e.target.value ? Number(e.target.value) : undefined,
-                'minPrice',
-                'maxPrice'
-              )}
+              value={localFilters.maxPrice ? (localFilters.maxPrice / 10000).toString() : ''}
+              onChange={(e) => handlePriceChange(e, 'max')}
+              aria-label="최대 가격"
             />
-          </RangeInputContainer>
+          </PriceInput>
         </FilterSection>
 
         <FilterSection>
           <FilterSectionHeader>
-            <FilterTitle>구독자 수</FilterTitle>
+            <FilterTitle>
+              구독자 수
+              <UnitLabel>(천명)</UnitLabel>
+            </FilterTitle>
             {(errors.minSubscribers || errors.maxSubscribers) && (
               <ErrorMessage>{errors.minSubscribers || errors.maxSubscribers}</ErrorMessage>
             )}
           </FilterSectionHeader>
-          <RangeInputContainer>
+          <SubscriberInput>
             <RangeInput
-              type="number"
+              type="text"
               placeholder="최소"
-              value={localFilters.minSubscribers || ''}
-              onChange={(e) => validateAndUpdate(
-                'minSubscribers',
-                e.target.value ? Number(e.target.value) : undefined,
-                'minSubscribers',
-                'maxSubscribers'
-              )}
+              value={localFilters.minSubscribers ? (localFilters.minSubscribers / 1000).toString() : ''}
+              onChange={(e) => handleSubscriberChange(e, 'min')}
+              aria-label="최소 구독자 수"
             />
-            <Divider>~</Divider>
+            <span>~</span>
             <RangeInput
-              type="number"
+              type="text"
               placeholder="최대"
-              value={localFilters.maxSubscribers || ''}
-              onChange={(e) => validateAndUpdate(
-                'maxSubscribers',
-                e.target.value ? Number(e.target.value) : undefined,
-                'minSubscribers',
-                'maxSubscribers'
-              )}
+              value={localFilters.maxSubscribers ? (localFilters.maxSubscribers / 1000).toString() : ''}
+              onChange={(e) => handleSubscriberChange(e, 'max')}
+              aria-label="최대 구독자 수"
             />
-          </RangeInputContainer>
+          </SubscriberInput>
         </FilterSection>
 
         <FilterSection>

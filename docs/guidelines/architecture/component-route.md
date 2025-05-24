@@ -119,6 +119,115 @@ const StyledComponent = styled.div`
 `;
 ```
 
+#### 1.2.5 상수 및 유틸리티 관리
+- 상수는 `src/constants` 디렉토리에서 관리
+  ```typescript
+  // src/constants/filters.ts
+  export const SORT_OPTIONS = {
+    'createdAt,desc': '최신순',
+    'createdAt,asc': '오래된순',
+    // ...
+  } as const;
+  ```
+
+- 유틸리티 함수는 `src/utils` 디렉토리에서 관리
+  ```typescript
+  // src/utils/formatters.ts
+  export const formatPrice = (price: number) => {
+    return new Intl.NumberFormat('ko-KR', {
+      style: 'currency',
+      currency: 'KRW',
+      maximumFractionDigits: 0,
+    }).format(price);
+  };
+  ```
+
+- 컴포넌트 내부에서만 사용되는 상수/유틸리티가 아닌 경우 반드시 분리
+- 하이드레이션 오류 방지를 위해 날짜, 숫자 포맷팅 등의 유틸리티는 클라이언트 사이드에서만 실행되도록 처리
+
+#### 1.2.6 성능 최적화
+- 자주 리렌더링되는 컴포넌트는 `memo` 사용
+  ```typescript
+  const FilterTags = memo(({ filters, onRemoveFilter, categories }: FilterTagsProps) => {
+    // 컴포넌트 구현
+  });
+  ```
+
+- 이벤트 핸들러는 `useCallback` 사용
+  ```typescript
+  const handleRemoveFilter = useCallback((key: keyof ListingParams, value?: string) => {
+    // 핸들러 구현
+  }, [/* 의존성 배열 */]);
+  ```
+
+- 복잡한 계산은 `useMemo` 사용
+  ```typescript
+  const formattedTags = useMemo(() => {
+    // 태그 포맷팅 로직
+  }, [filters, categories]);
+  ```
+
+#### 1.2.7 접근성
+- 모든 인터랙티브 요소에 적절한 ARIA 속성 추가
+  ```typescript
+  <button
+    onClick={handleClick}
+    aria-label="필터 제거"
+    role="button"
+  >
+    <span className="sr-only">필터 제거</span>
+    <XIcon />
+  </button>
+  ```
+
+- 키보드 네비게이션 지원
+  ```typescript
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      handleClick();
+    }
+  };
+  ```
+
+- 스크린 리더 지원을 위한 적절한 role 속성 사용
+  ```typescript
+  <div role="list">
+    {items.map(item => (
+      <div key={item.id} role="listitem">
+        {item.content}
+      </div>
+    ))}
+  </div>
+  ```
+
+#### 1.2.8 스타일 컴포넌트 네이밍
+- 컴포넌트 이름을 prefix로 사용
+  ```typescript
+  const FilterTagsContainer = styled.div`...`;
+  const FilterTag = styled.div`...`;
+  const FilterTagLabel = styled.span`...`;
+  ```
+
+- 유틸리티 스타일은 목적을 명확히 표현
+  ```typescript
+  const FlexCenter = styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  `;
+  ```
+
+- 스타일 컴포넌트는 관련 컴포넌트와 함께 배치
+  ```typescript
+  // FilterTags.tsx
+  const FilterTagsContainer = styled.div`...`;
+  const FilterTag = styled.div`...`;
+  
+  const FilterTags = () => {
+    // 컴포넌트 구현
+  };
+  ```
+
 ### 1.3 에러 처리
 
 #### 1.3.1 전역 에러 처리
