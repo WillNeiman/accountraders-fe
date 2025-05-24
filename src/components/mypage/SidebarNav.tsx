@@ -18,40 +18,67 @@ const NavItem = styled.li`
   margin-bottom: ${spacing[2]};
 `;
 
-const NavLink = styled(Link, {
-  shouldForwardProp: (prop) => isPropValid(prop) && prop !== 'isActive',
-})<{ isActive: boolean }>`
-  display: flex;
-  align-items: center;
-  padding: ${spacing[3]};
-  color: ${props => props.isActive ? colors.primary[600] : colors.text.primary};
-  background: ${props => props.isActive ? colors.primary[50] : 'transparent'};
-  border-radius: ${spacing[2]};
-  font-size: ${typography.fontSize.base};
-  font-weight: ${props => props.isActive ? typography.fontWeight.semibold : typography.fontWeight.normal};
-  text-decoration: none;
-  transition: all 0.2s ease-in-out;
-
-  &:hover {
-    background: ${colors.primary[50]};
-    color: ${colors.primary[600]};
-  }
-`;
-
 const NavSection = styled.div`
   margin-bottom: ${spacing[6]};
+  padding-bottom: ${spacing[3]};
+  border-bottom: 1px solid ${colors.gray[100]};
 
   &:last-child {
     margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
   }
 `;
 
 const NavSectionTitle = styled.h3`
-  font-size: ${typography.fontSize.sm};
-  font-weight: ${typography.fontWeight.semibold};
+  /* Layout */
+  display: block;
+  padding: ${spacing[2]} ${spacing[3]};
+  margin-bottom: ${spacing[2]};
+  /* Visual */
+  background: ${colors.background.gray};
+  border-radius: ${spacing[1]};
+  /* Typography */
+  font-size: ${typography.fontSize.xs};
+  font-weight: ${typography.fontWeight.bold};
   color: ${colors.text.secondary};
-  margin-bottom: ${spacing[3]};
-  padding: 0 ${spacing[3]};
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+`;
+
+const NavLink = styled(Link, {
+  shouldForwardProp: (prop) => isPropValid(prop) && prop !== 'isActive',
+})<{ isActive: boolean }>`
+  /* Layout */
+  display: flex;
+  align-items: center;
+  padding: ${spacing[3]};
+  margin: 0 ${spacing[1]};
+
+  /* Box Model */
+  border-radius: ${spacing[2]};
+
+  /* Visual */
+  color: ${props => props.isActive ? colors.primary[600] : colors.text.primary};
+  background: ${props => props.isActive ? colors.primary[50] : 'transparent'};
+  transition: all 0.2s ease-in-out;
+  box-shadow: ${props => props.isActive ? `0 0 0 2px ${colors.primary[100]}` : 'none'};
+
+  /* Typography */
+  font-size: ${typography.fontSize.base};
+  font-weight: ${props => props.isActive ? typography.fontWeight.semibold : typography.fontWeight.normal};
+  text-decoration: none;
+
+  &:hover {
+    background: ${colors.primary[50]};
+    color: ${colors.primary[600]};
+    box-shadow: 0 0 0 2px ${colors.primary[100]};
+  }
+
+  @media (max-width: 640px) {
+    padding: ${spacing[2]};
+    margin: 0;
+  }
 `;
 
 const navItems = {

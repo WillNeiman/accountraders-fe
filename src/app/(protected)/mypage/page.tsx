@@ -36,23 +36,27 @@ const PageDescription = styled.p`
 `;
 
 const ContentGrid = styled.div`
+  /* Layout */
   display: grid;
   grid-template-columns: 1fr;
   align-items: flex-start;
-  gap: ${spacing[8]};
+  gap: ${spacing[2]};
 
+  /* Responsive */
   ${mediaQueries.lg} {
     grid-template-columns: 280px 1fr;
   }
 `;
 
 const Sidebar = styled.nav`
+  /* Layout */
   background: ${colors.background.paper};
   border-radius: ${spacing[2]};
   padding: ${spacing[4]};
 `;
 
 const MainContent = styled.main`
+  /* Layout */
   background: ${colors.background.paper};
   border-radius: ${spacing[2]};
   padding: ${spacing[6]};
