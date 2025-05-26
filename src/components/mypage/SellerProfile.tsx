@@ -160,7 +160,7 @@ export default function SellerProfile() {
   }
 
   return (
-    <form onSubmit={handleSubmit}>
+    <>
       <Section>
         <SectionTitle>판매자 프로필</SectionTitle>
         <InfoGrid>
@@ -220,7 +220,7 @@ export default function SellerProfile() {
 
       <ButtonGroup>
         {isEditing ? (
-          <>
+          <form onSubmit={handleSubmit}>
             <Button type="submit" variant="primary">
               저장
             </Button>
@@ -236,13 +236,20 @@ export default function SellerProfile() {
             >
               취소
             </Button>
-          </>
+          </form>
         ) : (
-          <Button type="button" variant="primary" onClick={() => setIsEditing(true)}>
+          <Button 
+            type="button" 
+            variant="primary" 
+            onClick={(e) => {
+              e.preventDefault();
+              setIsEditing(true);
+            }}
+          >
             수정
           </Button>
         )}
       </ButtonGroup>
-    </form>
+    </>
   );
 } 

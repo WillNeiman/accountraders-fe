@@ -92,7 +92,7 @@ export default function AccountInfo({ userData, onUpdate }: AccountInfoProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <>
       <Section>
         <SectionTitle>기본 정보</SectionTitle>
         <InfoGrid>
@@ -130,7 +130,7 @@ export default function AccountInfo({ userData, onUpdate }: AccountInfoProps) {
                   name="contactNumber"
                   value={formData.contactNumber}
                   onChange={handleInputChange}
-                  placeholder="연락처를 입력하세요"
+                  placeholder="숫자만 입력해주세요 (예: 01012345678)"
                 />
               </InfoItem>
             </>
@@ -155,7 +155,7 @@ export default function AccountInfo({ userData, onUpdate }: AccountInfoProps) {
 
       <ButtonGroup>
         {isEditing ? (
-          <>
+          <form onSubmit={handleSubmit}>
             <Button type="submit" variant="primary">
               저장
             </Button>
@@ -173,15 +173,20 @@ export default function AccountInfo({ userData, onUpdate }: AccountInfoProps) {
             >
               취소
             </Button>
-          </>
+          </form>
         ) : (
-          <>
-            <Button type="button" variant="primary" onClick={() => setIsEditing(true)}>
-              수정
-            </Button>
-          </>
+          <Button 
+            type="button" 
+            variant="primary" 
+            onClick={(e) => {
+              e.preventDefault();
+              setIsEditing(true);
+            }}
+          >
+            수정
+          </Button>
         )}
       </ButtonGroup>
-    </form>
+    </>
   );
 } 

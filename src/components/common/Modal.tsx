@@ -1,29 +1,73 @@
-import { useEffect, useRef } from 'react';
+import { forwardRef } from 'react';
 import styled from '@emotion/styled';
+import { keyframes } from '@emotion/react';
 import { colors } from '@/styles/theme/colors';
 import { spacing } from '@/styles/theme/spacing';
 import { typography } from '@/styles/theme/typography';
 import { zIndex } from '@/styles/theme/zIndex';
 import { ModalProps } from '@/types/components';
 
-const Overlay = styled.div<{ isOpen: boolean }>`
+const fadeIn = keyframes`
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+`;
+
+const slideIn = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+`;
+
+const fadeOut = keyframes`
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+`;
+
+const slideOut = keyframes`
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+`;
+
+const Overlay = styled.div<{ isClosing?: boolean }>`
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
-  align-items: center;
   justify-content: center;
-  background-color: ${colors.gray[900]}80;
-  opacity: ${props => props.isOpen ? 1 : 0};
-  visibility: ${props => props.isOpen ? 'visible' : 'hidden'};
-  transition: all 0.3s ease-in-out;
-  z-index: ${zIndex.modal};
+  align-items: center;
+  z-index: 1000;
+  animation: ${props => props.isClosing ? fadeOut : fadeIn} 0.3s ease-in-out forwards;
 `;
 
-const ModalWrapper = styled.div<{ size?: 'small' | 'medium' | 'large' }>`
-  width: ${props => {
+const ModalContainer = styled.div<{ isClosing?: boolean; size?: 'small' | 'medium' | 'large' }>`
+  background: ${colors.background.default};
+  border-radius: ${spacing[2]};
+  padding: ${spacing[10]};
+  position: relative;
+  width: 100%;
+  max-width: ${props => {
     switch (props.size) {
       case 'small':
         return '400px';
@@ -33,67 +77,22 @@ const ModalWrapper = styled.div<{ size?: 'small' | 'medium' | 'large' }>`
         return '600px';
     }
   }};
-  max-width: 90%;
-  max-height: 90vh;
-  position: relative;
-  overflow: hidden;
-  border-radius: ${spacing[4]};
-`;
-
-const ModalContainer = styled.div<{ isOpen: boolean }>`
-  background-color: ${colors.background.default};
-  padding: ${spacing[6]};
-  position: relative;
-  width: 100%;
-  height: 100%;
-  max-height: 90vh;
-  overflow-y: auto;
-  transform: ${props => props.isOpen ? 'scale(1)' : 'scale(0.9)'};
-  opacity: ${props => props.isOpen ? 1 : 0};
-  transition: all 0.3s ease-in-out;
-  user-select: text;
-  
-  /* 스크롤바 스타일링 */
-  &::-webkit-scrollbar {
-    width: 8px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: ${colors.gray[300]};
-    border-radius: 4px;
-  }
-
-  &::-webkit-scrollbar-thumb:hover {
-    background: ${colors.gray[400]};
-  }
+  animation: ${props => props.isClosing ? slideOut : slideIn} 0.3s ease-in-out forwards;
 `;
 
 const CloseButton = styled.button`
-  /* Layout */
   position: absolute;
   top: ${spacing[4]};
   right: ${spacing[4]};
-
-  /* Box Model */
-  padding: ${spacing[2]};
-  border: none;
-
-  /* Visual */
   background: none;
-
-  /* Typography */
-  color: ${colors.gray[500]};
-
-  /* Others */
+  border: none;
   cursor: pointer;
+  color: ${colors.text.secondary};
+  padding: ${spacing[1]};
   transition: color 0.2s;
 
   &:hover {
-    color: ${colors.gray[700]};
+    color: ${colors.text.primary};
   }
 `;
 
@@ -105,73 +104,30 @@ const Title = styled.h2<{ align?: 'left' | 'center' | 'right' }>`
   text-align: ${props => props.align || 'left'};
 `;
 
-const Modal = ({
-  isOpen,
-  onClose,
-  title,
-  children,
-  size = 'medium',
-  showCloseButton = true,
-  titleAlign = 'left',
-}: ModalProps) => {
-  const modalRef = useRef<HTMLDivElement>(null);
-  const isDraggingRef = useRef(false);
-
-  useEffect(() => {
-    const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        onClose();
-      }
-    };
-
-    if (isOpen) {
-      document.addEventListener('keydown', handleEscape);
-      document.body.style.overflow = 'hidden';
-    }
-
-    return () => {
-      document.removeEventListener('keydown', handleEscape);
-      document.body.style.overflow = 'unset';
-    };
-  }, [isOpen, onClose]);
-
-  const handleMouseDown = (e: React.MouseEvent) => {
-    if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
-      isDraggingRef.current = true;
-    }
-  };
-
-  const handleMouseUp = (e: React.MouseEvent) => {
-    if (isDraggingRef.current && modalRef.current && !modalRef.current.contains(e.target as Node)) {
+const Modal = forwardRef<HTMLDivElement, ModalProps>(({ isOpen, onClose, title, children, size = 'medium', showCloseButton = true, titleAlign = 'left' }, ref) => {
+  const handleOverlayClick = (e: React.MouseEvent) => {
+    if (e.target === e.currentTarget) {
       onClose();
     }
-    isDraggingRef.current = false;
   };
 
   if (!isOpen) return null;
 
   return (
-    <Overlay 
-      isOpen={isOpen} 
-      onMouseDown={handleMouseDown}
-      onMouseUp={handleMouseUp}
-    >
-      <ModalWrapper size={size}>
-        <ModalContainer
-          ref={modalRef}
-          isOpen={isOpen}
-        >
-          {showCloseButton && (
-            <CloseButton onClick={onClose}>
-              ✕
-            </CloseButton>
-          )}
-          {title && <Title align={titleAlign}>{title}</Title>}
-          {children}
-        </ModalContainer>
-      </ModalWrapper>
+    <Overlay onClick={handleOverlayClick}>
+      <ModalContainer ref={ref} size={size}>
+        {showCloseButton && (
+          <CloseButton onClick={onClose} aria-label="닫기">
+            ✕
+          </CloseButton>
+        )}
+        {title && <Title align={titleAlign}>{title}</Title>}
+        {children}
+      </ModalContainer>
     </Overlay>
   );
-};
+});
+
+Modal.displayName = 'Modal';
 
 export default Modal; 

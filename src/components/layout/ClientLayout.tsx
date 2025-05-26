@@ -10,6 +10,7 @@ import Footer from './Footer';
 import LoginModal from '../auth/LoginModal';
 import SignupModal from '../auth/SignupModal';
 import { useAuth } from '@/contexts/AuthContext';
+import { typography } from "@/styles/theme/typography";
 
 const HeaderContainer = styled.header`
   position: fixed;
@@ -110,12 +111,53 @@ const MobileMenu = styled.div<{ isOpen: boolean }>`
     right: 0;
     width: 240px;
     height: 100vh;
-    background: #fff;
+    background: ${colors.background.default};
     padding: ${spacing[6]};
-    box-shadow: -2px 0 8px rgba(0,0,0,0.1);
+    box-shadow: 0 0 ${spacing[2]} ${colors.gray[200]};
     z-index: ${zIndex.modal + 1};
     gap: ${spacing[4]};
   }
+`;
+
+const MobileMenuLink = styled.button`
+  /* Layout */
+  display: flex;
+  align-items: center;
+  
+  /* Box Model */
+  padding: ${spacing[2]};
+  
+  /* Typography */
+  font-size: ${typography.fontSize.base};
+  color: ${colors.text.primary};
+  
+  /* Visual */
+  background: none;
+  border: none;
+  
+  /* Others */
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  
+  &:hover {
+    color: ${colors.primary[600]};
+  }
+  
+  &:focus-visible {
+    outline: 2px solid ${colors.primary[500]};
+    outline-offset: 2px;
+  }
+`;
+
+const LoadingText = styled.span`
+  color: ${colors.text.secondary};
+  font-size: ${typography.fontSize.sm};
+`;
+
+const UserName = styled.span`
+  color: ${colors.text.primary};
+  font-weight: ${typography.fontWeight.medium};
 `;
 
 // ClientLayout.tsx 예시 (필요시 적용)
@@ -246,34 +288,34 @@ const Header = memo(() => {
         <MobileMenuOverlay isOpen={isMenuOpen} onClick={() => setIsMenuOpen(false)} />
         <MobileMenu isOpen={isMenuOpen}>
           {isLoading ? (
-            <span>로딩중...</span>
+            <LoadingText>로딩중...</LoadingText>
           ) : user ? (
             <>
-              <span aria-label={`${user.nickname}님`}>{user.nickname}님</span>
-              <NavLink 
-                onClick={() => { setIsMenuOpen(false); logout(); }}
-                onKeyDown={(e) => handleKeyDown(e, () => { setIsMenuOpen(false); logout(); })}
+              <UserName aria-label={`${user.nickname}님`}>{user.nickname}님</UserName>
+              <MobileMenuLink 
+                onClick={logout}
+                onKeyDown={(e) => handleKeyDown(e, logout)}
                 aria-label="로그아웃"
               >
                 로그아웃
-              </NavLink>
+              </MobileMenuLink>
             </>
           ) : (
             <>
-              <NavLink 
-                onClick={() => { setIsMenuOpen(false); handleLoginClick(); }}
-                onKeyDown={(e) => handleKeyDown(e, () => { setIsMenuOpen(false); handleLoginClick(); })}
+              <MobileMenuLink 
+                onClick={handleLoginClick}
+                onKeyDown={(e) => handleKeyDown(e, handleLoginClick)}
                 aria-label="로그인"
               >
                 로그인
-              </NavLink>
-              <NavLink 
-                onClick={() => { setIsMenuOpen(false); handleSignupClick(); }}
-                onKeyDown={(e) => handleKeyDown(e, () => { setIsMenuOpen(false); handleSignupClick(); })}
+              </MobileMenuLink>
+              <MobileMenuLink 
+                onClick={handleSignupClick}
+                onKeyDown={(e) => handleKeyDown(e, handleSignupClick)}
                 aria-label="회원가입"
               >
                 회원가입
-              </NavLink>
+              </MobileMenuLink>
             </>
           )}
         </MobileMenu>

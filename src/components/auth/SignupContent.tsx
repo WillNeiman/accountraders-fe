@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import styled from '@emotion/styled';
 import { spacing } from '@/styles/theme/spacing';
+import { colors } from '@/styles/theme/colors';
+import { typography } from '@/styles/theme/typography';
 import SignupForm from './SignupForm';
 import Button from '../common/Button';
 import Checkbox from '../common/Checkbox';
@@ -16,13 +18,13 @@ const Header = styled.div`
 `;
 
 const Logo = styled.h1`
-  font-size: 24px;
-  font-weight: bold;
+  font-size: ${typography.fontSize['2xl']};
+  font-weight: ${typography.fontWeight.bold};
   margin-bottom: ${spacing[2]};
 `;
 
 const Subtitle = styled.p`
-  color: #666;
+  color: ${colors.text.secondary};
 `;
 
 const TermsContainer = styled.div`
@@ -32,8 +34,8 @@ const TermsContainer = styled.div`
 `;
 
 const TermsText = styled.p`
-  font-size: 14px;
-  color: #666;
+  font-size: ${typography.fontSize.sm};
+  color: ${colors.text.secondary};
   text-align: center;
   margin-top: ${spacing[2]};
 `;
@@ -41,15 +43,31 @@ const TermsText = styled.p`
 const TermsRow = styled.div`
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: ${spacing[2]};
 `;
 
 const TermsLink = styled.a`
-  color: #0070f3;
+  color: ${colors.primary[500]};
   text-decoration: underline;
-  font-size: 13px;
+  font-size: ${typography.fontSize.sm};
   cursor: pointer;
   margin-left: ${spacing[2]};
+`;
+
+const RequiredMark = styled.span`
+  color: ${colors.error.main};
+`;
+
+const OptionalMark = styled.span`
+  color: ${colors.text.secondary};
+`;
+
+const SubmitButton = styled(Button)`
+  margin-top: ${spacing[2]};
+`;
+
+const GoogleSignupButton = styled(Button)`
+  margin-top: ${spacing[4]};
 `;
 
 interface SignupContentProps {
@@ -112,7 +130,7 @@ export default function SignupContent({ onSubmit }: SignupContentProps) {
             checked={terms.service}
             onChange={e => handleTermChange('service', e.target.checked)}
             label={<>
-              이용약관 동의 <span style={{color:'#ff4444'}}>(필수)</span>
+              이용약관 동의 <RequiredMark>(필수)</RequiredMark>
               <TermsLink href="/terms/service" target="_blank">보기</TermsLink>
             </>}
           />
@@ -122,7 +140,7 @@ export default function SignupContent({ onSubmit }: SignupContentProps) {
             checked={terms.privacy}
             onChange={e => handleTermChange('privacy', e.target.checked)}
             label={<>
-              개인정보처리방침 동의 <span style={{color:'#ff4444'}}>(필수)</span>
+              개인정보처리방침 동의 <RequiredMark>(필수)</RequiredMark>
               <TermsLink href="/terms/privacy" target="_blank">보기</TermsLink>
             </>}
           />
@@ -132,7 +150,7 @@ export default function SignupContent({ onSubmit }: SignupContentProps) {
             checked={terms.marketing}
             onChange={e => handleTermChange('marketing', e.target.checked)}
             label={<>
-              마케팅 정보 수신 동의 <span style={{color:'#888'}}>(선택)</span>
+              마케팅 정보 수신 동의 <OptionalMark>(선택)</OptionalMark>
               <TermsLink href="/terms/marketing" target="_blank">보기</TermsLink>
             </>}
           />
@@ -142,26 +160,24 @@ export default function SignupContent({ onSubmit }: SignupContentProps) {
         </TermsText>
       </TermsContainer>
       <div>
-        <Button
+        <SubmitButton
           type="submit"
           variant="primary"
           fullWidth
-          style={{ marginTop: spacing[2] }}
           disabled={!formState.isFormValid || formState.isLoading}
           onClick={() => {
             document.querySelector('form')?.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
           }}
         >
           {formState.isLoading ? '가입 중...' : '회원가입'}
-        </Button>
+        </SubmitButton>
         {/* 구글 회원가입 기능 임시 중단
-        <Button
+        <GoogleSignupButton
           variant="secondary"
           fullWidth
-          style={{ marginTop: spacing[4] }}
         >
           Google 계정으로 가입
-        </Button>
+        </GoogleSignupButton>
         */}
       </div>
     </Container>

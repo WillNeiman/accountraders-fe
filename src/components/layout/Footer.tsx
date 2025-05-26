@@ -7,6 +7,9 @@ import { spacing } from '@/styles/theme/spacing';
 import { typography } from '@/styles/theme/typography';
 import { mediaQueries } from '@/styles/theme/breakpoints';
 
+const MAX_WIDTH = '1280px';
+const MOBILE_BREAKPOINT = '767px';
+
 const FooterWrapper = styled.footer`
   /* Layout */
   width: 100%;
@@ -20,7 +23,7 @@ const FooterWrapper = styled.footer`
 `;
 
 const FooterContainer = styled.div`
-  max-width: 1280px;
+  max-width: ${MAX_WIDTH};
   margin: 0 auto;
   padding: 0 ${spacing[4]};
 
