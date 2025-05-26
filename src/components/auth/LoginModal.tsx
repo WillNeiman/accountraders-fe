@@ -10,6 +10,7 @@ import { login, getCurrentUser } from '@/services/auth';
 import LoginContent from './LoginContent';
 import { useToast } from '@/contexts/ToastContext';
 import { useAuth } from '@/contexts/AuthContext';
+import Modal from '@/components/common/Modal';
 
 const fadeIn = keyframes`
   from {
@@ -123,13 +124,8 @@ export default function LoginModal({ isOpen, onClose, onSignupClick, onLoginSucc
   if (!isOpen) return null;
 
   return (
-    <Overlay onClick={handleOverlayClick}>
-      <ModalContainer>
-        <CloseButton onClick={onClose} aria-label="닫기">
-          ✕
-        </CloseButton>
-        <LoginContent onSubmit={handleLogin} onSignupClick={onSignupClick} />
-      </ModalContainer>
-    </Overlay>
+    <Modal isOpen={isOpen} onClose={onClose} size="small">
+      <LoginContent onSubmit={handleLogin} onSignupClick={onSignupClick} />
+    </Modal>
   );
 } 

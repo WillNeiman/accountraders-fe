@@ -9,6 +9,8 @@ import { User } from '@/types/user';
 import Button from '@/components/common/Button';
 import Input from '@/components/common/Input';
 import { useToast } from '@/contexts/ToastContext';
+import { useDupCheck } from '@/hooks/useDupCheck';
+import { FaSpinner, FaCheckCircle } from 'react-icons/fa';
 
 const Section = styled.section`
   /* Layout */
@@ -61,6 +63,23 @@ const ButtonGroup = styled.div`
   margin-bottom: ${spacing[10]};
 `;
 
+const ValidationMessage = styled.span<{ isValid?: boolean; isError?: boolean }>`
+  font-size: ${typography.fontSize.xs};
+  color: ${props => {
+    if (props.isError) return colors.error.main;
+    return props.isValid ? colors.success.main : colors.gray[500];
+  }};
+`;
+
+const InputRightIcon = styled.span`
+  position: absolute;
+  right: 12px;
+  top: 38px;
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+`;
+
 interface AccountInfoProps {
   userData: User;
   onUpdate: (data: Partial<User>) => Promise<void>;
@@ -74,6 +93,9 @@ export default function AccountInfo({ userData, onUpdate }: AccountInfoProps) {
     fullName: userData.fullName || '',
     contactNumber: userData.contactNumber || '',
   });
+
+  const isNicknameValid = formData.nickname.length >= 2 && formData.nickname.length <= 16;
+  const dupCheck = useDupCheck(formData.nickname, isNicknameValid);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -106,14 +128,33 @@ export default function AccountInfo({ userData, onUpdate }: AccountInfoProps) {
           </InfoItem>
           {isEditing ? (
             <>
-              <InfoItem>
+              <InfoItem style={{ position: 'relative' }}>
                 <Label>닉네임</Label>
                 <Input
                   name="nickname"
                   value={formData.nickname}
                   onChange={handleInputChange}
+                  onBlur={() => { dupCheck.check(); }}
                   placeholder="닉네임을 입력하세요"
                 />
+                <ValidationMessage
+                  isError={!isNicknameValid || dupCheck.status === 'invalid'}
+                  isValid={isNicknameValid && dupCheck.status === 'valid'}
+                >
+                  {!isNicknameValid
+                    ? '닉네임은 2-16자 사이여야 합니다'
+                    : dupCheck.status === 'invalid'
+                      ? dupCheck.message
+                      : dupCheck.status === 'valid'
+                        ? dupCheck.message
+                        : ''}
+                </ValidationMessage>
+                {dupCheck.status === 'checking' && (
+                  <InputRightIcon><FaSpinner className="spin" /></InputRightIcon>
+                )}
+                {dupCheck.status === 'valid' && (
+                  <InputRightIcon><FaCheckCircle color={colors.success.main} /></InputRightIcon>
+                )}
               </InfoItem>
               <InfoItem>
                 <Label>이름</Label>

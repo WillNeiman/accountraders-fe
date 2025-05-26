@@ -5,6 +5,7 @@ import { User } from '@/types/user';
 import { getCurrentUser, logout as logoutApi } from '@/services/auth';
 import { useToast } from '@/contexts/ToastContext';
 import { formatErrorMessage } from '@/utils/error';
+import Cookies from 'js-cookie';
 
 interface AuthContextType {
   user: User | null;
@@ -24,6 +25,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   // 페이지 로드 시 사용자 정보 확인
   useEffect(() => {
+    // accessToken이 없으면 /me 호출하지 않음
+    const accessToken = Cookies.get('accessToken');
+    if (!accessToken) {
+      setIsLoading(false);
+      return;
+    }
     const checkAuth = async () => {
       try {
         const userData = await getCurrentUser();
