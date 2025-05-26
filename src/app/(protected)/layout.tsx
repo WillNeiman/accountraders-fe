@@ -8,7 +8,7 @@ import { colors } from '@/styles/theme/colors';
 
 const ProtectedLayoutContainer = styled.div`
   min-height: 100vh;
-  background: ${colors.background.gray};
+  background: ${colors.background.default};
 `;
 
 export default function ProtectedLayout({

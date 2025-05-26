@@ -66,10 +66,6 @@ const SubmitButton = styled(Button)`
   margin-top: ${spacing[2]};
 `;
 
-const GoogleSignupButton = styled(Button)`
-  margin-top: ${spacing[4]};
-`;
-
 interface SignupContentProps {
   onSubmit: (data: {
     nickname: string;
@@ -171,14 +167,6 @@ export default function SignupContent({ onSubmit }: SignupContentProps) {
         >
           {formState.isLoading ? '가입 중...' : '회원가입'}
         </SubmitButton>
-        {/* 구글 회원가입 기능 임시 중단
-        <GoogleSignupButton
-          variant="secondary"
-          fullWidth
-        >
-          Google 계정으로 가입
-        </GoogleSignupButton>
-        */}
       </div>
     </Container>
   );

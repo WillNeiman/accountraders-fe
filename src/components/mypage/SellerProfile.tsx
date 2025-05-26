@@ -1,102 +1,21 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import styled from '@emotion/styled';
-import { colors } from '@/styles/theme/colors';
-import { spacing } from '@/styles/theme/spacing';
-import { typography } from '@/styles/theme/typography';
 import Button from '@/components/common/Button';
 import Input from '@/components/common/Input';
 import { useToast } from '@/contexts/ToastContext';
 import { apiClient } from '@/lib/api/apiClient';
 import { useAuth } from '@/contexts/AuthContext';
-
-const PayoutCard = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: ${spacing[1]};
-  background: ${colors.background.gray};
-  border-radius: ${spacing[2]};
-  padding: ${spacing[3]};
-  width: 100%;
-  max-width: 100%;
-`;
-
-const PayoutRow = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${spacing[2]};
-`;
-
-const PayoutLabel = styled.span`
-  min-width: 80px;
-  font-weight: ${typography.fontWeight.bold};
-  color: ${colors.text.secondary};
-  font-size: ${typography.fontSize.sm};
-`;
-
-const PayoutValue = styled.span`
-  color: ${colors.text.primary};
-  font-size: ${typography.fontSize.base};
-`;
-
-const Section = styled.section`
-  /* Layout */
-  margin-bottom: ${spacing[5]};
-`;
-
-const SectionTitle = styled.h2`
-  /* Typography */
-  font-size: ${typography.fontSize.xl};
-  font-weight: ${typography.fontWeight.bold};
-  color: ${colors.text.primary};
-  margin-bottom: ${spacing[4]};
-`;
-
-const InfoGrid = styled.div`
-  /* Layout */
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: ${spacing[4]};
-`;
-
-const InfoItem = styled.div`
-  /* Layout */
-  margin-bottom: ${spacing[1]};
-`;
-
-const Label = styled.label`
-  /* Typography */
-  display: block;
-  font-size: ${typography.fontSize.sm};
-  font-weight: ${typography.fontWeight.medium};
-  color: ${colors.text.secondary};
-  margin-bottom: ${spacing[2]};
-`;
-
-const Value = styled.div`
-  /* Typography */
-  font-size: ${typography.fontSize.base};
-  color: ${colors.text.primary};
-  /* Box Model */
-  padding: ${spacing[3]};
-  background: ${colors.background.gray};
-  border-radius: ${spacing[2]};
-`;
-
-const ButtonGroup = styled.div`
-  /* Layout */
-  display: flex;
-  gap: ${spacing[4]};
-  margin-bottom: ${spacing[10]};
-`;
-
-const WarningText = styled.p`
-  /* Typography */
-  color: ${colors.error.main};
-  font-size: ${typography.fontSize.sm};
-  margin-top: ${spacing[2]};
-`;
+import {
+  Section,
+  SectionTitle,
+  ItemList,
+  Item,
+  ItemLabel,
+  ItemValue,
+  EditButton,
+  InputWrap
+} from '@/components/common/styles/ProfileStyles';
 
 interface SellerProfileData {
   sellerProfileId: string;
@@ -116,10 +35,13 @@ interface SellerProfileData {
 export default function SellerProfile() {
   const { user } = useAuth();
   const { showToast } = useToast();
-  const [isEditing, setIsEditing] = useState(false);
+  const [editField, setEditField] = useState<string | null>(null);
   const [profileData, setProfileData] = useState<SellerProfileData | null>(null);
   const [formData, setFormData] = useState({
     businessRegistrationNumber: '',
+    method: '',
+    dayOfMonth: '',
+    minAmount: '',
   });
 
   useEffect(() => {
@@ -130,6 +52,9 @@ export default function SellerProfile() {
         setProfileData(data);
         setFormData({
           businessRegistrationNumber: data.businessRegistrationNumber || '',
+          method: data.payoutPreference?.method || '',
+          dayOfMonth: data.payoutPreference?.dayOfMonth?.toString() || '',
+          minAmount: data.payoutPreference?.minAmount?.toString() || '',
         });
       } catch {
         showToast('판매자 프로필을 불러오는데 실패했습니다.', 3000);
@@ -143,13 +68,22 @@ export default function SellerProfile() {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSave = async (field: string) => {
     try {
-      const { data } = await apiClient.put('/api/v1/users/seller-profiles/me', formData);
+      const payload: Record<string, unknown> = {};
+      if (field === 'businessRegistrationNumber') {
+        payload.businessRegistrationNumber = formData.businessRegistrationNumber;
+      } else if (field === 'method' || field === 'dayOfMonth' || field === 'minAmount') {
+        payload.payoutPreference = {
+          method: formData.method,
+          dayOfMonth: formData.dayOfMonth ? Number(formData.dayOfMonth) : null,
+          minAmount: formData.minAmount ? Number(formData.minAmount) : null,
+        };
+      }
+      const { data } = await apiClient.put('/api/v1/users/seller-profiles/me', payload);
       setProfileData(data);
       showToast('판매자 프로필이 성공적으로 업데이트되었습니다.', 3000);
-      setIsEditing(false);
+      setEditField(null);
     } catch {
       showToast('판매자 프로필 업데이트에 실패했습니다.', 3000);
     }
@@ -160,96 +94,97 @@ export default function SellerProfile() {
   }
 
   return (
-    <>
-      <Section>
-        <SectionTitle>판매자 프로필</SectionTitle>
-        <InfoGrid>
-          <InfoItem>
-            <Label>사업자등록번호</Label>
-            {isEditing ? (
+    <Section>
+      <SectionTitle>판매자 프로필</SectionTitle>
+      <ItemList>
+        {/* 사업자등록번호 */}
+        <Item>
+          <ItemLabel>사업자등록번호</ItemLabel>
+          {editField === 'businessRegistrationNumber' ? (
+            <InputWrap>
               <Input
                 name="businessRegistrationNumber"
                 value={formData.businessRegistrationNumber}
                 onChange={handleInputChange}
                 placeholder="사업자등록번호를 입력하세요"
               />
-            ) : (
-              <Value>{profileData.businessRegistrationNumber || '-'}</Value>
-            )}
-          </InfoItem>
-          <InfoItem>
-            <Label>정산 방식</Label>
-            {profileData.payoutPreference ? (
-              <PayoutCard>
-                <PayoutRow>
-                  <PayoutLabel>방식</PayoutLabel>
-                  <PayoutValue>{profileData.payoutPreference.method}</PayoutValue>
-                </PayoutRow>
-                {profileData.payoutPreference.dayOfMonth && (
-                  <PayoutRow>
-                    <PayoutLabel>매월 정산일</PayoutLabel>
-                    <PayoutValue>{profileData.payoutPreference.dayOfMonth}일</PayoutValue>
-                  </PayoutRow>
-                )}
-                {profileData.payoutPreference.minAmount && (
-                  <PayoutRow>
-                    <PayoutLabel>최소 금액</PayoutLabel>
-                    <PayoutValue>{profileData.payoutPreference.minAmount.toLocaleString()}원</PayoutValue>
-                  </PayoutRow>
-                )}
-              </PayoutCard>
-            ) : (
-              <Value>-</Value>
-            )}
-          </InfoItem>
-          <InfoItem>
-            <Label>거래 페널티 횟수</Label>
-            <Value>
-              {profileData.penaltyStrikes === 0
-                ? '페널티 이력이 없어요.'
-                : profileData.penaltyStrikes}
-            </Value>
-            {typeof profileData.penaltyStrikes === 'number' && profileData.penaltyStrikes > 0 && (
-              <WarningText>
-                페널티가 {profileData.penaltyStrikes}회 누적되었습니다.
-              </WarningText>
-            )}
-          </InfoItem>
-        </InfoGrid>
-      </Section>
-
-      <ButtonGroup>
-        {isEditing ? (
-          <form onSubmit={handleSubmit}>
-            <Button type="submit" variant="primary">
-              저장
-            </Button>
-            <Button
-              type="button"
-              variant="secondary"
-              onClick={() => {
-                setIsEditing(false);
-                setFormData({
-                  businessRegistrationNumber: profileData.businessRegistrationNumber || '',
-                });
-              }}
-            >
-              취소
-            </Button>
-          </form>
-        ) : (
-          <Button 
-            type="button" 
-            variant="primary" 
-            onClick={(e) => {
-              e.preventDefault();
-              setIsEditing(true);
-            }}
-          >
-            수정
-          </Button>
-        )}
-      </ButtonGroup>
-    </>
+              <Button size="small" type="button" onClick={() => handleSave('businessRegistrationNumber')}>저장</Button>
+              <Button size="small" type="button" variant="secondary" onClick={() => setEditField(null)}>취소</Button>
+            </InputWrap>
+          ) : (
+            <>
+              <ItemValue>{profileData.businessRegistrationNumber || '-'}</ItemValue>
+              <EditButton type="button" onClick={() => setEditField('businessRegistrationNumber')}>변경</EditButton>
+            </>
+          )}
+        </Item>
+        {/* 정산 방식 */}
+        <Item>
+          <ItemLabel>정산 방식</ItemLabel>
+          {editField === 'method' ? (
+            <InputWrap>
+              <Input
+                name="method"
+                value={formData.method}
+                onChange={handleInputChange}
+                placeholder="정산 방식을 입력하세요"
+              />
+              <Button size="small" type="button" onClick={() => handleSave('method')}>저장</Button>
+              <Button size="small" type="button" variant="secondary" onClick={() => setEditField(null)}>취소</Button>
+            </InputWrap>
+          ) : (
+            <>
+              <ItemValue>{profileData.payoutPreference?.method || '-'}</ItemValue>
+              <EditButton type="button" onClick={() => setEditField('method')}>변경</EditButton>
+            </>
+          )}
+        </Item>
+        <Item>
+          <ItemLabel>매월 정산일</ItemLabel>
+          {editField === 'dayOfMonth' ? (
+            <InputWrap>
+              <Input
+                name="dayOfMonth"
+                value={formData.dayOfMonth}
+                onChange={handleInputChange}
+                placeholder="정산일(숫자)"
+              />
+              <Button size="small" type="button" onClick={() => handleSave('dayOfMonth')}>저장</Button>
+              <Button size="small" type="button" variant="secondary" onClick={() => setEditField(null)}>취소</Button>
+            </InputWrap>
+          ) : (
+            <>
+              <ItemValue>{profileData.payoutPreference?.dayOfMonth ? `${profileData.payoutPreference.dayOfMonth}일` : '-'}</ItemValue>
+              <EditButton type="button" onClick={() => setEditField('dayOfMonth')}>변경</EditButton>
+            </>
+          )}
+        </Item>
+        <Item>
+          <ItemLabel>최소 금액</ItemLabel>
+          {editField === 'minAmount' ? (
+            <InputWrap>
+              <Input
+                name="minAmount"
+                value={formData.minAmount}
+                onChange={handleInputChange}
+                placeholder="최소 금액"
+              />
+              <Button size="small" type="button" onClick={() => handleSave('minAmount')}>저장</Button>
+              <Button size="small" type="button" variant="secondary" onClick={() => setEditField(null)}>취소</Button>
+            </InputWrap>
+          ) : (
+            <>
+              <ItemValue>{profileData.payoutPreference?.minAmount ? `${profileData.payoutPreference.minAmount.toLocaleString()}원` : '-'}</ItemValue>
+              <EditButton type="button" onClick={() => setEditField('minAmount')}>변경</EditButton>
+            </>
+          )}
+        </Item>
+        {/* 페널티 */}
+        <Item>
+          <ItemLabel>거래 페널티 횟수</ItemLabel>
+          <ItemValue>{profileData.penaltyStrikes || 0}회</ItemValue>
+        </Item>
+      </ItemList>
+    </Section>
   );
 } 

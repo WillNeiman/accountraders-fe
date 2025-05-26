@@ -6,10 +6,9 @@ import Modal from '../common/Modal';
 interface SignupModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onLoginClick?: () => void;
 }
 
-export default function SignupModal({ isOpen, onClose, onLoginClick }: SignupModalProps) {
+export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
   const { showToast } = useToast();
 
   const handleSignup = async (data: {

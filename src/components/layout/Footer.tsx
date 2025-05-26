@@ -8,7 +8,6 @@ import { typography } from '@/styles/theme/typography';
 import { mediaQueries } from '@/styles/theme/breakpoints';
 
 const MAX_WIDTH = '1280px';
-const MOBILE_BREAKPOINT = '767px';
 
 const FooterWrapper = styled.footer`
   /* Layout */

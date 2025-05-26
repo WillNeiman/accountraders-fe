@@ -12,6 +12,7 @@ import SignupModal from '../auth/SignupModal';
 import { useAuth } from '@/contexts/AuthContext';
 import { typography } from "@/styles/theme/typography";
 import Link from 'next/link';
+import SidebarNav from '@/components/mypage/SidebarNav';
 
 const HeaderContainer = styled.header`
   position: fixed;
@@ -111,7 +112,7 @@ const MobileMenu = styled.div<{ isOpen: boolean }>`
     top: 0;
     right: 0;
     width: 80vw;
-    max-width: 320px;
+    max-width: 240px;
     height: 100vh;
     background: ${colors.background.default};
     padding: ${spacing[6]};
@@ -119,6 +120,7 @@ const MobileMenu = styled.div<{ isOpen: boolean }>`
     z-index: ${zIndex.modal + 1};
     gap: ${spacing[1]};
     justify-content: flex-start;
+    overflow-y: auto;
   }
 `;
 
@@ -151,11 +153,6 @@ const MobileMenuLink = styled.button`
     outline: 2px solid ${colors.primary[500]};
     outline-offset: 2px;
   }
-`;
-
-const LoadingText = styled.span`
-  color: ${colors.text.secondary};
-  font-size: ${typography.fontSize.sm};
 `;
 
 const UserName = styled.span`
@@ -341,8 +338,8 @@ const Header = memo(() => {
                   {user.nickname}님
                 </UserName>
                 <DropdownMenu open={isDropdownOpen}>
-                  <Link href="/mypage">
-                    <DropdownItem as="button" type="button">회원정보</DropdownItem>
+                  <Link href="/my/account">
+                    <DropdownItem as="button" type="button">마이페이지</DropdownItem>
                   </Link>
                   <DropdownItem disabled>거래현황 (준비중)</DropdownItem>
                 </DropdownMenu>
@@ -379,13 +376,7 @@ const Header = memo(() => {
         <MobileMenu isOpen={isMenuOpen}>
           {user ? (
             <>
-              <UserName aria-label={`${user.nickname}님`} tabIndex={0} style={{ marginBottom: spacing[4] }}>
-                {user.nickname}님
-              </UserName>
-              <Link href="/mypage">
-                <DropdownItem as="button" type="button" style={{ width: '100%' }}>회원정보</DropdownItem>
-              </Link>
-              <DropdownItem disabled style={{ width: '100%' }}>거래현황 (준비중)</DropdownItem>
+              <SidebarNav className="mobile-menu-sidebar" />
               <MobileLogoutButton
                 onClick={logout}
                 aria-label="로그아웃"
