@@ -20,7 +20,7 @@ const onRefreshed = (token: string) => {
 };
 
 // 갱신 실패 시 대기 중인 요청들을 처리
-const onRefreshFailed = (error: any) => {
+const onRefreshFailed = (error: Error) => {
   refreshSubscribers.forEach(callback => callback(''));
   refreshSubscribers = [];
   return Promise.reject(error);
@@ -42,7 +42,7 @@ apiClient.interceptors.response.use(
       // 이미 갱신 중인 경우, 현재 요청을 대기열에 추가
       if (isRefreshing) {
         try {
-          const token = await new Promise<string>((resolve) => {
+          await new Promise<string>((resolve) => {
             refreshSubscribers.push(resolve);
           });
           return apiClient(originalRequest);
@@ -69,7 +69,7 @@ apiClient.interceptors.response.use(
         isRefreshing = false;
         
         // 갱신 실패 시 대기 중인 요청들 처리
-        onRefreshFailed(refreshError);
+        onRefreshFailed(refreshError instanceof Error ? refreshError : new Error('Token refresh failed'));
         
         // 토큰 갱신 실패 시 서버의 에러 응답에 따라 처리
         if (refreshError instanceof AxiosError) {
