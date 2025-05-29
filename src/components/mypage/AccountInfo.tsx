@@ -6,60 +6,58 @@ import { colors } from '@/styles/theme/colors';
 import { spacing } from '@/styles/theme/spacing';
 import { typography } from '@/styles/theme/typography';
 import { User } from '@/types/user';
-import Button from '@/components/common/Button';
 import Input from '@/components/common/Input';
 import { useToast } from '@/contexts/ToastContext';
+import { useDupCheck } from '@/hooks/useDupCheck';
+import {
+  Section,
+  SectionTitle,
+  ItemList,
+  Item,
+  ItemLabel,
+  ItemValue,
+  EditButton,
+  InputWrap
+} from '@/components/common/styles/ProfileStyles';
+import Label from '@/components/common/Label';
 
-const Section = styled.section`
-  /* Layout */
-  margin-bottom: ${spacing[3]};
-`;
-
-const SectionTitle = styled.h2`
-  /* Typography */
-  font-size: ${typography.fontSize.xl};
-  font-weight: ${typography.fontWeight.bold};
-  color: ${colors.text.primary};
-  margin-bottom: ${spacing[4]};
-`;
-
-const InfoGrid = styled.div`
-  /* Layout */
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: ${spacing[4]};
-`;
-
-const InfoItem = styled.div`
-  /* Layout */
-  margin-bottom: ${spacing[1]};
-`;
-
-const Label = styled.label`
-  /* Typography */
-  display: block;
+const ToggleLabel = styled.label`
   font-size: ${typography.fontSize.sm};
+  color: ${colors.gray[400]};
   font-weight: ${typography.fontWeight.medium};
-  color: ${colors.text.secondary};
-  margin-bottom: ${spacing[2]};
 `;
 
-const Value = styled.div`
-  /* Typography */
-  font-size: ${typography.fontSize.base};
-  color: ${colors.text.primary};
-  /* Box Model */
-  padding: ${spacing[3]};
-  background: ${colors.background.gray};
-  border-radius: ${spacing[2]};
+const Toggle = styled.input`
+  width: 40px;
+  height: 20px;
+  appearance: none;
+  background: ${colors.gray[200]};
+  border-radius: 20px;
+  position: relative;
+  outline: none;
+  cursor: pointer;
+  transition: background 0.2s;
+  &:checked {
+    background: ${colors.primary[400]};
+  }
+  &::before {
+    content: '';
+    position: absolute;
+    left: 2px;
+    top: 2px;
+    width: 16px;
+    height: 16px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform 0.2s;
+    transform: translateX(0);
+  }
+  &:checked::before {
+    transform: translateX(20px);
+  }
 `;
 
-const ButtonGroup = styled.div`
-  /* Layout */
-  display: flex;
-  gap: ${spacing[4]};
-  margin-bottom: ${spacing[10]};
-`;
+const MaskedPassword = ({ length = 8 }: { length?: number }) => <span>{'●'.repeat(length)}</span>;
 
 interface AccountInfoProps {
   userData: User;
@@ -68,120 +66,201 @@ interface AccountInfoProps {
 
 export default function AccountInfo({ userData, onUpdate }: AccountInfoProps) {
   const { showToast } = useToast();
-  const [isEditing, setIsEditing] = useState(false);
+  const [editField, setEditField] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     nickname: userData.nickname || '',
     fullName: userData.fullName || '',
     contactNumber: userData.contactNumber || '',
+    password: '',
   });
+  const [adSms, setAdSms] = useState(false);
+  const [adEmail, setAdEmail] = useState(false);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
+  const isNicknameValid = formData.nickname.length >= 2 && formData.nickname.length <= 16;
+  const dupCheck = useDupCheck(formData.nickname, isNicknameValid);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSave = async (field: string) => {
     try {
-      await onUpdate(formData);
-      showToast('계정 정보가 성공적으로 업데이트되었습니다.', 3000);
-      setIsEditing(false);
+      if (field === 'nickname') {
+        if (!isNicknameValid) {
+          showToast('닉네임은 2-16자 사이여야 합니다.', 3000);
+          return;
+        }
+        if (dupCheck.status === 'invalid') {
+          showToast(dupCheck.message, 3000);
+          return;
+        }
+      }
+      await onUpdate({ [field]: formData[field as keyof typeof formData] });
+      showToast('정보가 성공적으로 업데이트되었습니다.', 3000);
+      setEditField(null);
     } catch {
-      showToast('계정 정보 업데이트에 실패했습니다.', 3000);
+      showToast('정보 업데이트에 실패했습니다.', 3000);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <>
       <Section>
-        <SectionTitle>기본 정보</SectionTitle>
-        <InfoGrid>
-          <InfoItem>
-            <Label>이메일</Label>
-            <Value>{userData.email}</Value>
-          </InfoItem>
-          <InfoItem>
-            <Label>계정 상태</Label>
-            <Value>{userData.status}</Value>
-          </InfoItem>
-          {isEditing ? (
-            <>
-              <InfoItem>
-                <Label>닉네임</Label>
-                <Input
-                  name="nickname"
-                  value={formData.nickname}
-                  onChange={handleInputChange}
-                  placeholder="닉네임을 입력하세요"
-                />
-              </InfoItem>
-              <InfoItem>
-                <Label>이름</Label>
-                <Input
-                  name="fullName"
-                  value={formData.fullName}
-                  onChange={handleInputChange}
-                  placeholder="이름을 입력하세요"
-                />
-              </InfoItem>
-              <InfoItem>
-                <Label>연락처</Label>
-                <Input
-                  name="contactNumber"
-                  value={formData.contactNumber}
-                  onChange={handleInputChange}
-                  placeholder="연락처를 입력하세요"
-                />
-              </InfoItem>
-            </>
-          ) : (
-            <>
-              <InfoItem>
-                <Label>닉네임</Label>
-                <Value>{userData.nickname || '-'}</Value>
-              </InfoItem>
-              <InfoItem>
-                <Label>이름</Label>
-                <Value>{userData.fullName || '-'}</Value>
-              </InfoItem>
-              <InfoItem>
-                <Label>연락처</Label>
-                <Value>{userData.contactNumber || '-'}</Value>
-              </InfoItem>
-            </>
-          )}
-        </InfoGrid>
-      </Section>
+        <SectionTitle>로그인 정보</SectionTitle>
+        <ItemList>
+          {/* 내 계정 섹션 */}
+          <Item as="div" style={{ fontWeight: 600, fontSize: typography.fontSize.lg, border: 'none', paddingBottom: spacing[2] }}>내 계정</Item>
+          {/* 이메일(아이디) */}
+          <Item>
+            <ItemLabel>이메일 주소</ItemLabel>
+            <ItemValue>{userData.email}</ItemValue>
+          </Item>
+          {/* 비밀번호 */}
+          <Item>
+            <ItemLabel>비밀번호</ItemLabel>
+            {editField === 'password' ? (
+              <InputWrap>
+                <div style={{ flex: 'none', width: spacing[40] }}>
+                  <Input
+                    name="password"
+                    type="password"
+                    value={formData.password}
+                    onChange={e => setFormData(f => ({ ...f, password: e.target.value }))}
+                    placeholder="새 비밀번호 입력"
+                    style={{ height: spacing[8], width: '100%' }}
+                    fullWidth={false}
+                  />
+                </div>
+                <div style={{ display: 'flex', gap: spacing[2], marginLeft: 'auto' }}>
+                  <EditButton type="button" variant="primary" onClick={() => handleSave('password')}>저장</EditButton>
+                  <EditButton type="button" variant="errorOutline" onClick={() => setEditField(null)}>취소</EditButton>
+                </div>
+              </InputWrap>
+            ) : (
+              <>
+                <ItemValue><MaskedPassword length={8} /></ItemValue>
+                <EditButton type="button" onClick={() => setEditField('password')}>변경</EditButton>
+              </>
+            )}
+          </Item>
+          {/* 닉네임 */}
+          <Item>
+            <ItemLabel>닉네임</ItemLabel>
+            {editField === 'nickname' ? (
+              <InputWrap>
+                <div style={{ flex: 'none', width: spacing[40] }}>
+                  <Input
+                    name="nickname"
+                    value={formData.nickname}
+                    onChange={e => setFormData(f => ({ ...f, nickname: e.target.value }))}
+                    onBlur={() => { dupCheck.check(); }}
+                    placeholder="닉네임을 입력하세요"
+                    style={{ height: spacing[8], width: '100%' }}
+                    fullWidth={false}
+                  />
+                </div>
+                <div style={{ display: 'flex', gap: spacing[2], marginLeft: 'auto' }}>
+                  <EditButton type="button" variant="primary" onClick={() => handleSave('nickname')}>저장</EditButton>
+                  <EditButton type="button" variant="errorOutline" onClick={() => setEditField(null)}>취소</EditButton>
+                </div>
+              </InputWrap>
+            ) : (
+              <>
+                <ItemValue>{userData.nickname || '-'}</ItemValue>
+                <EditButton type="button" onClick={() => setEditField('nickname')}>변경</EditButton>
+              </>
+            )}
+          </Item>
 
-      <ButtonGroup>
-        {isEditing ? (
-          <>
-            <Button type="submit" variant="primary">
-              저장
-            </Button>
-            <Button
-              type="button"
-              variant="secondary"
-              onClick={() => {
-                setIsEditing(false);
-                setFormData({
-                  nickname: userData.nickname || '',
-                  fullName: userData.fullName || '',
-                  contactNumber: userData.contactNumber || '',
-                });
-              }}
-            >
-              취소
-            </Button>
-          </>
-        ) : (
-          <>
-            <Button type="button" variant="primary" onClick={() => setIsEditing(true)}>
-              수정
-            </Button>
-          </>
-        )}
-      </ButtonGroup>
-    </form>
+          {/* 개인 정보 섹션 */}
+          <Item as="div" style={{ fontWeight: 600, fontSize: typography.fontSize.lg, border: 'none', paddingTop: spacing[8], paddingBottom: spacing[2] }}>개인 정보</Item>
+          {/* 휴대폰 번호 */}
+          <Item>
+            <ItemLabel>휴대폰 번호</ItemLabel>
+            {editField === 'contactNumber' ? (
+              <InputWrap>
+                <div style={{ flex: 'none', width: spacing[40] }}>
+                  <Input
+                    name="contactNumber"
+                    value={formData.contactNumber}
+                    onChange={e => setFormData(f => ({ ...f, contactNumber: e.target.value }))}
+                    placeholder="숫자만 입력해주세요 (예: 01012345678)"
+                    style={{ height: spacing[8], width: '100%' }}
+                    fullWidth={false}
+                  />
+                </div>
+                <div style={{ display: 'flex', gap: spacing[2], marginLeft: 'auto' }}>
+                  <EditButton type="button" variant="primary" onClick={() => handleSave('contactNumber')}>저장</EditButton>
+                  <EditButton type="button" variant="errorOutline" onClick={() => setEditField(null)}>취소</EditButton>
+                </div>
+              </InputWrap>
+            ) : (
+              <>
+                <ItemValue>
+                  {userData.contactNumber ? (
+                    userData.contactNumber
+                  ) : (
+                    <Label colorType="error">미등록</Label>
+                  )}
+                </ItemValue>
+                <EditButton type="button" variant={userData.contactNumber ? undefined : 'success'} onClick={() => setEditField('contactNumber')}>
+                  {userData.contactNumber ? '변경' : '등록'}
+                </EditButton>
+              </>
+            )}
+          </Item>
+          {/* 이름 */}
+          <Item>
+            <ItemLabel>이름</ItemLabel>
+            {editField === 'fullName' ? (
+              <InputWrap>
+                <div style={{ flex: 'none', width: spacing[40] }}>
+                  <Input
+                    name="fullName"
+                    value={formData.fullName}
+                    onChange={e => setFormData(f => ({ ...f, fullName: e.target.value }))}
+                    placeholder="이름을 입력하세요"
+                    style={{ height: spacing[8], width: '100%' }}
+                    fullWidth={false}
+                  />
+                </div>
+                <div style={{ display: 'flex', gap: spacing[2], marginLeft: 'auto' }}>
+                  <EditButton type="button" variant="primary" onClick={() => handleSave('fullName')}>저장</EditButton>
+                  <EditButton type="button" variant="errorOutline" onClick={() => setEditField(null)}>취소</EditButton>
+                </div>
+              </InputWrap>
+            ) : (
+              <>
+                <ItemValue>
+                  {userData.fullName ? (
+                    userData.fullName
+                  ) : (
+                    <Label colorType="error">미등록</Label>
+                  )}
+                </ItemValue>
+                <EditButton type="button" variant={userData.fullName ? undefined : 'success'} onClick={() => setEditField('fullName')}>
+                  {userData.fullName ? '변경' : '등록'}
+                </EditButton>
+              </>
+            )}
+          </Item>
+
+          {/* 광고성 정보 수신 섹션 */}
+          <Item as="div" style={{ fontWeight: 600, fontSize: typography.fontSize.lg, border: 'none', paddingTop: spacing[8], paddingBottom: spacing[2] }}>광고성 정보 수신</Item>
+          <Item>
+            <div style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+              <ToggleLabel htmlFor="adSms">문자 메시지</ToggleLabel>
+              <div style={{ marginLeft: 'auto' }}>
+                <Toggle id="adSms" type="checkbox" checked={adSms} onChange={() => setAdSms(v => !v)} />
+              </div>
+            </div>
+          </Item>
+          <Item>
+            <div style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+              <ToggleLabel htmlFor="adEmail">이메일</ToggleLabel>
+              <div style={{ marginLeft: 'auto' }}>
+                <Toggle id="adEmail" type="checkbox" checked={adEmail} onChange={() => setAdEmail(v => !v)} />
+              </div>
+            </div>
+          </Item>
+        </ItemList>
+      </Section>
+    </>
   );
 } 

@@ -1,10 +1,10 @@
 "use client";
 
-import Modal from '@/components/common/Modal';
 import { login, getCurrentUser } from '@/services/auth';
 import LoginContent from './LoginContent';
 import { useToast } from '@/contexts/ToastContext';
 import { useAuth } from '@/contexts/AuthContext';
+import Modal from '@/components/common/Modal';
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -29,12 +29,10 @@ export default function LoginModal({ isOpen, onClose, onSignupClick, onLoginSucc
     }
   };
 
+  if (!isOpen) return null;
+
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      size="small"
-    >
+    <Modal isOpen={isOpen} onClose={onClose} size="small">
       <LoginContent onSubmit={handleLogin} onSignupClick={onSignupClick} />
     </Modal>
   );

@@ -1,6 +1,6 @@
 "use client";
 
-import { memo, useCallback, useState, KeyboardEvent, useEffect } from 'react';
+import { memo, useCallback, useState, KeyboardEvent, useEffect, useRef } from 'react';
 import styled from "@emotion/styled";
 import { colors } from "@/styles/theme/colors";
 import { spacing } from "@/styles/theme/spacing";
@@ -10,6 +10,9 @@ import Footer from './Footer';
 import LoginModal from '../auth/LoginModal';
 import SignupModal from '../auth/SignupModal';
 import { useAuth } from '@/contexts/AuthContext';
+import { typography } from "@/styles/theme/typography";
+import Link from 'next/link';
+import SidebarNav from '@/components/mypage/SidebarNav';
 
 const HeaderContainer = styled.header`
   position: fixed;
@@ -108,14 +111,53 @@ const MobileMenu = styled.div<{ isOpen: boolean }>`
     position: fixed;
     top: 0;
     right: 0;
-    width: 240px;
+    width: 80vw;
+    max-width: 240px;
     height: 100vh;
-    background: #fff;
+    background: ${colors.background.default};
     padding: ${spacing[6]};
-    box-shadow: -2px 0 8px rgba(0,0,0,0.1);
+    box-shadow: 0 0 ${spacing[2]} ${colors.gray[200]};
     z-index: ${zIndex.modal + 1};
-    gap: ${spacing[4]};
+    gap: ${spacing[1]};
+    justify-content: flex-start;
+    overflow-y: auto;
   }
+`;
+
+const MobileMenuLink = styled.button`
+  /* Layout */
+  display: flex;
+  align-items: center;
+  
+  /* Box Model */
+  padding: ${spacing[2]};
+  
+  /* Typography */
+  font-size: ${typography.fontSize.base};
+  color: ${colors.text.primary};
+  
+  /* Visual */
+  background: none;
+  border: none;
+  
+  /* Others */
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  
+  &:hover {
+    color: ${colors.primary[600]};
+  }
+  
+  &:focus-visible {
+    outline: 2px solid ${colors.primary[500]};
+    outline-offset: 2px;
+  }
+`;
+
+const UserName = styled.span`
+  color: ${colors.text.primary};
+  font-weight: ${typography.fontWeight.medium};
 `;
 
 // ClientLayout.tsx 예시 (필요시 적용)
@@ -164,11 +206,69 @@ const LayoutContent = styled.div`
   }
 `;
 
+const DropdownContainer = styled.div`
+  position: relative;
+  display: inline-block;
+`;
+
+const DropdownMenu = styled.div<{ open: boolean }>`
+  position: absolute;
+  top: calc(100% + ${spacing[2]});
+  right: 0;
+  min-width: 160px;
+  background: ${colors.background.paper};
+  border-radius: ${spacing[2]};
+  box-shadow: 0 4px 16px ${colors.gray[200]};
+  padding: ${spacing[2]} 0;
+  opacity: ${({ open }) => (open ? 1 : 0)};
+  transform: ${({ open }) => (open ? 'translateY(0)' : 'translateY(-8px)')};
+  pointer-events: ${({ open }) => (open ? 'auto' : 'none')};
+  transition: opacity 0.2s, transform 0.2s;
+  z-index: 100;
+`;
+
+const DropdownItem = styled.button<{ disabled?: boolean }>`
+  width: 100%;
+  background: none;
+  border: none;
+  text-align: left;
+  padding: ${spacing[1]} ${spacing[4]};
+  font-size: ${typography.fontSize.base};
+  color: ${({ disabled }) => disabled ? colors.text.disabled : colors.text.primary};
+  cursor: ${({ disabled }) => disabled ? 'not-allowed' : 'pointer'};
+  font-weight: ${typography.fontWeight.medium};
+  border-radius: ${spacing[1]};
+  transition: background 0.15s;
+  &:hover {
+    background: ${({ disabled }) => disabled ? 'none' : colors.gray[100]};
+  }
+`;
+
+const MobileLogoutButton = styled.button`
+  width: 100%;
+  margin-top: auto;
+  background: ${colors.error.main};
+  color: #fff;
+  border: none;
+  border-radius: ${spacing[2]};
+  padding: ${spacing[3]} 0;
+  font-size: ${typography.fontSize.base};
+  font-weight: ${typography.fontWeight.bold};
+  cursor: pointer;
+  box-shadow: 0 2px 8px ${colors.gray[200]};
+  transition: background 0.15s;
+  &:hover {
+    background: ${colors.error.dark};
+  }
+`;
+
 const Header = memo(() => {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isSignupModalOpen, setIsSignupModalOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, isLoading, logout } = useAuth();
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const handleLoginClick = useCallback(() => {
     setIsLoginModalOpen(true);
@@ -199,6 +299,18 @@ const Header = memo(() => {
     setIsMenuOpen(prev => !prev);
   }, []);
 
+  // 바깥 클릭 시 드롭다운 닫기
+  useEffect(() => {
+    if (!isDropdownOpen) return;
+    const handleClick = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [isDropdownOpen]);
+
   return (
     <HeaderContainer role="banner">
       <Nav role="navigation" aria-label="메인 네비게이션">
@@ -211,11 +323,27 @@ const Header = memo(() => {
           {isMenuOpen ? '✕' : '☰'}
         </MenuButton>
         <NavLinks>
-          {isLoading ? (
-            <span>로딩중...</span>
-          ) : user ? (
+          {user ? (
             <>
-              <span aria-label={`${user.nickname}님`}>{user.nickname}님</span>
+              <DropdownContainer ref={dropdownRef}>
+                <UserName
+                  aria-label={`${user.nickname}님`}
+                  tabIndex={0}
+                  style={{ cursor: 'pointer' }}
+                  onClick={() => setIsDropdownOpen(v => !v)}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter' || e.key === ' ') setIsDropdownOpen(v => !v);
+                  }}
+                >
+                  {user.nickname}님
+                </UserName>
+                <DropdownMenu open={isDropdownOpen}>
+                  <Link href="/my/account">
+                    <DropdownItem as="button" type="button">마이페이지</DropdownItem>
+                  </Link>
+                  <DropdownItem disabled>거래현황 (준비중)</DropdownItem>
+                </DropdownMenu>
+              </DropdownContainer>
               <NavLink 
                 onClick={logout}
                 onKeyDown={(e) => handleKeyDown(e, logout)}
@@ -226,6 +354,7 @@ const Header = memo(() => {
             </>
           ) : (
             <>
+              {isLoading && <span style={{ fontSize: '0.9em', color: colors.text.disabled, marginRight: spacing[2] }}>로딩중...</span>}
               <NavLink 
                 onClick={handleLoginClick}
                 onKeyDown={(e) => handleKeyDown(e, handleLoginClick)}
@@ -245,35 +374,32 @@ const Header = memo(() => {
         </NavLinks>
         <MobileMenuOverlay isOpen={isMenuOpen} onClick={() => setIsMenuOpen(false)} />
         <MobileMenu isOpen={isMenuOpen}>
-          {isLoading ? (
-            <span>로딩중...</span>
-          ) : user ? (
+          {user ? (
             <>
-              <span aria-label={`${user.nickname}님`}>{user.nickname}님</span>
-              <NavLink 
-                onClick={() => { setIsMenuOpen(false); logout(); }}
-                onKeyDown={(e) => handleKeyDown(e, () => { setIsMenuOpen(false); logout(); })}
+              <SidebarNav className="mobile-menu-sidebar" />
+              <MobileLogoutButton
+                onClick={logout}
                 aria-label="로그아웃"
               >
                 로그아웃
-              </NavLink>
+              </MobileLogoutButton>
             </>
           ) : (
             <>
-              <NavLink 
-                onClick={() => { setIsMenuOpen(false); handleLoginClick(); }}
-                onKeyDown={(e) => handleKeyDown(e, () => { setIsMenuOpen(false); handleLoginClick(); })}
+              <MobileMenuLink 
+                onClick={handleLoginClick}
+                onKeyDown={(e) => handleKeyDown(e, handleLoginClick)}
                 aria-label="로그인"
               >
                 로그인
-              </NavLink>
-              <NavLink 
-                onClick={() => { setIsMenuOpen(false); handleSignupClick(); }}
-                onKeyDown={(e) => handleKeyDown(e, () => { setIsMenuOpen(false); handleSignupClick(); })}
+              </MobileMenuLink>
+              <MobileMenuLink 
+                onClick={handleSignupClick}
+                onKeyDown={(e) => handleKeyDown(e, handleSignupClick)}
                 aria-label="회원가입"
               >
                 회원가입
-              </NavLink>
+              </MobileMenuLink>
             </>
           )}
         </MobileMenu>
