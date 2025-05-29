@@ -43,17 +43,6 @@ const ValidationMessage = styled.span<{ isValid?: boolean; isError?: boolean }>`
   margin-top: 2px;
 `;
 
-const InputRow = styled.div`
-  display: flex;
-  gap: ${spacing[2]};
-  align-items: center;
-`;
-
-const AccountVerifyButton = styled(Button)`
-  min-width: 120px;
-  height: 40px;
-`;
-
 const LabelRow = styled.div`
   display: flex;
   justify-content: space-between;
@@ -166,7 +155,7 @@ export default function SellerProfileRegisterForm({ userId, onSuccess }: Props) 
         setErrors({ form: '프로필 생성 후 데이터 확인에 실패했습니다. 새로고침 후 다시 시도해 주세요.' });
       }
       if (onSuccess) onSuccess();
-    } catch (err) {
+    } catch {
       setErrors({ form: '등록에 실패했습니다. 다시 시도해 주세요.' });
     } finally {
       setIsSubmitting(false);

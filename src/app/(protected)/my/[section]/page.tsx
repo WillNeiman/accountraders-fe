@@ -4,9 +4,6 @@ import { useParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import SidebarNav from '@/components/mypage/SidebarNav';
 import AccountInfo from '@/components/mypage/AccountInfo';
-import SellerProfile from '@/components/mypage/SellerProfile';
-import TransactionHistory from '@/components/mypage/TransactionHistory';
-import { useToast } from '@/contexts/ToastContext';
 import {
   MyContainer,
   PageHeader,

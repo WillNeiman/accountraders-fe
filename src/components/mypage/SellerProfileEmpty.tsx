@@ -34,10 +34,9 @@ const GuideText = styled.div`
 
 interface SellerProfileEmptyProps {
   userId: string;
-  onRegister?: () => void;
 }
 
-export default function SellerProfileEmpty({ userId, onRegister }: SellerProfileEmptyProps) {
+export default function SellerProfileEmpty({ userId }: SellerProfileEmptyProps) {
   const [showForm, setShowForm] = useState(false);
   if (showForm) {
     return <>
