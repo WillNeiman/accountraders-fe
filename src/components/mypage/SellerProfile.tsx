@@ -16,6 +16,7 @@ import {
   EditButton,
   InputWrap
 } from '@/components/common/styles/ProfileStyles';
+import SellerProfileEmpty from './SellerProfileEmpty';
 
 interface SellerProfileData {
   sellerProfileId: string;
@@ -89,8 +90,8 @@ export default function SellerProfile() {
     }
   };
 
-  if (!profileData) {
-    return <div>로딩 중...</div>;
+  if (!profileData || Object.keys(profileData).length === 0) {
+    return <SellerProfileEmpty userId={user?.userId ?? ''} />;
   }
 
   return (

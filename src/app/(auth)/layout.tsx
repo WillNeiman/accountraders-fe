@@ -1,9 +1,11 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
 import styled from '@emotion/styled'
+import { LayoutProps } from '@/types/layout'
+import LoadingSpinner from '@/components/common/LoadingSpinner'
 
 const AuthLayoutContainer = styled.div`
   min-height: 100vh;
@@ -11,13 +13,11 @@ const AuthLayoutContainer = styled.div`
   align-items: center;
   justify-content: center;
   background-color: #fff;
+  role: 'main';
+  tabIndex: 0;
 `
 
-export default function AuthLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function AuthLayout({ children }: LayoutProps) {
   const router = useRouter()
   const { user } = useAuth()
   const [mounted, setMounted] = useState(false)
@@ -33,12 +33,12 @@ export default function AuthLayout({
   }, [mounted, user, router])
 
   if (!mounted) {
-    return null
+    return <LoadingSpinner />
   }
 
   return (
-    <AuthLayoutContainer>
-      {children}
-    </AuthLayoutContainer>
+    <Suspense fallback={<LoadingSpinner />}>
+      <AuthLayoutContainer>{children}</AuthLayoutContainer>
+    </Suspense>
   )
 } 
