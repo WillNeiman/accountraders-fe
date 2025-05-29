@@ -6,7 +6,6 @@ import { colors } from '@/styles/theme/colors';
 import { spacing } from '@/styles/theme/spacing';
 import { typography } from '@/styles/theme/typography';
 import { User } from '@/types/user';
-import Button from '@/components/common/Button';
 import Input from '@/components/common/Input';
 import { useToast } from '@/contexts/ToastContext';
 import { useDupCheck } from '@/hooks/useDupCheck';
@@ -20,18 +19,12 @@ import {
   EditButton,
   InputWrap
 } from '@/components/common/styles/ProfileStyles';
-
-const ToggleWrap = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${spacing[8]};
-`;
+import Label from '@/components/common/Label';
 
 const ToggleLabel = styled.label`
-  font-size: ${typography.fontSize.base};
-  color: ${colors.text.secondary};
+  font-size: ${typography.fontSize.sm};
+  color: ${colors.gray[400]};
   font-weight: ${typography.fontWeight.medium};
-  margin-right: ${spacing[4]};
 `;
 
 const Toggle = styled.input`
@@ -123,15 +116,21 @@ export default function AccountInfo({ userData, onUpdate }: AccountInfoProps) {
             <ItemLabel>비밀번호</ItemLabel>
             {editField === 'password' ? (
               <InputWrap>
-                <Input
-                  name="password"
-                  type="password"
-                  value={formData.password}
-                  onChange={e => setFormData(f => ({ ...f, password: e.target.value }))}
-                  placeholder="새 비밀번호 입력"
-                />
-                <Button size="small" type="button" onClick={() => handleSave('password')}>저장</Button>
-                <Button size="small" type="button" variant="secondary" onClick={() => setEditField(null)}>취소</Button>
+                <div style={{ flex: 'none', width: spacing[40] }}>
+                  <Input
+                    name="password"
+                    type="password"
+                    value={formData.password}
+                    onChange={e => setFormData(f => ({ ...f, password: e.target.value }))}
+                    placeholder="새 비밀번호 입력"
+                    style={{ height: spacing[8], width: '100%' }}
+                    fullWidth={false}
+                  />
+                </div>
+                <div style={{ display: 'flex', gap: spacing[2], marginLeft: 'auto' }}>
+                  <EditButton type="button" variant="primary" onClick={() => handleSave('password')}>저장</EditButton>
+                  <EditButton type="button" variant="errorOutline" onClick={() => setEditField(null)}>취소</EditButton>
+                </div>
               </InputWrap>
             ) : (
               <>
@@ -145,15 +144,21 @@ export default function AccountInfo({ userData, onUpdate }: AccountInfoProps) {
             <ItemLabel>닉네임</ItemLabel>
             {editField === 'nickname' ? (
               <InputWrap>
-                <Input
-                  name="nickname"
-                  value={formData.nickname}
-                  onChange={e => setFormData(f => ({ ...f, nickname: e.target.value }))}
-                  onBlur={() => { dupCheck.check(); }}
-                  placeholder="닉네임을 입력하세요"
-                />
-                <Button size="small" type="button" onClick={() => handleSave('nickname')}>저장</Button>
-                <Button size="small" type="button" variant="secondary" onClick={() => setEditField(null)}>취소</Button>
+                <div style={{ flex: 'none', width: spacing[40] }}>
+                  <Input
+                    name="nickname"
+                    value={formData.nickname}
+                    onChange={e => setFormData(f => ({ ...f, nickname: e.target.value }))}
+                    onBlur={() => { dupCheck.check(); }}
+                    placeholder="닉네임을 입력하세요"
+                    style={{ height: spacing[8], width: '100%' }}
+                    fullWidth={false}
+                  />
+                </div>
+                <div style={{ display: 'flex', gap: spacing[2], marginLeft: 'auto' }}>
+                  <EditButton type="button" variant="primary" onClick={() => handleSave('nickname')}>저장</EditButton>
+                  <EditButton type="button" variant="errorOutline" onClick={() => setEditField(null)}>취소</EditButton>
+                </div>
               </InputWrap>
             ) : (
               <>
@@ -170,19 +175,33 @@ export default function AccountInfo({ userData, onUpdate }: AccountInfoProps) {
             <ItemLabel>휴대폰 번호</ItemLabel>
             {editField === 'contactNumber' ? (
               <InputWrap>
-                <Input
-                  name="contactNumber"
-                  value={formData.contactNumber}
-                  onChange={e => setFormData(f => ({ ...f, contactNumber: e.target.value }))}
-                  placeholder="숫자만 입력해주세요 (예: 01012345678)"
-                />
-                <Button size="small" type="button" onClick={() => handleSave('contactNumber')}>저장</Button>
-                <Button size="small" type="button" variant="secondary" onClick={() => setEditField(null)}>취소</Button>
+                <div style={{ flex: 'none', width: spacing[40] }}>
+                  <Input
+                    name="contactNumber"
+                    value={formData.contactNumber}
+                    onChange={e => setFormData(f => ({ ...f, contactNumber: e.target.value }))}
+                    placeholder="숫자만 입력해주세요 (예: 01012345678)"
+                    style={{ height: spacing[8], width: '100%' }}
+                    fullWidth={false}
+                  />
+                </div>
+                <div style={{ display: 'flex', gap: spacing[2], marginLeft: 'auto' }}>
+                  <EditButton type="button" variant="primary" onClick={() => handleSave('contactNumber')}>저장</EditButton>
+                  <EditButton type="button" variant="errorOutline" onClick={() => setEditField(null)}>취소</EditButton>
+                </div>
               </InputWrap>
             ) : (
               <>
-                <ItemValue>{userData.contactNumber || '-'}</ItemValue>
-                <EditButton type="button" onClick={() => setEditField('contactNumber')}>변경</EditButton>
+                <ItemValue>
+                  {userData.contactNumber ? (
+                    userData.contactNumber
+                  ) : (
+                    <Label colorType="error">미등록</Label>
+                  )}
+                </ItemValue>
+                <EditButton type="button" variant={userData.contactNumber ? undefined : 'success'} onClick={() => setEditField('contactNumber')}>
+                  {userData.contactNumber ? '변경' : '등록'}
+                </EditButton>
               </>
             )}
           </Item>
@@ -191,19 +210,33 @@ export default function AccountInfo({ userData, onUpdate }: AccountInfoProps) {
             <ItemLabel>이름</ItemLabel>
             {editField === 'fullName' ? (
               <InputWrap>
-                <Input
-                  name="fullName"
-                  value={formData.fullName}
-                  onChange={e => setFormData(f => ({ ...f, fullName: e.target.value }))}
-                  placeholder="이름을 입력하세요"
-                />
-                <Button size="small" type="button" onClick={() => handleSave('fullName')}>저장</Button>
-                <Button size="small" type="button" variant="secondary" onClick={() => setEditField(null)}>취소</Button>
+                <div style={{ flex: 'none', width: spacing[40] }}>
+                  <Input
+                    name="fullName"
+                    value={formData.fullName}
+                    onChange={e => setFormData(f => ({ ...f, fullName: e.target.value }))}
+                    placeholder="이름을 입력하세요"
+                    style={{ height: spacing[8], width: '100%' }}
+                    fullWidth={false}
+                  />
+                </div>
+                <div style={{ display: 'flex', gap: spacing[2], marginLeft: 'auto' }}>
+                  <EditButton type="button" variant="primary" onClick={() => handleSave('fullName')}>저장</EditButton>
+                  <EditButton type="button" variant="errorOutline" onClick={() => setEditField(null)}>취소</EditButton>
+                </div>
               </InputWrap>
             ) : (
               <>
-                <ItemValue>{userData.fullName || '-'}</ItemValue>
-                <EditButton type="button" onClick={() => setEditField('fullName')}>변경</EditButton>
+                <ItemValue>
+                  {userData.fullName ? (
+                    userData.fullName
+                  ) : (
+                    <Label colorType="error">미등록</Label>
+                  )}
+                </ItemValue>
+                <EditButton type="button" variant={userData.fullName ? undefined : 'success'} onClick={() => setEditField('fullName')}>
+                  {userData.fullName ? '변경' : '등록'}
+                </EditButton>
               </>
             )}
           </Item>
@@ -211,16 +244,20 @@ export default function AccountInfo({ userData, onUpdate }: AccountInfoProps) {
           {/* 광고성 정보 수신 섹션 */}
           <Item as="div" style={{ fontWeight: 600, fontSize: typography.fontSize.lg, border: 'none', paddingTop: spacing[8], paddingBottom: spacing[2] }}>광고성 정보 수신</Item>
           <Item>
-            <ToggleWrap>
+            <div style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
               <ToggleLabel htmlFor="adSms">문자 메시지</ToggleLabel>
-              <Toggle id="adSms" type="checkbox" checked={adSms} onChange={() => setAdSms(v => !v)} />
-            </ToggleWrap>
+              <div style={{ marginLeft: 'auto' }}>
+                <Toggle id="adSms" type="checkbox" checked={adSms} onChange={() => setAdSms(v => !v)} />
+              </div>
+            </div>
           </Item>
           <Item>
-            <ToggleWrap>
+            <div style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
               <ToggleLabel htmlFor="adEmail">이메일</ToggleLabel>
-              <Toggle id="adEmail" type="checkbox" checked={adEmail} onChange={() => setAdEmail(v => !v)} />
-            </ToggleWrap>
+              <div style={{ marginLeft: 'auto' }}>
+                <Toggle id="adEmail" type="checkbox" checked={adEmail} onChange={() => setAdEmail(v => !v)} />
+              </div>
+            </div>
           </Item>
         </ItemList>
       </Section>

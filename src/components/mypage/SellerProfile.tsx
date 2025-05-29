@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Button from '@/components/common/Button';
 import Input from '@/components/common/Input';
 import { useToast } from '@/contexts/ToastContext';
 import { apiClient } from '@/lib/api/apiClient';
@@ -17,20 +16,20 @@ import {
   InputWrap
 } from '@/components/common/styles/ProfileStyles';
 import SellerProfileEmpty from './SellerProfileEmpty';
+import Label from '@/components/common/Label';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
+import { spacing } from '@/styles/theme/spacing';
 
 interface SellerProfileData {
   sellerProfileId: string;
   userId: string;
   businessRegistrationNumber: string | null;
-  payoutPreference: {
-    method: string;
-    day: number | null;
-    dayOfMonth: number | null;
-    minAmount: number | null;
-  } | null;
-  penaltyStrikes: number | null;
-  createdAt: string | null;
-  updatedAt: string | null;
+  isBankAccountRegistered: boolean;
+  isPenaltyCardRegistered: boolean;
+  penaltyStrikes: number;
+  soldChannelsCount: number | null;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export default function SellerProfile() {
@@ -40,9 +39,8 @@ export default function SellerProfile() {
   const [profileData, setProfileData] = useState<SellerProfileData | null>(null);
   const [formData, setFormData] = useState({
     businessRegistrationNumber: '',
-    method: '',
-    dayOfMonth: '',
-    minAmount: '',
+    bankAccount: '',
+    card: '',
   });
 
   useEffect(() => {
@@ -53,9 +51,8 @@ export default function SellerProfile() {
         setProfileData(data);
         setFormData({
           businessRegistrationNumber: data.businessRegistrationNumber || '',
-          method: data.payoutPreference?.method || '',
-          dayOfMonth: data.payoutPreference?.dayOfMonth?.toString() || '',
-          minAmount: data.payoutPreference?.minAmount?.toString() || '',
+          bankAccount: '', // 실제 값이 있다면 여기에 할당
+          card: '', // 실제 값이 있다면 여기에 할당
         });
       } catch {
         showToast('판매자 프로필을 불러오는데 실패했습니다.', 3000);
@@ -74,12 +71,12 @@ export default function SellerProfile() {
       const payload: Record<string, unknown> = {};
       if (field === 'businessRegistrationNumber') {
         payload.businessRegistrationNumber = formData.businessRegistrationNumber;
-      } else if (field === 'method' || field === 'dayOfMonth' || field === 'minAmount') {
-        payload.payoutPreference = {
-          method: formData.method,
-          dayOfMonth: formData.dayOfMonth ? Number(formData.dayOfMonth) : null,
-          minAmount: formData.minAmount ? Number(formData.minAmount) : null,
-        };
+      }
+      if (field === 'bankAccount') {
+        payload.bankAccount = formData.bankAccount;
+      }
+      if (field === 'card') {
+        payload.card = formData.card;
       }
       const { data } = await apiClient.put('/api/v1/users/seller-profiles/me', payload);
       setProfileData(data);
@@ -90,8 +87,12 @@ export default function SellerProfile() {
     }
   };
 
-  if (!profileData || Object.keys(profileData).length === 0) {
-    return <SellerProfileEmpty userId={user?.userId ?? ''} />;
+  if (!user) return null;
+  if (!profileData) {
+    return <LoadingSpinner />;
+  }
+  if (Object.keys(profileData).length === 0) {
+    return <SellerProfileEmpty userId={user.userId} />;
   }
 
   return (
@@ -103,14 +104,20 @@ export default function SellerProfile() {
           <ItemLabel>사업자등록번호</ItemLabel>
           {editField === 'businessRegistrationNumber' ? (
             <InputWrap>
-              <Input
-                name="businessRegistrationNumber"
-                value={formData.businessRegistrationNumber}
-                onChange={handleInputChange}
-                placeholder="사업자등록번호를 입력하세요"
-              />
-              <Button size="small" type="button" onClick={() => handleSave('businessRegistrationNumber')}>저장</Button>
-              <Button size="small" type="button" variant="secondary" onClick={() => setEditField(null)}>취소</Button>
+              <div style={{ flex: 'none', width: spacing[40] }}>
+                <Input
+                  name="businessRegistrationNumber"
+                  value={formData.businessRegistrationNumber}
+                  onChange={handleInputChange}
+                  placeholder="사업자등록번호를 입력하세요"
+                  style={{ height: spacing[8], width: '100%' }}
+                  fullWidth={false}
+                />
+              </div>
+              <div style={{ display: 'flex', gap: spacing[2], marginLeft: 'auto' }}>
+                <EditButton type="button" variant="primary" onClick={() => handleSave('businessRegistrationNumber')}>저장</EditButton>
+                <EditButton type="button" variant="errorOutline" onClick={() => setEditField(null)}>취소</EditButton>
+              </div>
             </InputWrap>
           ) : (
             <>
@@ -119,71 +126,91 @@ export default function SellerProfile() {
             </>
           )}
         </Item>
-        {/* 정산 방식 */}
+        {/* 정산 계좌 */}
         <Item>
-          <ItemLabel>정산 방식</ItemLabel>
-          {editField === 'method' ? (
+          <ItemLabel>정산 계좌</ItemLabel>
+          {editField === 'bankAccount' ? (
             <InputWrap>
-              <Input
-                name="method"
-                value={formData.method}
-                onChange={handleInputChange}
-                placeholder="정산 방식을 입력하세요"
-              />
-              <Button size="small" type="button" onClick={() => handleSave('method')}>저장</Button>
-              <Button size="small" type="button" variant="secondary" onClick={() => setEditField(null)}>취소</Button>
+              <div style={{ flex: 'none', width: spacing[40] }}>
+                <Input
+                  name="bankAccount"
+                  value={formData.bankAccount}
+                  onChange={handleInputChange}
+                  placeholder="정산 계좌 정보를 입력하세요"
+                  style={{ height: spacing[8], width: '100%' }}
+                  fullWidth={false}
+                />
+              </div>
+              <div style={{ display: 'flex', gap: spacing[2], marginLeft: 'auto' }}>
+                <EditButton type="button" variant="primary" onClick={() => handleSave('bankAccount')}>저장</EditButton>
+                <EditButton type="button" variant="errorOutline" onClick={() => setEditField(null)}>취소</EditButton>
+              </div>
             </InputWrap>
           ) : (
-            <>
-              <ItemValue>{profileData.payoutPreference?.method || '-'}</ItemValue>
-              <EditButton type="button" onClick={() => setEditField('method')}>변경</EditButton>
-            </>
+            <ItemValue style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <Label colorType={profileData.isBankAccountRegistered ? 'success' : 'error'}>
+                {profileData.isBankAccountRegistered ? '등록됨' : '미등록'}
+              </Label>
+              {profileData.isBankAccountRegistered ? (
+                <EditButton type="button" variant="default" onClick={() => setEditField('bankAccount')}>변경</EditButton>
+              ) : (
+                <EditButton type="button" variant="success" onClick={() => setEditField('bankAccount')}>등록</EditButton>
+              )}
+            </ItemValue>
           )}
         </Item>
+        {/* 결제 카드 */}
         <Item>
-          <ItemLabel>매월 정산일</ItemLabel>
-          {editField === 'dayOfMonth' ? (
+          <ItemLabel>결제 카드</ItemLabel>
+          {editField === 'card' ? (
             <InputWrap>
-              <Input
-                name="dayOfMonth"
-                value={formData.dayOfMonth}
-                onChange={handleInputChange}
-                placeholder="정산일(숫자)"
-              />
-              <Button size="small" type="button" onClick={() => handleSave('dayOfMonth')}>저장</Button>
-              <Button size="small" type="button" variant="secondary" onClick={() => setEditField(null)}>취소</Button>
+              <div style={{ flex: 'none', width: spacing[40] }}>
+                <Input
+                  name="card"
+                  value={formData.card}
+                  onChange={handleInputChange}
+                  placeholder="결제 카드 정보를 입력하세요"
+                  style={{ height: spacing[8], width: '100%' }}
+                  fullWidth={false}
+                />
+              </div>
+              <div style={{ display: 'flex', gap: spacing[2], marginLeft: 'auto' }}>
+                <EditButton type="button" variant="primary" onClick={() => handleSave('card')}>저장</EditButton>
+                <EditButton type="button" variant="errorOutline" onClick={() => setEditField(null)}>취소</EditButton>
+              </div>
             </InputWrap>
           ) : (
-            <>
-              <ItemValue>{profileData.payoutPreference?.dayOfMonth ? `${profileData.payoutPreference.dayOfMonth}일` : '-'}</ItemValue>
-              <EditButton type="button" onClick={() => setEditField('dayOfMonth')}>변경</EditButton>
-            </>
+            <ItemValue style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <Label colorType={profileData.isPenaltyCardRegistered ? 'success' : 'error'}>
+                {profileData.isPenaltyCardRegistered ? '등록됨' : '미등록'}
+              </Label>
+              {profileData.isPenaltyCardRegistered ? (
+                <EditButton type="button" variant="default" onClick={() => setEditField('card')}>변경</EditButton>
+              ) : (
+                <EditButton type="button" variant="success" onClick={() => setEditField('card')}>등록</EditButton>
+              )}
+            </ItemValue>
           )}
         </Item>
+        {/* 거래 취소 */}
         <Item>
-          <ItemLabel>최소 금액</ItemLabel>
-          {editField === 'minAmount' ? (
-            <InputWrap>
-              <Input
-                name="minAmount"
-                value={formData.minAmount}
-                onChange={handleInputChange}
-                placeholder="최소 금액"
-              />
-              <Button size="small" type="button" onClick={() => handleSave('minAmount')}>저장</Button>
-              <Button size="small" type="button" variant="secondary" onClick={() => setEditField(null)}>취소</Button>
-            </InputWrap>
-          ) : (
-            <>
-              <ItemValue>{profileData.payoutPreference?.minAmount ? `${profileData.payoutPreference.minAmount.toLocaleString()}원` : '-'}</ItemValue>
-              <EditButton type="button" onClick={() => setEditField('minAmount')}>변경</EditButton>
-            </>
-          )}
+          <ItemLabel>거래 취소</ItemLabel>
+          <ItemValue>{profileData.penaltyStrikes}회</ItemValue>
         </Item>
-        {/* 페널티 */}
+        {/* 판매 완료 채널 수 */}
         <Item>
-          <ItemLabel>거래 페널티 횟수</ItemLabel>
-          <ItemValue>{profileData.penaltyStrikes || 0}회</ItemValue>
+          <ItemLabel>판매 완료</ItemLabel>
+          <ItemValue>{profileData.soldChannelsCount?.toLocaleString() ?? 0}개</ItemValue>
+        </Item>
+        {/* 생성일 */}
+        <Item>
+          <ItemLabel>생성일</ItemLabel>
+          <ItemValue>{new Date(profileData.createdAt).toLocaleDateString()}</ItemValue>
+        </Item>
+        {/* 수정일 */}
+        <Item>
+          <ItemLabel>최종 수정일</ItemLabel>
+          <ItemValue>{new Date(profileData.updatedAt).toLocaleDateString()}</ItemValue>
         </Item>
       </ItemList>
     </Section>

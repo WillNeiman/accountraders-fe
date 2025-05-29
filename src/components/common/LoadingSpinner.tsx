@@ -17,8 +17,8 @@ const SpinnerContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 100vh;
-  background-color: ${colors.background.default};
+  width: 100%;
+  height: 100%;
 `
 
 const Spinner = styled.div`

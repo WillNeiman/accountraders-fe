@@ -2,6 +2,7 @@
 
 import { useParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/contexts/ToastContext';
 import SidebarNav from '@/components/mypage/SidebarNav';
 import AccountInfo from '@/components/mypage/AccountInfo';
 import {

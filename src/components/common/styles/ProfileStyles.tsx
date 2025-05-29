@@ -43,28 +43,97 @@ export const ItemValue = styled.div`
   word-break: break-all;
 `;
 
-export const EditButton = styled.button`
+export const EditButton = styled.button<{
+  variant?: 'default' | 'primary' | 'error' | 'secondaryError' | 'success' | 'outline' | 'errorOutline';
+}>`
   margin-left: ${spacing[4]};
-  background: none;
-  border: 1px solid ${colors.gray[300]};
+  background: ${({ variant }) =>
+    variant === 'secondaryError' ? colors.error.light :
+    variant === 'success' ? colors.success.light :
+    variant === 'outline' ? colors.background.default :
+    variant === 'errorOutline' ? colors.background.default :
+    'none'};
+  border: 1px solid
+    ${({ variant }) =>
+      variant === 'primary'
+        ? colors.primary[400]
+        : variant === 'error'
+        ? colors.error.main
+        : variant === 'secondaryError'
+        ? colors.error.light
+        : variant === 'success'
+        ? colors.success.main
+        : variant === 'outline'
+        ? colors.gray[300]
+        : variant === 'errorOutline'
+        ? colors.error.main
+        : colors.gray[300]};
   border-radius: ${spacing[2]};
-  color: ${colors.gray[400]};
+  color: ${({ variant }) =>
+    variant === 'primary'
+      ? colors.primary[600]
+      : variant === 'error'
+      ? colors.error.main
+      : variant === 'secondaryError'
+      ? colors.error.main
+      : variant === 'success'
+      ? colors.success.main
+      : variant === 'outline'
+      ? colors.gray[600]
+      : variant === 'errorOutline'
+      ? colors.error.main
+      : colors.gray[400]};
   font-size: ${typography.fontSize.sm};
   font-weight: ${typography.fontWeight.medium};
   padding: 0 ${spacing[4]};
   height: 32px;
   cursor: pointer;
-  transition: border 0.2s, color 0.2s;
+  transition: border 0.2s, color 0.2s, background 0.2s;
   &:hover {
-    border: 1px solid ${colors.primary[400]};
-    color: ${colors.primary[500]};
+    border: 1px solid
+      ${({ variant }) =>
+        variant === 'primary'
+          ? colors.primary[600]
+          : variant === 'error'
+          ? colors.error.dark
+          : variant === 'secondaryError'
+          ? colors.error.light
+          : variant === 'success'
+          ? colors.success.dark
+          : variant === 'outline'
+          ? colors.gray[400]
+          : variant === 'errorOutline'
+          ? colors.error.dark
+          : colors.primary[400]};
+    color: ${({ variant }) =>
+      variant === 'primary'
+        ? colors.primary[700]
+        : variant === 'error'
+        ? colors.error.dark
+        : variant === 'secondaryError'
+        ? colors.error.dark
+        : variant === 'success'
+        ? colors.success.dark
+        : variant === 'outline'
+        ? colors.gray[800]
+        : variant === 'errorOutline'
+        ? colors.error.dark
+        : colors.primary[500]};
+    background: ${({ variant }) =>
+      variant === 'secondaryError' ? colors.error.light :
+      variant === 'success' ? colors.success.light :
+      variant === 'outline' ? colors.background.default :
+      variant === 'errorOutline' ? colors.background.default :
+      'none'};
   }
 `;
 
 export const InputWrap = styled.div`
   flex: 1;
   display: flex;
+  flex-direction: row;
   align-items: center;
+  justify-content: flex-start;
   gap: ${spacing[2]};
   margin-left: ${spacing[6]};
 `;
