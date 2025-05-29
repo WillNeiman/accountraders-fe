@@ -117,12 +117,12 @@ export default function AccountInfo({ userData, onUpdate }: AccountInfoProps) {
             {editField === 'password' ? (
               <InputWrap>
                 <div style={{ flex: 'none', width: spacing[40] }}>
-                  <Input
-                    name="password"
-                    type="password"
-                    value={formData.password}
-                    onChange={e => setFormData(f => ({ ...f, password: e.target.value }))}
-                    placeholder="새 비밀번호 입력"
+                <Input
+                  name="password"
+                  type="password"
+                  value={formData.password}
+                  onChange={e => setFormData(f => ({ ...f, password: e.target.value }))}
+                  placeholder="새 비밀번호 입력"
                     style={{ height: spacing[8], width: '100%' }}
                     fullWidth={false}
                   />
@@ -145,12 +145,12 @@ export default function AccountInfo({ userData, onUpdate }: AccountInfoProps) {
             {editField === 'nickname' ? (
               <InputWrap>
                 <div style={{ flex: 'none', width: spacing[40] }}>
-                  <Input
-                    name="nickname"
-                    value={formData.nickname}
-                    onChange={e => setFormData(f => ({ ...f, nickname: e.target.value }))}
-                    onBlur={() => { dupCheck.check(); }}
-                    placeholder="닉네임을 입력하세요"
+                <Input
+                  name="nickname"
+                  value={formData.nickname}
+                  onChange={e => setFormData(f => ({ ...f, nickname: e.target.value }))}
+                  onBlur={() => { dupCheck.check(); }}
+                  placeholder="닉네임을 입력하세요"
                     style={{ height: spacing[8], width: '100%' }}
                     fullWidth={false}
                   />
@@ -176,11 +176,11 @@ export default function AccountInfo({ userData, onUpdate }: AccountInfoProps) {
             {editField === 'contactNumber' ? (
               <InputWrap>
                 <div style={{ flex: 'none', width: spacing[40] }}>
-                  <Input
-                    name="contactNumber"
-                    value={formData.contactNumber}
-                    onChange={e => setFormData(f => ({ ...f, contactNumber: e.target.value }))}
-                    placeholder="숫자만 입력해주세요 (예: 01012345678)"
+                <Input
+                  name="contactNumber"
+                  value={formData.contactNumber}
+                  onChange={e => setFormData(f => ({ ...f, contactNumber: e.target.value }))}
+                  placeholder="숫자만 입력해주세요 (예: 01012345678)"
                     style={{ height: spacing[8], width: '100%' }}
                     fullWidth={false}
                   />
@@ -211,11 +211,11 @@ export default function AccountInfo({ userData, onUpdate }: AccountInfoProps) {
             {editField === 'fullName' ? (
               <InputWrap>
                 <div style={{ flex: 'none', width: spacing[40] }}>
-                  <Input
-                    name="fullName"
-                    value={formData.fullName}
-                    onChange={e => setFormData(f => ({ ...f, fullName: e.target.value }))}
-                    placeholder="이름을 입력하세요"
+                <Input
+                  name="fullName"
+                  value={formData.fullName}
+                  onChange={e => setFormData(f => ({ ...f, fullName: e.target.value }))}
+                  placeholder="이름을 입력하세요"
                     style={{ height: spacing[8], width: '100%' }}
                     fullWidth={false}
                   />
@@ -247,7 +247,7 @@ export default function AccountInfo({ userData, onUpdate }: AccountInfoProps) {
             <div style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
               <ToggleLabel htmlFor="adSms">문자 메시지</ToggleLabel>
               <div style={{ marginLeft: 'auto' }}>
-                <Toggle id="adSms" type="checkbox" checked={adSms} onChange={() => setAdSms(v => !v)} />
+              <Toggle id="adSms" type="checkbox" checked={adSms} onChange={() => setAdSms(v => !v)} />
               </div>
             </div>
           </Item>
@@ -255,7 +255,7 @@ export default function AccountInfo({ userData, onUpdate }: AccountInfoProps) {
             <div style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
               <ToggleLabel htmlFor="adEmail">이메일</ToggleLabel>
               <div style={{ marginLeft: 'auto' }}>
-                <Toggle id="adEmail" type="checkbox" checked={adEmail} onChange={() => setAdEmail(v => !v)} />
+              <Toggle id="adEmail" type="checkbox" checked={adEmail} onChange={() => setAdEmail(v => !v)} />
               </div>
             </div>
           </Item>

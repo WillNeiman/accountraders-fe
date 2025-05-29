@@ -17,7 +17,6 @@ import {
 } from '@/components/common/styles/ProfileStyles';
 import SellerProfileEmpty from './SellerProfileEmpty';
 import Label from '@/components/common/Label';
-import LoadingSpinner from '@/components/common/LoadingSpinner';
 import { spacing } from '@/styles/theme/spacing';
 
 interface SellerProfileData {
@@ -47,10 +46,14 @@ export default function SellerProfile() {
     if (!user) return;
     const fetchSellerProfile = async () => {
       try {
-        const { data } = await apiClient.get(`/api/v1/seller-profiles/users/${user.userId}`);
-        setProfileData(data);
+        const response = await apiClient.get(`/api/v1/seller-profiles/users/${user.userId}`);
+        if (!response.data || Object.keys(response.data).length === 0) {
+          setProfileData(null);
+          return;
+        }
+        setProfileData(response.data);
         setFormData({
-          businessRegistrationNumber: data.businessRegistrationNumber || '',
+          businessRegistrationNumber: response.data.businessRegistrationNumber || '',
           bankAccount: '', // 실제 값이 있다면 여기에 할당
           card: '', // 실제 값이 있다면 여기에 할당
         });
@@ -89,9 +92,6 @@ export default function SellerProfile() {
 
   if (!user) return null;
   if (!profileData) {
-    return <LoadingSpinner />;
-  }
-  if (Object.keys(profileData).length === 0) {
     return <SellerProfileEmpty userId={user.userId} />;
   }
 
@@ -105,11 +105,11 @@ export default function SellerProfile() {
           {editField === 'businessRegistrationNumber' ? (
             <InputWrap>
               <div style={{ flex: 'none', width: spacing[40] }}>
-                <Input
-                  name="businessRegistrationNumber"
-                  value={formData.businessRegistrationNumber}
-                  onChange={handleInputChange}
-                  placeholder="사업자등록번호를 입력하세요"
+              <Input
+                name="businessRegistrationNumber"
+                value={formData.businessRegistrationNumber}
+                onChange={handleInputChange}
+                placeholder="사업자등록번호를 입력하세요"
                   style={{ height: spacing[8], width: '100%' }}
                   fullWidth={false}
                 />
@@ -132,10 +132,10 @@ export default function SellerProfile() {
           {editField === 'bankAccount' ? (
             <InputWrap>
               <div style={{ flex: 'none', width: spacing[40] }}>
-                <Input
+              <Input
                   name="bankAccount"
                   value={formData.bankAccount}
-                  onChange={handleInputChange}
+                onChange={handleInputChange}
                   placeholder="정산 계좌 정보를 입력하세요"
                   style={{ height: spacing[8], width: '100%' }}
                   fullWidth={false}
@@ -165,10 +165,10 @@ export default function SellerProfile() {
           {editField === 'card' ? (
             <InputWrap>
               <div style={{ flex: 'none', width: spacing[40] }}>
-                <Input
+              <Input
                   name="card"
                   value={formData.card}
-                  onChange={handleInputChange}
+                onChange={handleInputChange}
                   placeholder="결제 카드 정보를 입력하세요"
                   style={{ height: spacing[8], width: '100%' }}
                   fullWidth={false}
