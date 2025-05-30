@@ -1,9 +1,25 @@
 'use client';
-import ChannelsEmpty from './ChannelsEmpty';
 import Link from 'next/link';
 import Image from 'next/image';
-import { MyYoutubeChannelSummary, Page } from '@/types/youtube-channels';
-import { formatNumber } from '@/utils/format';
+
+// 타입 및 숫자 포맷 함수 직접 정의
+interface MyYoutubeChannelSummary {
+  channelId: string;
+  channelName: string;
+  thumbnailUrl: string | null;
+  subscriberCount: number | null;
+  status: string;
+  platformCoOwnerStatus: string;
+}
+
+interface Page<T> {
+  content: T[];
+  empty: boolean;
+}
+
+function formatNumber(num: number): string {
+  return num.toLocaleString();
+}
 
 interface MyChannelsProps {
   user: { userId: string } | null;
@@ -12,7 +28,7 @@ interface MyChannelsProps {
 
 export default function MyChannels({ user, channels }: MyChannelsProps) {
   if (!user || !channels || channels.empty) {
-    return user ? <ChannelsEmpty userId={user.userId} /> : null;
+    return user ? null : null;
   }
 
   return (
