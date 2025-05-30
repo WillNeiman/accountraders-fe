@@ -111,6 +111,7 @@ const navItems = {
   ],
   seller: [
     { href: '/my/seller-profile', label: '판매자 프로필' },
+    { href: '/my/youtube-channels', label: '채널 관리' },
     { href: '/my/seller/settings', label: '판매자 설정' },
     { href: '/my/seller/analytics', label: '판매자 통계' },
   ],
@@ -128,7 +129,7 @@ export default function SidebarNav({ className }: { className?: string }) {
     <Sidebar className={className}>
       <NavList>
         <NavSection>
-          <NavSectionTitle>내 정보</NavSectionTitle>
+          <NavSectionTitle>계정 관리</NavSectionTitle>
           {navItems.account.map((item) => (
             <NavItem key={item.href}>
               <NavLink href={item.href} isActive={pathname === item.href}>
