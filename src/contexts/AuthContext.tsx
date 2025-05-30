@@ -25,26 +25,42 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   // 페이지 로드 시 사용자 정보 확인
   useEffect(() => {
-    // accessToken이 없으면 /me 호출하지 않음
-    const accessToken = Cookies.get('accessToken');
-    if (!accessToken) {
-      setIsLoading(false);
-      return;
-    }
     const checkAuth = async () => {
       try {
+        const accessToken = Cookies.get('accessToken');
+        if (!accessToken) {
+          setUser(null);
+          setIsLoading(false);
+          return;
+        }
+        
         const userData = await getCurrentUser();
         setUser(userData);
         setError(null);
       } catch (err) {
         setUser(null);
         setError(err instanceof Error ? err : new Error('인증 확인 중 오류가 발생했습니다.'));
+        // 토큰이 유효하지 않은 경우 쿠키 삭제
+        Cookies.remove('accessToken');
       } finally {
         setIsLoading(false);
       }
     };
     checkAuth();
   }, []);
+
+  // 라우트 변경 시 인증 상태 재확인
+  useEffect(() => {
+    const handleRouteChange = () => {
+      const accessToken = Cookies.get('accessToken');
+      if (!accessToken && user) {
+        setUser(null);
+      }
+    };
+
+    window.addEventListener('popstate', handleRouteChange);
+    return () => window.removeEventListener('popstate', handleRouteChange);
+  }, [user]);
 
   const login = useCallback((userData: User) => {
     setUser(userData);
