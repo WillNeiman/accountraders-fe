@@ -1,4 +1,5 @@
-import axios, { AxiosError } from 'axios';
+import axios from 'axios';
+import Cookies from 'js-cookie';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080';
 
@@ -35,7 +36,6 @@ apiClient.interceptors.response.use(
     // 토큰 갱신이 필요한 경우
     if (
       error.response?.status === 401 &&
-      error.response?.data?.code === 'TOKEN_EXPIRED' && // 서버 응답의 에러 코드로 판단
       !originalRequest._retry &&
       !(originalRequest.url && originalRequest.url.includes('/auth/refresh-token'))
     ) {
@@ -56,14 +56,20 @@ apiClient.interceptors.response.use(
       
       try {
         // 토큰 갱신 요청
-        // 서버가 자동으로 새로운 액세스 토큰과 리프레시 토큰을 쿠키에 설정
-        await apiClient.post('/api/v1/auth/refresh-token');
+        const response = await apiClient.post('/api/v1/auth/refresh-token');
+        
+        // 새로운 액세스 토큰을 쿠키에 저장
+        const newAccessToken = response.data.accessToken;
+        Cookies.set('accessToken', newAccessToken, {
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'strict'
+        });
         
         // 갱신 성공 시 대기 중인 요청들 처리
-        onRefreshed('');
+        onRefreshed(newAccessToken);
         isRefreshing = false;
         
-        // 원래 요청 재시도 (쿠키는 자동으로 갱신되므로 헤더 수정 불필요)
+        // 원래 요청 재시도
         return apiClient(originalRequest);
       } catch (refreshError) {
         isRefreshing = false;
@@ -71,23 +77,15 @@ apiClient.interceptors.response.use(
         // 갱신 실패 시 대기 중인 요청들 처리
         onRefreshFailed(refreshError instanceof Error ? refreshError : new Error('Token refresh failed'));
         
-        // 토큰 갱신 실패 시 서버의 에러 응답에 따라 처리
-        if (refreshError instanceof AxiosError) {
-          const errorCode = refreshError.response?.data?.code;
-          
-          // 리프레시 토큰이 만료되었거나 유효하지 않은 경우
-          if (errorCode === 'TOKEN_EXPIRED' || errorCode === 'INVALID_TOKEN') {
-            if (typeof window !== 'undefined') {
-              try {
-                // 로그아웃 처리 후 로그인 페이지로 리다이렉트
-                await apiClient.post('/api/v1/auth/logout');
-              } catch (logoutError) {
-                console.error('Logout failed:', logoutError);
-              } finally {
-                // 로그아웃 API 호출 실패 여부와 관계없이 로그인 페이지로 이동
-                window.location.href = '/login';
-              }
-            }
+        // 토큰 갱신 실패 시 로그아웃 처리
+        if (typeof window !== 'undefined') {
+          try {
+            await apiClient.post('/api/v1/auth/logout');
+          } catch (logoutError) {
+            console.error('Logout failed:', logoutError);
+          } finally {
+            Cookies.remove('accessToken');
+            window.location.href = '/login';
           }
         }
         return Promise.reject(refreshError);

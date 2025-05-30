@@ -23,44 +23,31 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [error, setError] = useState<Error | null>(null);
   const { showToast } = useToast();
 
-  // 페이지 로드 시 사용자 정보 확인
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const accessToken = Cookies.get('accessToken');
-        if (!accessToken) {
-          setUser(null);
-          setIsLoading(false);
-          return;
-        }
-        
-        const userData = await getCurrentUser();
-        setUser(userData);
-        setError(null);
-      } catch (err) {
+  const checkAuth = useCallback(async () => {
+    try {
+      const accessToken = Cookies.get('accessToken');
+      if (!accessToken) {
         setUser(null);
-        setError(err instanceof Error ? err : new Error('인증 확인 중 오류가 발생했습니다.'));
-        // 토큰이 유효하지 않은 경우 쿠키 삭제
-        Cookies.remove('accessToken');
-      } finally {
         setIsLoading(false);
+        return;
       }
-    };
-    checkAuth();
+
+      const userData = await getCurrentUser();
+      setUser(userData);
+      setError(null);
+    } catch (err) {
+      setUser(null);
+      setError(err instanceof Error ? err : new Error('인증 확인 중 오류가 발생했습니다.'));
+      // 토큰이 유효하지 않은 경우 쿠키 삭제
+      Cookies.remove('accessToken');
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
-  // 라우트 변경 시 인증 상태 재확인
   useEffect(() => {
-    const handleRouteChange = () => {
-      const accessToken = Cookies.get('accessToken');
-      if (!accessToken && user) {
-        setUser(null);
-      }
-    };
-
-    window.addEventListener('popstate', handleRouteChange);
-    return () => window.removeEventListener('popstate', handleRouteChange);
-  }, [user]);
+    checkAuth();
+  }, [checkAuth]);
 
   const login = useCallback((userData: User) => {
     setUser(userData);
@@ -72,6 +59,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       await logoutApi();
       setUser(null);
       setError(null);
+      Cookies.remove('accessToken');
     } catch (err) {
       showToast(formatErrorMessage(err));
     }
