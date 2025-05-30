@@ -28,7 +28,7 @@ export default function AccountPage() {
   return (
     <MyContainer>
       <PageHeader>
-        <PageTitle>마이페이지</PageTitle>
+        <PageTitle>계정 관리</PageTitle>
         <PageDescription>
           {currentUser.nickname || currentUser.email}님의 회원 정보를 관리하세요.
         </PageDescription>
