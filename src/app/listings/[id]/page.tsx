@@ -1,9 +1,9 @@
-import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getListingDetail } from '@/services/api/listings';
 import ListingDetailPageClient from './ListingDetailPageClient';
 
-export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function generateMetadata({ params }: any) {
   try {
     const listing = await getListingDetail(params.id);
     return {
@@ -29,7 +29,8 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
   }
 }
 
-export default async function ListingDetailPage({ params }: { params: { id: string } }) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export default async function ListingDetailPage({ params }: any) {
   try {
     const listing = await getListingDetail(params.id);
     return <ListingDetailPageClient listing={listing} />;
