@@ -20,8 +20,10 @@ export default function ProtectedLayout({ children }: LayoutProps) {
   const { user, isLoading } = useAuth();
 
   useEffect(() => {
-    if (!isLoading && !user) {
-      router.push('/login');
+    if (!isLoading) {
+      if (!user) {
+        router.replace('/login');
+      }
     }
   }, [isLoading, user, router]);
 
