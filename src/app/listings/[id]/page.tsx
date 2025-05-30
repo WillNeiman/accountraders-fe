@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import ListingDetail from '@/components/listings/ListingDetail';
 import { getListingDetail } from '@/services/api/listings';
+import ListingDetailPageClient from './ListingDetailPageClient';
 
 interface Props {
   params: {
@@ -38,7 +38,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function ListingDetailPage({ params }: Props) {
   try {
     const listing = await getListingDetail(params.id);
-    return <ListingDetail listing={listing} />;
+    return <ListingDetailPageClient listing={listing} />;
   } catch {
     notFound();
   }

@@ -5,6 +5,7 @@ import { colors } from '@/styles/theme/colors';
 import { spacing } from '@/styles/theme/spacing';
 import { typography } from '@/styles/theme/typography';
 import { YoutubeListingDetail } from '@/types/listings';
+import { mediaQueries } from '@/styles/theme/breakpoints';
 
 const Container = styled.div`
   display: flex;
@@ -64,6 +65,12 @@ const Title = styled.h1`
   font-weight: ${typography.fontWeight.bold};
   color: ${colors.text.primary};
   margin: 0;
+  ${mediaQueries.sm} {
+    font-size: ${typography.fontSize['2xl']};
+  }
+  @media (max-width: 767px) {
+    font-size: ${typography.fontSize.xl};
+  }
 `;
 
 const Category = styled.div`
