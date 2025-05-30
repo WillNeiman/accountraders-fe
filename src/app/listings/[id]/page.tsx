@@ -3,13 +3,7 @@ import { notFound } from 'next/navigation';
 import { getListingDetail } from '@/services/api/listings';
 import ListingDetailPageClient from './ListingDetailPageClient';
 
-interface Props {
-  params: {
-    id: string;
-  };
-}
-
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
   try {
     const listing = await getListingDetail(params.id);
     return {
@@ -35,7 +29,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-export default async function ListingDetailPage({ params }: Props) {
+export default async function ListingDetailPage({ params }: { params: { id: string } }) {
   try {
     const listing = await getListingDetail(params.id);
     return <ListingDetailPageClient listing={listing} />;
