@@ -25,13 +25,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const checkAuth = useCallback(async () => {
     try {
-      const accessToken = Cookies.get('accessToken');
-      if (!accessToken) {
-        setUser(null);
-        setIsLoading(false);
-        return;
-      }
-
       const userData = await getCurrentUser();
       setUser(userData);
       setError(null);
