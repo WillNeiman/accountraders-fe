@@ -6,6 +6,7 @@ import { typography } from '@/styles/theme/typography';
 import { spacing } from '@/styles/theme/spacing';
 import { mediaQueries } from '@/styles/theme/breakpoints';
 import { Listing } from '@/types/listings';
+import Link from 'next/link';
 
 interface ListingCardProps {
   listing: Listing;
@@ -187,45 +188,47 @@ const formatPrice = (price: number) => {
 
 const ListingCard = ({ listing }: ListingCardProps) => {
   return (
-    <Card>
-      <ThumbnailContainer>
-        <PlaceholderContent>
-          <PlaceholderIcon>
-            <svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15" />
-              <path d="M7 10L12 15L17 10" />
-              <path d="M12 15V3" />
-            </svg>
-          </PlaceholderIcon>
-          <PlaceholderText>채널 이미지</PlaceholderText>
-        </PlaceholderContent>
-        <Badge>{listing.status === 'ACTIVE' ? '판매중' : '판매완료'}</Badge>
-      </ThumbnailContainer>
-      <Content>
-        <Title>{listing.title}</Title>
-        <ChannelName>{listing.listingDescription}</ChannelName>
-        <Stats>
-          <StatItem>
-            <StatLabel>조회수</StatLabel>
-            <StatValue>{formatNumber(listing.viewCountOnPlatform)}</StatValue>
-          </StatItem>
-          <StatItem>
-            <StatLabel>등록일</StatLabel>
-            <StatValue>{new Date(listing.createdAt).toLocaleDateString()}</StatValue>
-          </StatItem>
-        </Stats>
-        <Price>{formatPrice(listing.askingPrice)}</Price>
-      </Content>
-    </Card>
+    <Link href={`/listings/${listing.listingId}`}>
+      <Card>
+        <ThumbnailContainer>
+          <PlaceholderContent>
+            <PlaceholderIcon>
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15" />
+                <path d="M7 10L12 15L17 10" />
+                <path d="M12 15V3" />
+              </svg>
+            </PlaceholderIcon>
+            <PlaceholderText>채널 이미지</PlaceholderText>
+          </PlaceholderContent>
+          <Badge>{listing.status === 'ACTIVE' ? '판매중' : '판매완료'}</Badge>
+        </ThumbnailContainer>
+        <Content>
+          <Title>{listing.title}</Title>
+          <ChannelName>{listing.listingDescription}</ChannelName>
+          <Stats>
+            <StatItem>
+              <StatLabel>조회수</StatLabel>
+              <StatValue>{formatNumber(listing.viewCountOnPlatform)}</StatValue>
+            </StatItem>
+            <StatItem>
+              <StatLabel>등록일</StatLabel>
+              <StatValue>{new Date(listing.createdAt).toLocaleDateString()}</StatValue>
+            </StatItem>
+          </Stats>
+          <Price>{formatPrice(listing.askingPrice)}</Price>
+        </Content>
+      </Card>
+    </Link>
   );
 };
 
