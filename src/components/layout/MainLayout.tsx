@@ -1,11 +1,8 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from 'react';
 import styled from '@emotion/styled';
 import { spacing } from '@/styles/theme/spacing';
 import { mediaQueries } from '@/styles/theme/breakpoints';
-import Header from './Header';
-import Footer from './Footer';
 
 const Main = styled.main<{ hasHeader: boolean; headerHeight: number }>`
   display: flex;
@@ -29,31 +26,12 @@ const LayoutContent = styled.div`
   ${mediaQueries.lg} { gap: ${spacing[10]}; }
 `;
 
-const ClientLayout = ({ children }: { children: React.ReactNode }) => {
-  const [mounted, setMounted] = useState(false);
-  const [headerHeight, setHeaderHeight] = useState(0);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) {
-    return null;
-  }
-
+export default function MainLayout({ children, headerHeight }: { children: React.ReactNode; headerHeight: number }) {
   return (
-    <>
-      <Header onHeightChange={setHeaderHeight} />
-      <Main hasHeader={true} headerHeight={headerHeight}>
-        <LayoutContent>
-          {children}
-        </LayoutContent>
-      </Main>
-      <Footer />
-    </>
+    <Main hasHeader={true} headerHeight={headerHeight}>
+      <LayoutContent>
+        {children}
+      </LayoutContent>
+    </Main>
   );
-};
-
-ClientLayout.displayName = 'ClientLayout';
-
-export default ClientLayout; 
+} 
