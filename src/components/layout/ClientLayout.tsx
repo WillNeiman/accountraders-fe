@@ -6,7 +6,7 @@ import { colors } from "@/styles/theme/colors";
 import { spacing } from "@/styles/theme/spacing";
 import { zIndex } from "@/styles/theme/zIndex";
 import { mediaQueries } from "@/styles/theme/breakpoints";
-import { FiMenu, FiX, FiUser, FiLogOut, FiActivity } from 'react-icons/fi';
+import { FiMenu, FiUser, FiLogOut, FiActivity } from 'react-icons/fi';
 import Footer from './Footer';
 import LoginModal from '../auth/LoginModal';
 import SignupModal from '../auth/SignupModal';
@@ -334,9 +334,6 @@ const DropdownLogoutButton = styled(DropdownMenuItem)`
   }
 `;
 
-// ClientLayout.tsx 예시 (필요시 적용)
-const HEADER_HEIGHT = '50px'; // 헤더 높이
-
 const Main = styled.main<{ hasHeader: boolean; headerHeight: number }>`
   display: flex;
   flex-direction: column;
@@ -369,24 +366,6 @@ const LayoutContent = styled.div`
 const DropdownContainer = styled.div`
   position: relative;
   display: inline-block;
-`;
-
-const MobileLogoutButton = styled.button`
-  width: 100%;
-  margin-top: auto;
-  background: ${colors.error.main};
-  color: #fff;
-  border: none;
-  border-radius: ${spacing[2]};
-  padding: ${spacing[3]} 0;
-  font-size: ${typography.fontSize.base};
-  font-weight: ${typography.fontWeight.bold};
-  cursor: pointer;
-  box-shadow: 0 2px 8px ${colors.gray[200]};
-  transition: background 0.15s;
-  &:hover {
-    background: ${colors.error.dark};
-  }
 `;
 
 // 밑줄 인디케이터(애벌레 애니메이션)

@@ -12,8 +12,16 @@ export const metadata: Metadata = {
     default: '채널링크',
     template: '%s | 채널링크'
   },
-  description: '채널링크 - 안전하고 신뢰할 수 있는 계정거래 플랫폼',
-  keywords: ['계정거래', '채널링크', '계정마켓', '계정거래소'],
+  description: '믿을 수 있는 채널 거래의 시작, 채널링크',
+  keywords: [
+      // 기존 핵심 키워드
+      '유튜브 채널 거래', '계정거래', '채널링크', '계정마켓', '채널거래',
+      // 사용자의 구체적인 질문/의도 키워드 (롱테일)
+      '유튜브 채널 사는곳', '유튜브 채널 파는법', '유튜브 채널 가격',
+      '유튜브 구독자 거래', '수익창출 채널 구매', '안전한 유튜브 거래',
+      // 잠재 고객이 관심을 가질만한 키워드
+      '유튜브 채널 가치평가', '채널 양도양수'
+    ],
   authors: [{ name: '채널링크' }],
   creator: '채널링크',
   publisher: '채널링크',
@@ -27,8 +35,8 @@ export const metadata: Metadata = {
     canonical: '/',
   },
   openGraph: {
-    title: '채널링크 - 계정거래 플랫폼',
-    description: '안전하고 신뢰할 수 있는 계정거래 플랫폼',
+    title: '채널링크 - 유튜브 채널 거래 플랫폼',
+    description: '믿을 수 있는 채널 거래의 시작, 채널링크',
     url: 'https://channellink.com',
     siteName: '채널링크',
     images: [
@@ -44,8 +52,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: '채널링크 - 계정거래 플랫폼',
-    description: '안전하고 신뢰할 수 있는 계정거래 플랫폼',
+    title: '채널링크 - 유튜브 채널 거래 플랫폼',
+    description: '믿을 수 있는 채널 거래의 시작, 채널링크',
     images: ['/twitter-image.png'],
     creator: '@channellink',
   },
@@ -74,14 +82,14 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: '로그인',
-  description: '채널링크 로그인 페이지입니다. 계정거래 플랫폼 채널링크에 로그인하세요.',
+  description: '채널링크 로그인 페이지입니다. 유튜브 채널 거래 플랫폼 채널링크에 로그인하세요.',
   robots: {
     index: false,
     follow: true,
   },
   openGraph: {
     title: '로그인 | 채널링크',
-    description: '채널링크 로그인 페이지입니다. 계정거래 플랫폼 채널링크에 로그인하세요.',
+    description: '채널링크 로그인 페이지입니다. 유튜브 채널 거래 플랫폼 채널링크에 로그인하세요.',
   },
 }
 ```

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import styled from '@emotion/styled';
 import { spacing } from '@/styles/theme/spacing';
 import { Listing, ListingParams } from '@/types/listings';
@@ -80,24 +80,7 @@ export const ListingGrid = () => {
   });
   const [categories, setCategories] = useState<YoutubeCategory[]>([]);
 
-  useEffect(() => {
-    loadCategories();
-  }, []);
-
-  useEffect(() => {
-    loadListings();
-  }, [filters]);
-
-  const loadCategories = async () => {
-    try {
-      const categories = await fetchYoutubeCategories();
-      setCategories(categories);
-    } catch (error) {
-      console.error('Failed to load categories:', error);
-    }
-  };
-
-  const loadListings = async () => {
+  const loadListings = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     try {
@@ -108,6 +91,23 @@ export const ListingGrid = () => {
       console.error('Failed to load listings:', error);
     } finally {
       setIsLoading(false);
+    }
+  }, [filters]);
+
+  useEffect(() => {
+    loadCategories();
+  }, []);
+
+  useEffect(() => {
+    loadListings();
+  }, [loadListings]);
+
+  const loadCategories = async () => {
+    try {
+      const categories = await fetchYoutubeCategories();
+      setCategories(categories);
+    } catch (error) {
+      console.error('Failed to load categories:', error);
     }
   };
 

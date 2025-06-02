@@ -14,7 +14,7 @@ const GuideContainer = styled.div`
 
 const HeroSection = styled.section`
   text-align: center;
-  margin-bottom: ${spacing[12]};
+  margin: ${spacing[12]};
   padding: ${spacing[8]} 0;
 `;
 
@@ -22,7 +22,7 @@ const Title = styled.h1`
   font-size: 2.5rem;
   font-weight: ${typography.fontWeight.bold};
   color: ${colors.text.primary};
-  margin-bottom: ${spacing[4]};
+  margin-bottom: ${spacing[6]};
   @media (max-width: 1023px) {
     font-size: 2rem;
   }
@@ -121,7 +121,7 @@ const FeatureDescription = styled.p`
 `;
 
 const ProcessSection = styled.section`
-  margin: ${spacing[12]} 0;
+  margin: ${spacing[24]} 0;
 `;
 
 const ProcessStep = styled.div`
@@ -245,8 +245,8 @@ export default function GuidePage() {
       <HeroSection>
         <Title>안전하고 신뢰할 수 있는<br />유튜브 채널 거래 플랫폼</Title>
         <Description>
-          채널링크는 유튜브 채널 거래를 위한 최고의 중개 플랫폼입니다.
-          검증된 시스템과 전문가의 관리로 안전한 거래를 보장합니다.
+          채널링크는 믿을 수 있는 유튜브 채널 거래 플랫폼입니다.<br/>
+          전문가의 검증과 안전 결제 시스템으로 누구나 안심하고 거래할 수 있습니다.
         </Description>
       </HeroSection>
 
