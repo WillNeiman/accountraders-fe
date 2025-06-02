@@ -6,6 +6,7 @@ import './globals.css'
 import ClientLayout from '@/components/layout/ClientLayout'
 import { AuthProvider } from '@/contexts/AuthContext'
 import { ToastProvider } from '@/contexts/ToastContext'
+import EmotionRegistry from '@/styles/EmotionRegistry'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -22,13 +23,15 @@ export default function RootLayout({
   return (
     <html lang="ko" suppressHydrationWarning>
       <body className={inter.className}>
-        <ToastProvider>
-          <AuthProvider>
-            <ClientLayout>
-              {children}
-            </ClientLayout>
-          </AuthProvider>
-        </ToastProvider>
+        <EmotionRegistry>
+          <ToastProvider>
+            <AuthProvider>
+              <ClientLayout>
+                {children}
+              </ClientLayout>
+            </AuthProvider>
+          </ToastProvider>
+        </EmotionRegistry>
       </body>
     </html>
   )
