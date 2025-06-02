@@ -24,6 +24,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const { showToast } = useToast();
 
   const checkAuth = useCallback(async () => {
+    const accessToken = Cookies.get('accessToken');
+    
+    // 토큰이 없는 경우 바로 로딩 상태 해제
+    if (!accessToken) {
+      setUser(null);
+      setIsLoading(false);
+      return;
+    }
+
     try {
       const userData = await getCurrentUser();
       setUser(userData);

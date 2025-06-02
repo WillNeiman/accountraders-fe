@@ -7,9 +7,9 @@ import { Listing, ListingParams } from '@/types/listings';
 import { fetchYoutubeListings } from '@/lib/api/youtubeListings';
 import { fetchYoutubeCategories, YoutubeCategory } from '@/lib/api/youtubeCategories';
 import ListingCard from './ListingCard';
-import FilterButton from './FilterButton';
-import FilterTags from './FilterTags';
 import FilterModal from './FilterModal';
+import { FilterHeader } from './FilterHeader';
+import { FilterTagsScroll } from './FilterTagsScroll';
 import { theme } from '@/styles/theme';
 import { mediaQueries } from '@/styles/theme/breakpoints';
 
@@ -23,11 +23,31 @@ const Grid = styled.div`
 const GridContainer = styled.div`
   display: flex;
   flex-direction: column;
-  gap: ${theme.spacing[4]};
-  padding: ${theme.spacing[4]};
   max-width: 1280px;
   margin: 0 auto;
   width: 100%;
+`;
+
+const FilterSection = styled.div`
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: white;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding: ${spacing[2]};
+  &::-webkit-scrollbar {
+    display: none;
+  }
+`;
+
+const ContentSection = styled.div`
+  padding: ${theme.spacing[4]};
 
   ${mediaQueries.sm} {
     padding: ${theme.spacing[6]};
@@ -35,18 +55,6 @@ const GridContainer = styled.div`
 
   ${mediaQueries.lg} {
     padding: ${theme.spacing[8]};
-  }
-`;
-
-const FilterContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: ${theme.spacing[4]};
-  align-items: flex-start;
-  
-  ${mediaQueries.md} {
-    flex-direction: row;
-    align-items: center;
   }
 `;
 
@@ -65,7 +73,7 @@ const ErrorMessage = styled.div`
 export const ListingGrid = () => {
   const [listings, setListings] = useState<Listing[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
   const [filters, setFilters] = useState<ListingParams>({
     sort: ['createdAt,desc']
@@ -73,67 +81,94 @@ export const ListingGrid = () => {
   const [categories, setCategories] = useState<YoutubeCategory[]>([]);
 
   useEffect(() => {
-    const loadListings = async () => {
-      try {
-        setIsLoading(true);
-        const response = await fetchYoutubeListings(filters);
-        setListings(response.content ?? []);
-      } catch (err) {
-        setError(err as Error);
-        setListings([]);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+    loadCategories();
+  }, []);
 
+  useEffect(() => {
     loadListings();
   }, [filters]);
 
-  useEffect(() => {
-    fetchYoutubeCategories().then(setCategories).catch(() => setCategories([]));
-  }, []);
+  const loadCategories = async () => {
+    try {
+      const categories = await fetchYoutubeCategories();
+      setCategories(categories);
+    } catch (error) {
+      console.error('Failed to load categories:', error);
+    }
+  };
+
+  const loadListings = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const response = await fetchYoutubeListings(filters);
+      setListings(response.content);
+    } catch (error) {
+      setError('채널 목록을 불러오는데 실패했습니다.');
+      console.error('Failed to load listings:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleFilterChange = (newFilters: ListingParams) => {
-    setFilters(newFilters);
-    setIsFilterModalOpen(false);
+    setFilters(prev => ({
+      ...prev,
+      ...newFilters
+    }));
   };
 
   const handleRemoveFilter = (key: keyof ListingParams, value?: string) => {
     setFilters(prev => {
       const newFilters = { ...prev };
       if (key === 'categoryIds' && value) {
-        newFilters.categoryIds = (newFilters.categoryIds ?? []).filter(id => id !== value);
-        if (newFilters.categoryIds.length === 0) delete newFilters.categoryIds;
+        newFilters.categoryIds = prev.categoryIds?.filter(id => id !== value) || [];
+        if (newFilters.categoryIds.length === 0) {
+          delete newFilters.categoryIds;
+        }
+      } else if (key === 'sort') {
+        delete newFilters.sort;
       } else {
         delete newFilters[key];
-      }
-      // 기본 정렬값 유지
-      if (!newFilters.sort) {
-        newFilters.sort = ['createdAt,desc'];
       }
       return newFilters;
     });
   };
 
-  if (isLoading) {
-    return <LoadingMessage>로딩 중...</LoadingMessage>;
-  }
+  const handleResetFilters = () => {
+    setFilters({
+      sort: ['createdAt,desc']
+    });
+  };
 
   if (error) {
-    return <ErrorMessage>데이터를 불러오는 중 오류가 발생했습니다.</ErrorMessage>;
+    return <ErrorMessage>{error}</ErrorMessage>;
   }
 
   return (
     <GridContainer>
-      <FilterContainer>
-        <FilterButton onClick={() => setIsFilterModalOpen(true)} />
-        <FilterTags filters={filters} onRemoveFilter={handleRemoveFilter} categories={categories} />
-      </FilterContainer>
-      <Grid>
-        {listings.map((listing) => (
-          <ListingCard key={listing.listingId} listing={listing} />
-        ))}
-      </Grid>
+      <FilterSection>
+        <FilterHeader
+          onFilterClick={() => setIsFilterModalOpen(true)}
+        />
+        <FilterTagsScroll
+          filters={filters}
+          onRemoveFilter={handleRemoveFilter}
+          onResetFilters={handleResetFilters}
+          categories={categories}
+        />
+      </FilterSection>
+      <ContentSection>
+        {isLoading ? (
+          <LoadingMessage>로딩 중...</LoadingMessage>
+        ) : (
+          <Grid>
+            {listings.map((listing) => (
+              <ListingCard key={listing.listingId} listing={listing} />
+            ))}
+          </Grid>
+        )}
+      </ContentSection>
       <FilterModal
         isOpen={isFilterModalOpen}
         onClose={() => setIsFilterModalOpen(false)}

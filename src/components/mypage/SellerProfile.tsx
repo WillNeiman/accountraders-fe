@@ -192,15 +192,15 @@ export default function SellerProfile() {
             </ItemValue>
           )}
         </Item>
-        {/* 거래 취소 */}
-        <Item>
-          <ItemLabel>거래 취소</ItemLabel>
-          <ItemValue>{profileData.penaltyStrikes}회</ItemValue>
-        </Item>
         {/* 판매 완료 채널 수 */}
         <Item>
           <ItemLabel>판매 완료</ItemLabel>
           <ItemValue>{profileData.soldChannelsCount?.toLocaleString() ?? 0}개</ItemValue>
+        </Item>
+        {/* 거래 취소 */}
+        <Item>
+          <ItemLabel>거래 취소</ItemLabel>
+          <ItemValue>{profileData.penaltyStrikes}회</ItemValue>
         </Item>
         {/* 생성일 */}
         <Item>
