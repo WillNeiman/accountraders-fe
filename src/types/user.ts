@@ -1,7 +1,7 @@
 import { Role, UserStatus } from './auth';
 
 export interface User {
-  id: string;
+  userId: string;
   email: string;
   nickname: string;
   roles: Role[];

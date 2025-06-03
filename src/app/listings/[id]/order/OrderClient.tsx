@@ -220,7 +220,7 @@ export default function OrderClient({ listing: initialListing }: OrderClientProp
   useEffect(() => {
     if (!isAuthLoading) {
       if (!user) {
-        setIsLoginModalOpen(true);
+      setIsLoginModalOpen(true);
       } else {
         const validationResult = validateAuth(user, {
           requiredRoles: [Role.USER, Role.BUYER],

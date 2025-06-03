@@ -41,9 +41,9 @@ export default function ProtectedLayout({ children }: LayoutProps) {
         isAuthRequired={true}
         onLoginSuccess={() => setIsLoginModalOpen(false)}
       />
-      <Suspense fallback={<LoadingSpinner />}>
-        <ProtectedLayoutContainer>{children}</ProtectedLayoutContainer>
-      </Suspense>
+    <Suspense fallback={<LoadingSpinner />}>
+      <ProtectedLayoutContainer>{children}</ProtectedLayoutContainer>
+    </Suspense>
     </>
   );
 } 
