@@ -1,16 +1,11 @@
-interface Authority {
-  authority: string;
-}
+import { Role, UserStatus } from './auth';
 
 export interface User {
-  userId: string;
-  nickname: string;
+  id: string;
   email: string;
-  userType: 'BUYER' | 'SELLER' | 'ADMIN';
-  status: 'ACTIVE' | 'INACTIVE' | 'SUSPENDED';
-  fullName: string;
-  contactNumber: string;
-  profilePictureUrl: string;
-  isEnabled: boolean;
-  authorities: Authority[];
+  nickname: string;
+  roles: Role[];
+  status: UserStatus;
+  createdAt: string;
+  updatedAt: string;
 } 

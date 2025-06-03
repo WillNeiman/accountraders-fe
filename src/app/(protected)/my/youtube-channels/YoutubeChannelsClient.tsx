@@ -1,5 +1,6 @@
 'use client';
 
+import { useAuth } from '@/contexts/AuthContext';
 import SidebarNav from '@/components/mypage/SidebarNav';
 import YoutubeChannels from '@/components/mypage/YoutubeChannels';
 import {
@@ -13,6 +14,8 @@ import {
 } from '@/components/common/styles/MyPageLayout';
 
 export default function YoutubeChannelsClient() {
+  const { user } = useAuth();
+  if (!user) return null;
   return (
     <MyContainer>
       <PageHeader>

@@ -37,4 +37,8 @@ export interface ModalProps {
   size?: 'small' | 'medium' | 'large';
   showCloseButton?: boolean;
   titleAlign?: 'left' | 'center' | 'right';
+  hasUnsavedChanges?: boolean;
+  unsavedChangesMessage?: string;
+  isLoading?: boolean;
+  preventCloseWhenLoading?: boolean;
 } 

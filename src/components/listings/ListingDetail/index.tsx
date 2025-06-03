@@ -10,6 +10,9 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useState } from 'react';
 import LoginModal from '@/components/auth/LoginModal';
+import { useToast } from '@/contexts/ToastContext';
+import { validateAuth } from '@/utils/auth';
+import { Role, UserStatus } from '@/types/auth';
 
 const Container = styled.div`
   display: flex;
@@ -239,17 +242,26 @@ export default function ListingDetail({ listing }: Props) {
   const router = useRouter();
   const { user } = useAuth();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const { showToast } = useToast();
 
   const handleBuyClick = () => {
     if (!user) {
       setIsLoginModalOpen(true);
       return;
     }
-    router.push(`/listings/${listing?.listingId}/order`);
-  };
 
-  const handleLoginSuccess = () => {
-    setIsLoginModalOpen(false);
+    // 권한 검증
+    const validationResult = validateAuth(user, {
+      requiredRoles: [Role.USER, Role.BUYER],
+      requiredStatus: UserStatus.ACTIVE,
+      requireActive: true,
+    });
+
+    if (!validationResult.isValid && validationResult.reason) {
+      showToast(validationResult.reason);
+      return;
+    }
+
     router.push(`/listings/${listing?.listingId}/order`);
   };
 
@@ -284,7 +296,7 @@ export default function ListingDetail({ listing }: Props) {
       <LoginModal
         isOpen={isLoginModalOpen}
         onClose={handleLoginClose}
-        onLoginSuccess={handleLoginSuccess}
+        redirectUrl={`/listings/${listing?.listingId}/order`}
       />
       <Container>
         <Main>

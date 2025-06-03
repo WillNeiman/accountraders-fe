@@ -1,18 +1,15 @@
-import { forwardRef } from 'react';
+import { forwardRef, useRef, useEffect } from 'react';
 import styled from '@emotion/styled';
 import { keyframes } from '@emotion/react';
 import { colors } from '@/styles/theme/colors';
 import { spacing } from '@/styles/theme/spacing';
 import { typography } from '@/styles/theme/typography';
 import { ModalProps } from '@/types/components';
+import { zIndex } from '@/styles/theme/zIndex';
 
 const fadeIn = keyframes`
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+  from { opacity: 0; }
+  to { opacity: 1; }
 `;
 
 const slideIn = keyframes`
@@ -27,12 +24,8 @@ const slideIn = keyframes`
 `;
 
 const fadeOut = keyframes`
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
-  }
+  from { opacity: 1; }
+  to { opacity: 0; }
 `;
 
 const slideOut = keyframes`
@@ -56,7 +49,7 @@ const Overlay = styled.div<{ isClosing?: boolean }>`
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: ${zIndex.modalBackdrop};
   animation: ${props => props.isClosing ? fadeOut : fadeIn} 0.3s ease-in-out forwards;
 `;
 
@@ -76,6 +69,7 @@ const ModalContainer = styled.div<{ isClosing?: boolean; size?: 'small' | 'mediu
         return '600px';
     }
   }};
+  z-index: ${zIndex.modal};
   animation: ${props => props.isClosing ? slideOut : slideIn} 0.3s ease-in-out forwards;
 `;
 
@@ -103,20 +97,106 @@ const Title = styled.h2<{ align?: 'left' | 'center' | 'right' }>`
   text-align: ${props => props.align || 'left'};
 `;
 
-const Modal = forwardRef<HTMLDivElement, ModalProps>(({ isOpen, onClose, title, children, size = 'medium', showCloseButton = true, titleAlign = 'left' }, ref) => {
-  const handleOverlayClick = (e: React.MouseEvent) => {
-    if (e.target === e.currentTarget) {
+const Modal = forwardRef<HTMLDivElement, ModalProps>(({ 
+  isOpen, 
+  onClose, 
+  title, 
+  children, 
+  size = 'medium', 
+  showCloseButton = true, 
+  titleAlign = 'left',
+  hasUnsavedChanges = false,
+  unsavedChangesMessage = '작성 중인 내용이 있습니다. 정말로 닫으시겠습니까?',
+  isLoading = false,
+  preventCloseWhenLoading = false
+}, ref) => {
+  const modalRef = useRef<HTMLDivElement>(null);
+  const dragStartPos = useRef<{ x: number; y: number } | null>(null);
+  const isPotentialDragRef = useRef(false);
+
+  const attemptClose = () => {
+    if (isLoading && preventCloseWhenLoading) {
+      return;
+    }
+
+    if (hasUnsavedChanges) {
+      if (window.confirm(unsavedChangesMessage)) {
+        onClose();
+      }
+    } else {
       onClose();
     }
+  };
+
+  const handleOverlayMouseDown = (e: React.MouseEvent) => {
+    if (e.target === e.currentTarget) {
+      isPotentialDragRef.current = false;
+      dragStartPos.current = { x: e.clientX, y: e.clientY };
+    }
+  };
+
+  const handleModalContentMouseDown = () => {
+    isPotentialDragRef.current = true;
+  };
+
+  useEffect(() => {
+    const handleGlobalMouseMove = (e: MouseEvent) => {
+      if (dragStartPos.current) {
+        const dx = Math.abs(e.clientX - dragStartPos.current.x);
+        const dy = Math.abs(e.clientY - dragStartPos.current.y);
+        if (dx > 5 || dy > 5) {
+          isPotentialDragRef.current = true;
+        }
+      }
+    };
+
+    if (isOpen) {
+      window.addEventListener('mousemove', handleGlobalMouseMove);
+    }
+
+    return () => {
+      window.removeEventListener('mousemove', handleGlobalMouseMove);
+    };
+  }, [isOpen]);
+
+  const handleOverlayMouseUp = () => {
+    if (dragStartPos.current) {
+      dragStartPos.current = null;
+    }
+  };
+
+  const handleOverlayClick = (e: React.MouseEvent) => {
+    if (e.target === e.currentTarget) {
+      if (!isPotentialDragRef.current) {
+        attemptClose();
+      }
+    }
+    isPotentialDragRef.current = false;
+    dragStartPos.current = null;
   };
 
   if (!isOpen) return null;
 
   return (
-    <Overlay onClick={handleOverlayClick}>
-      <ModalContainer ref={ref} size={size}>
+    <Overlay
+      onMouseDown={handleOverlayMouseDown}
+      onMouseUp={handleOverlayMouseUp}
+      onClick={handleOverlayClick}
+    >
+      <ModalContainer
+        ref={(node) => {
+          if (typeof ref === 'function') {
+            ref(node);
+          } else if (ref) {
+            ref.current = node;
+          }
+          modalRef.current = node;
+        }}
+        size={size}
+        onMouseDown={handleModalContentMouseDown}
+      >
         {showCloseButton && (
-          <CloseButton onClick={onClose} aria-label="닫기">
+          <CloseButton onClick={attemptClose} aria-label="닫기">
             ✕
           </CloseButton>
         )}

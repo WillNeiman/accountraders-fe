@@ -19,7 +19,6 @@ import {
   EditButton,
   InputWrap
 } from '@/components/common/styles/ProfileStyles';
-import Label from '@/components/common/Label';
 
 const ToggleLabel = styled.label`
   font-size: ${typography.fontSize.sm};
@@ -69,8 +68,6 @@ export default function AccountInfo({ userData, onUpdate }: AccountInfoProps) {
   const [editField, setEditField] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     nickname: userData.nickname || '',
-    fullName: userData.fullName || '',
-    contactNumber: userData.contactNumber || '',
     password: '',
   });
   const [adSms, setAdSms] = useState(false);
@@ -164,79 +161,6 @@ export default function AccountInfo({ userData, onUpdate }: AccountInfoProps) {
               <>
                 <ItemValue>{userData.nickname || '-'}</ItemValue>
                 <EditButton type="button" onClick={() => setEditField('nickname')}>변경</EditButton>
-              </>
-            )}
-          </Item>
-
-          {/* 개인 정보 섹션 */}
-          <Item as="div" style={{ fontWeight: 600, fontSize: typography.fontSize.lg, border: 'none', paddingTop: spacing[8], paddingBottom: spacing[2] }}>개인 정보</Item>
-          {/* 휴대폰 번호 */}
-          <Item>
-            <ItemLabel>휴대폰 번호</ItemLabel>
-            {editField === 'contactNumber' ? (
-              <InputWrap>
-                <div style={{ flex: 'none', width: spacing[40] }}>
-                <Input
-                  name="contactNumber"
-                  value={formData.contactNumber}
-                  onChange={e => setFormData(f => ({ ...f, contactNumber: e.target.value }))}
-                  placeholder="숫자만 입력해주세요 (예: 01012345678)"
-                    style={{ height: spacing[8], width: '100%' }}
-                    fullWidth={false}
-                  />
-                </div>
-                <div style={{ display: 'flex', gap: spacing[2], marginLeft: 'auto' }}>
-                  <EditButton type="button" variant="primary" onClick={() => handleSave('contactNumber')}>저장</EditButton>
-                  <EditButton type="button" variant="errorOutline" onClick={() => setEditField(null)}>취소</EditButton>
-                </div>
-              </InputWrap>
-            ) : (
-              <>
-                <ItemValue>
-                  {userData.contactNumber ? (
-                    userData.contactNumber
-                  ) : (
-                    <Label colorType="error">미등록</Label>
-                  )}
-                </ItemValue>
-                <EditButton type="button" variant={userData.contactNumber ? undefined : 'success'} onClick={() => setEditField('contactNumber')}>
-                  {userData.contactNumber ? '변경' : '등록'}
-                </EditButton>
-              </>
-            )}
-          </Item>
-          {/* 이름 */}
-          <Item>
-            <ItemLabel>이름</ItemLabel>
-            {editField === 'fullName' ? (
-              <InputWrap>
-                <div style={{ flex: 'none', width: spacing[40] }}>
-                <Input
-                  name="fullName"
-                  value={formData.fullName}
-                  onChange={e => setFormData(f => ({ ...f, fullName: e.target.value }))}
-                  placeholder="이름을 입력하세요"
-                    style={{ height: spacing[8], width: '100%' }}
-                    fullWidth={false}
-                  />
-                </div>
-                <div style={{ display: 'flex', gap: spacing[2], marginLeft: 'auto' }}>
-                  <EditButton type="button" variant="primary" onClick={() => handleSave('fullName')}>저장</EditButton>
-                  <EditButton type="button" variant="errorOutline" onClick={() => setEditField(null)}>취소</EditButton>
-                </div>
-              </InputWrap>
-            ) : (
-              <>
-                <ItemValue>
-                  {userData.fullName ? (
-                    userData.fullName
-                  ) : (
-                    <Label colorType="error">미등록</Label>
-                  )}
-                </ItemValue>
-                <EditButton type="button" variant={userData.fullName ? undefined : 'success'} onClick={() => setEditField('fullName')}>
-                  {userData.fullName ? '변경' : '등록'}
-                </EditButton>
               </>
             )}
           </Item>

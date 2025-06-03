@@ -46,7 +46,7 @@ export default function SellerProfile() {
     if (!user) return;
     const fetchSellerProfile = async () => {
       try {
-        const response = await apiClient.get(`/api/v1/seller-profiles/users/${user.userId}`);
+        const response = await apiClient.get(`/api/v1/seller-profiles/users/${user.id}`);
         if (!response.data || Object.keys(response.data).length === 0) {
           setProfileData(null);
           return;
@@ -92,7 +92,7 @@ export default function SellerProfile() {
 
   if (!user) return null;
   if (!profileData) {
-    return <SellerProfileEmpty userId={user.userId} />;
+    return <SellerProfileEmpty userId={user.id} />;
   }
 
   return (

@@ -14,6 +14,10 @@ import { getListingDetail } from '@/services/api/listings';
 import { purchaseListing } from '@/services/api/listings';
 import { useAuth } from '@/contexts/AuthContext';
 import LoginModal from '@/components/auth/LoginModal';
+import { Role, UserStatus } from '@/types/auth';
+import { validateAuth } from '@/utils/auth';
+import { useToast } from '@/contexts/ToastContext';
+import { useLoginModalCloseHandler } from '@/utils/navigation';
 
 interface OrderClientProps {
   listing: YoutubeListingDetail;
@@ -208,23 +212,52 @@ export default function OrderClient({ listing: initialListing }: OrderClientProp
   const [listing, setListing] = useState(initialListing);
   const [hasPriceChanged, setHasPriceChanged] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  const { user, isLoading: isAuthLoading } = useAuth();
   const router = useRouter();
+  const { user, isLoading: isAuthLoading } = useAuth();
+  const { showToast } = useToast();
+  const handleLoginClose = useLoginModalCloseHandler();
 
-  // 로그인 체크
   useEffect(() => {
-    if (!isAuthLoading && !user) {
-      setIsLoginModalOpen(true);
+    if (!isAuthLoading) {
+      if (!user) {
+        setIsLoginModalOpen(true);
+      } else {
+        const validationResult = validateAuth(user, {
+          requiredRoles: [Role.USER, Role.BUYER],
+          requiredStatus: UserStatus.ACTIVE,
+          requireActive: true,
+        });
+
+        if (!validationResult.isValid && validationResult.reason) {
+          // document.referrer가 비어있으면 외부 접근으로 간주
+          if (!document.referrer) {
+            router.push('/');
+            setTimeout(() => {
+              if (validationResult.reason) {
+                showToast(validationResult.reason);
+              }
+            }, 100);
+          } else {
+            router.back();
+            // 이전 페이지로 이동 후 토스트 메시지 표시를 위해 sessionStorage 사용
+            sessionStorage.setItem('authError', validationResult.reason);
+          }
+        }
+      }
     }
-  }, [user, isAuthLoading]);
+  }, [isAuthLoading, user, router, showToast]);
+
+  // 이전 페이지에서 저장된 에러 메시지가 있는지 확인
+  useEffect(() => {
+    const errorMessage = sessionStorage.getItem('authError');
+    if (errorMessage) {
+      showToast(errorMessage);
+      sessionStorage.removeItem('authError');
+    }
+  }, [showToast]);
 
   const handleLoginSuccess = () => {
     setIsLoginModalOpen(false);
-  };
-
-  const handleLoginClose = () => {
-    setIsLoginModalOpen(false);
-    router.back();
   };
 
   // 주문 페이지 진입 시 최신 데이터로 업데이트
@@ -262,12 +295,10 @@ export default function OrderClient({ listing: initialListing }: OrderClientProp
     setIsLoading(true);
     try {
       const result = await purchaseListing(listing.listingId, {
-        paymentMethod: 'INICIS', // 실제 구현 시 사용자가 선택한 결제 수단으로 변경
+        paymentMethod: 'INICIS',
       });
       
-      // 결제 성공 시 처리
       console.log('Purchase successful:', result);
-      // TODO: 결제 성공 페이지로 이동
     } catch (error) {
       console.error('Purchase failed:', error);
       alert('결제 처리 중 오류가 발생했습니다. 다시 시도해주세요.');
@@ -276,7 +307,9 @@ export default function OrderClient({ listing: initialListing }: OrderClientProp
     }
   };
 
-  const totalPrice = listing.askingPrice;
+  if (isAuthLoading) {
+    return <div>로딩 중...</div>;
+  }
 
   return (
     <>
@@ -284,6 +317,7 @@ export default function OrderClient({ listing: initialListing }: OrderClientProp
         isOpen={isLoginModalOpen}
         onClose={handleLoginClose}
         onLoginSuccess={handleLoginSuccess}
+        isAuthRequired={true}
       />
       <OrderPageContainer>
         <MainContent>
@@ -357,7 +391,7 @@ export default function OrderClient({ listing: initialListing }: OrderClientProp
             </SummaryRow>
             <SummaryRow style={{ paddingTop: spacing[4], marginTop:spacing[2] }}>
               <TotalPriceLabel>총 결제 예정 금액</TotalPriceLabel>
-              <TotalPriceValue>{totalPrice.toLocaleString()}원</TotalPriceValue>
+              <TotalPriceValue>{listing.askingPrice.toLocaleString()}원</TotalPriceValue>
             </SummaryRow>
           </OrderSummaryCard>
 
@@ -384,7 +418,7 @@ export default function OrderClient({ listing: initialListing }: OrderClientProp
             loadingText="결제 진행 중..."
             style={{ marginTop: spacing[4] }}
           >
-            {totalPrice.toLocaleString()}원 결제하기
+            {listing.askingPrice.toLocaleString()}원 결제하기
           </Button>
         </Sidebar>
       </OrderPageContainer>

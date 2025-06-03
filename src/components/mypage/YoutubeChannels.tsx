@@ -189,7 +189,7 @@ export default function YoutubeChannels() {
     if (!user) return;
     const fetchChannels = async () => {
       try {
-        const response = await apiClient.get(`/api/v1/users/${user.userId}/youtube-channels`);
+        const response = await apiClient.get(`/api/v1/users/${user.id}/youtube-channels`);
         setChannels(response.data.content || []);
       } catch {
         showToast('채널 목록을 불러오는데 실패했습니다.', 3000);
@@ -210,7 +210,7 @@ export default function YoutubeChannels() {
     return (
       <Section>
         <SectionTitle>채널 등록</SectionTitle>
-        <YoutubeChannelRegisterForm userId={user.userId} onSuccess={() => setShowForm(false)} />
+        <YoutubeChannelRegisterForm userId={user.id} onSuccess={() => setShowForm(false)} />
       </Section>
     );
   }

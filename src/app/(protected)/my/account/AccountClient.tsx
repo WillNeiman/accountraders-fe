@@ -17,8 +17,9 @@ import {
 
 export default function AccountClient() {
   const { user } = useAuth();
-  const currentUser = user as User;
   const { showToast } = useToast();
+  if (!user) return null;
+  const currentUser = user as User;
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleAccountUpdate = async (_data: Partial<User>) => {

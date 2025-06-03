@@ -1,5 +1,6 @@
 'use client';
 
+import { useAuth } from '@/contexts/AuthContext';
 import SidebarNav from '@/components/mypage/SidebarNav';
 import SellerProfile from '@/components/mypage/SellerProfile';
 import {
@@ -13,6 +14,8 @@ import {
 } from '@/components/common/styles/MyPageLayout';
 
 export default function SellerProfileClient() {
+  const { user } = useAuth();
+  if (!user) return null;
   return (
     <MyContainer>
       <PageHeader>
