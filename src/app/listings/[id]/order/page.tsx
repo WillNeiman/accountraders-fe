@@ -6,7 +6,7 @@ import { getListingDetail } from '@/services/api/listings';
 const PLACEHOLDER_THUMBNAIL = 'https://placeholderjs.com/1200x630&text=No+Image&background=_F5F6FA&color=_888888&fontsize=48';
 
 export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
-  const id = params.id;
+  const { id } = await params;
   try {
     const listing = await getListingDetail(id);
     return {
@@ -15,7 +15,14 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
       openGraph: {
         title: `${listing.title} - 주문하기 | 채널링크`,
         description: `${listing.title} 상품을 주문하고 안전하게 거래하세요.`,
-        images: ['https://placeholderjs.com/1200x630&text=Channel+Link'],
+        images: [
+          {
+            url: 'https://placeholderjs.com/1200x630&text=Channel+Link',
+            width: 1200,
+            height: 630,
+            alt: listing.title,
+          },
+        ],
       },
     };
   } catch {
@@ -27,7 +34,7 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
 }
 
 export default async function OrderPage({ params }: { params: { id: string } }) {
-  const id = params.id;
+  const { id } = await params;
   try {
     const listing = await getListingDetail(id);
     return <OrderClient listing={listing} />;
