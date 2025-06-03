@@ -325,4 +325,14 @@ export default function robots(): MetadataRoute.Robots {
 - [Next.js Metadata API](https://nextjs.org/docs/app/api-reference/functions/generate-metadata)
 - [Schema.org](https://schema.org/)
 - [Google Search Central](https://developers.google.com/search)
-- [Open Graph Protocol](https://ogp.me/) 
+- [Open Graph Protocol](https://ogp.me/)
+
+## 7. 플레이스홀더 이미지 컨벤션
+
+- 썸네일, og:image 등 외부 이미지가 없거나 로드에 실패할 경우, 반드시 플레이스홀더 이미지를 사용한다.
+- 플레이스홀더 이미지는 `https://placehold.co/` 서비스를 기본으로 하며, 예시:
+  - 썸네일: `https://placehold.co/400x225?text=No+Image&font=roboto`
+  - og:image: `https://placehold.co/1200x630?text=No+Image&font=roboto`
+- next/image 사용 시, 해당 도메인이 next.config.ts의 remotePatterns에 등록되어 있어야 한다.
+- 플레이스홀더 이미지는 alt 속성에 "No Image" 또는 적절한 대체 텍스트를 반드시 포함한다.
+- 실제 이미지가 존재할 경우에는 플레이스홀더가 아닌 실제 이미지를 우선적으로 사용한다. 
