@@ -6,6 +6,10 @@ import { spacing } from '@/styles/theme/spacing';
 import { typography } from '@/styles/theme/typography';
 import { YoutubeListingDetail } from '@/types/listings';
 import { mediaQueries } from '@/styles/theme/breakpoints';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/contexts/AuthContext';
+import { useState } from 'react';
+import LoginModal from '@/components/auth/LoginModal';
 
 const Container = styled.div`
   display: flex;
@@ -232,6 +236,27 @@ interface Props {
 }
 
 export default function ListingDetail({ listing }: Props) {
+  const router = useRouter();
+  const { user } = useAuth();
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+
+  const handleBuyClick = () => {
+    if (!user) {
+      setIsLoginModalOpen(true);
+      return;
+    }
+    router.push(`/listings/${listing?.listingId}/order`);
+  };
+
+  const handleLoginSuccess = () => {
+    setIsLoginModalOpen(false);
+    router.push(`/listings/${listing?.listingId}/order`);
+  };
+
+  const handleLoginClose = () => {
+    setIsLoginModalOpen(false);
+  };
+
   // 플레이스홀더 데이터
   const placeholder = {
     thumbnail: undefined,
@@ -255,53 +280,60 @@ export default function ListingDetail({ listing }: Props) {
   };
 
   return (
-    <Container>
-      <Main>
-        <TopSection>
-          <Thumbnail src={placeholder.thumbnail || '/placeholder-thumbnail.png'} alt="채널 썸네일" />
-          <InfoBlock>
-            <Title>{placeholder.title}</Title>
-            <Category>
-              {(placeholder.category || '게임')} |
-              <ChannelLink href={placeholder.channelUrl || 'https://youtube.com/@placeholder'} target="_blank" rel="noopener noreferrer">채널 바로가기</ChannelLink>
-            </Category>
-            <MetricsWrapper>
-              <MetricsLine />
-              <Metrics>
-                <div>구독자: {(placeholder.metrics.subscribers ?? 25000).toLocaleString()}명</div>
-                <div>조회수: {(placeholder.metrics.views ?? 1000000).toLocaleString()}회</div>
-                <div>월수익: {(placeholder.metrics.income ?? 5000000).toLocaleString()}원</div>
-              </Metrics>
-            </MetricsWrapper>
-            <Price>
-              {placeholder.price.toLocaleString()} {placeholder.currency}
-            </Price>
-            <Actions>
-              <BuyButton>구매하기</BuyButton>
-              <FavoriteButton>찜하기</FavoriteButton>
-            </Actions>
-          </InfoBlock>
-        </TopSection>
-        <Description>{placeholder.description}</Description>
-      </Main>
-      <Side>
-        <SellerCard>
-          <SellerName>{(placeholder.seller?.nickname) || '홍길동'}</SellerName>
-          <SellerMeta>평점: {(placeholder.seller?.rating ?? 4.8)} / 거래 {(placeholder.seller?.transactionCount ?? 12)}건</SellerMeta>
-          <SellerButton>판매자 문의</SellerButton>
-        </SellerCard>
-        <ImagesSection>
-          <ImagesTitle>첨부 이미지</ImagesTitle>
-          <ImagesGrid>
-            {(placeholder.images ?? ['/placeholder1.png', '/placeholder2.png', '/placeholder3.png', '/placeholder4.png']).map((img: string, idx: number) => (
-              <AttachImage key={idx} src={img} alt={`첨부${idx+1}`} />
-            ))}
-          </ImagesGrid>
-        </ImagesSection>
-        <Notice>
-          안전거래를 위해 반드시 플랫폼 내 결제 시스템을 이용해 주세요.
-        </Notice>
-      </Side>
-    </Container>
+    <>
+      <LoginModal
+        isOpen={isLoginModalOpen}
+        onClose={handleLoginClose}
+        onLoginSuccess={handleLoginSuccess}
+      />
+      <Container>
+        <Main>
+          <TopSection>
+            <Thumbnail src={placeholder.thumbnail || '/placeholder-thumbnail.png'} alt="채널 썸네일" />
+            <InfoBlock>
+              <Title>{placeholder.title}</Title>
+              <Category>
+                {(placeholder.category || '게임')} |
+                <ChannelLink href={placeholder.channelUrl || 'https://youtube.com/@placeholder'} target="_blank" rel="noopener noreferrer">채널 바로가기</ChannelLink>
+              </Category>
+              <MetricsWrapper>
+                <MetricsLine />
+                <Metrics>
+                  <div>구독자: {(placeholder.metrics.subscribers ?? 25000).toLocaleString()}명</div>
+                  <div>조회수: {(placeholder.metrics.views ?? 1000000).toLocaleString()}회</div>
+                  <div>월수익: {(placeholder.metrics.income ?? 5000000).toLocaleString()}원</div>
+                </Metrics>
+              </MetricsWrapper>
+              <Price>
+                {placeholder.price.toLocaleString()} {placeholder.currency}
+              </Price>
+              <Actions>
+                <BuyButton onClick={handleBuyClick}>구매하기</BuyButton>
+                <FavoriteButton>찜하기</FavoriteButton>
+              </Actions>
+            </InfoBlock>
+          </TopSection>
+          <Description>{placeholder.description}</Description>
+        </Main>
+        <Side>
+          <SellerCard>
+            <SellerName>{(placeholder.seller?.nickname) || '홍길동'}</SellerName>
+            <SellerMeta>평점: {(placeholder.seller?.rating ?? 4.8)} / 거래 {(placeholder.seller?.transactionCount ?? 12)}건</SellerMeta>
+            <SellerButton>판매자 문의</SellerButton>
+          </SellerCard>
+          <ImagesSection>
+            <ImagesTitle>첨부 이미지</ImagesTitle>
+            <ImagesGrid>
+              {(placeholder.images ?? ['/placeholder1.png', '/placeholder2.png', '/placeholder3.png', '/placeholder4.png']).map((img: string, idx: number) => (
+                <AttachImage key={idx} src={img} alt={`첨부${idx+1}`} />
+              ))}
+            </ImagesGrid>
+          </ImagesSection>
+          <Notice>
+            안전거래를 위해 반드시 플랫폼 내 결제 시스템을 이용해 주세요.
+          </Notice>
+        </Side>
+      </Container>
+    </>
   );
 } 

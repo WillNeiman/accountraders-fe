@@ -3,9 +3,7 @@ import { notFound } from 'next/navigation';
 import OrderClient from './OrderClient';
 import { getListingDetail } from '@/services/api/listings';
 
-const PLACEHOLDER_THUMBNAIL = 'https://placeholderjs.com/1200x630&text=No+Image&background=_F5F6FA&color=_888888&fontsize=48';
-
-export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params;
   try {
     const listing = await getListingDetail(id);
@@ -33,7 +31,7 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
   }
 }
 
-export default async function OrderPage({ params }: { params: { id: string } }) {
+export default async function OrderPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   try {
     const listing = await getListingDetail(id);

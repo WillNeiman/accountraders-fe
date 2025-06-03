@@ -343,8 +343,8 @@ const DropdownContainer = styled.div`
 // 밑줄 인디케이터(애벌레 애니메이션)
 const UnderlineIndicator = styled.div<{
   left: number;
-  right: number;
-  animating: boolean;
+  width: number;
+  opacity: number;
 }>`
   position: absolute;
   bottom: -${spacing[4]};
@@ -352,10 +352,8 @@ const UnderlineIndicator = styled.div<{
   background: ${colors.primary[600]};
   border-radius: 1px;
   left: ${props => props.left}px;
-  right: ${props => props.right}px;
-  transition:
-    left 0.25s cubic-bezier(0.7,0,0.3,1),
-    right 0.25s cubic-bezier(0.7,0,0.3,1);
+  width: ${props => props.width}px;
+  transition: all 0.3s ease;
   z-index: 2;
   pointer-events: none;
 `;
@@ -407,9 +405,8 @@ const Header = memo(({ onHeightChange = () => {} }: HeaderProps) => {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLElement>(null);
   const pathname = usePathname();
-  const [indicator, setIndicator] = useState({ left: 0, right: 0, animating: false });
+  const [indicator, setIndicator] = useState({ left: 0, width: 0 });
   const menuRefs = useRef<(HTMLAnchorElement | null)[]>([]);
-  const animTimeout = useRef<NodeJS.Timeout | null>(null);
   const router = useRouter();
 
   // 헤더 높이 측정 및 전달
@@ -425,23 +422,21 @@ const Header = memo(({ onHeightChange = () => {} }: HeaderProps) => {
   }, [onHeightChange]);
 
   // 메뉴 위치 계산 함수
-  const getMenuEdge = (idx: number) => {
+  const updateIndicator = (idx: number) => {
     const el = menuRefs.current[idx];
-    if (!el) return { left: 0, right: 0 };
+    if (!el) return;
     const rect = el.getBoundingClientRect();
-    const parentRect = el.parentElement!.getBoundingClientRect();
-    return {
-      left: rect.left - parentRect.left,
-      right: parentRect.right - rect.right,
-    };
+    setIndicator({
+      left: rect.left - el.parentElement!.getBoundingClientRect().left,
+      width: rect.width
+    });
   };
 
   // 페이지 진입/경로 변경 시 밑줄 위치 초기화
   useLayoutEffect(() => {
     const idx = MENU_ITEMS.findIndex(item => item.href === pathname);
     if (idx !== -1) {
-      const { left, right } = getMenuEdge(idx);
-      setIndicator({ left, right, animating: false });
+      updateIndicator(idx);
     }
   }, [pathname]);
 
@@ -486,30 +481,9 @@ const Header = memo(({ onHeightChange = () => {} }: HeaderProps) => {
     return () => document.removeEventListener('mousedown', handleClick);
   }, [isDropdownOpen]);
 
-  // 메뉴 클릭 시 애벌레 애니메이션
+  // 메뉴 클릭 시 밑줄 이동
   const handleMenuClick = (targetIdx: number) => {
-    if (!menuRefs.current[targetIdx]) return;
-    const { left: targetLeft, right: targetRight } = getMenuEdge(targetIdx);
-    const currentIdx = MENU_ITEMS.findIndex(item => item.href === pathname);
-    if (currentIdx === -1) return;
-    const { left: currentLeft, right: currentRight } = getMenuEdge(currentIdx);
-
-    if (targetIdx > currentIdx) {
-      // 왼→오: 오른쪽 먼저
-      setIndicator({ left: currentLeft, right: targetRight, animating: true });
-      if (animTimeout.current) clearTimeout(animTimeout.current);
-      animTimeout.current = setTimeout(() => {
-        setIndicator({ left: targetLeft, right: targetRight, animating: true });
-      }, 250);
-    } else if (targetIdx < currentIdx) {
-      // 오→왼: 왼쪽 먼저
-      setIndicator({ left: targetLeft, right: currentRight, animating: true });
-      if (animTimeout.current) clearTimeout(animTimeout.current);
-      animTimeout.current = setTimeout(() => {
-        setIndicator({ left: targetLeft, right: targetRight, animating: true });
-      }, 250);
-    }
-    // 같은 인덱스면 아무것도 안 함
+    updateIndicator(targetIdx);
   };
 
   return (
@@ -539,7 +513,7 @@ const Header = memo(({ onHeightChange = () => {} }: HeaderProps) => {
               {item.label}
             </MenuLink>
           ))}
-          <UnderlineIndicator left={indicator.left} right={indicator.right} animating={indicator.animating} />
+          <UnderlineIndicator left={indicator.left} width={indicator.width} opacity={1} />
         </NavLinks>
         <AuthLinks>
           {user ? (

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import styled from '@emotion/styled';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import Button from '@/components/common/Button';
 import { colors } from '@/styles/theme/colors';
 import { spacing } from '@/styles/theme/spacing';
@@ -11,6 +12,8 @@ import { mediaQueries } from '@/styles/theme/breakpoints';
 import { YoutubeListingDetail } from '@/types/listings';
 import { getListingDetail } from '@/services/api/listings';
 import { purchaseListing } from '@/services/api/listings';
+import { useAuth } from '@/contexts/AuthContext';
+import LoginModal from '@/components/auth/LoginModal';
 
 interface OrderClientProps {
   listing: YoutubeListingDetail;
@@ -204,6 +207,25 @@ export default function OrderClient({ listing: initialListing }: OrderClientProp
   const [isLoading, setIsLoading] = useState(false);
   const [listing, setListing] = useState(initialListing);
   const [hasPriceChanged, setHasPriceChanged] = useState(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const { user, isLoading: isAuthLoading } = useAuth();
+  const router = useRouter();
+
+  // 로그인 체크
+  useEffect(() => {
+    if (!isAuthLoading && !user) {
+      setIsLoginModalOpen(true);
+    }
+  }, [user, isAuthLoading]);
+
+  const handleLoginSuccess = () => {
+    setIsLoginModalOpen(false);
+  };
+
+  const handleLoginClose = () => {
+    setIsLoginModalOpen(false);
+    router.back();
+  };
 
   // 주문 페이지 진입 시 최신 데이터로 업데이트
   useEffect(() => {
@@ -257,108 +279,115 @@ export default function OrderClient({ listing: initialListing }: OrderClientProp
   const totalPrice = listing.askingPrice;
 
   return (
-    <OrderPageContainer>
-      <MainContent>
-        <SectionTitle>주문서 작성</SectionTitle>
-        
-        <ProductInfoCard>
-          <ProductImageWrapper>
-            <Image 
-              src={PLACEHOLDER_THUMBNAIL}
-              alt={`${listing.title} 썸네일`} 
-              fill
-              style={{objectFit: 'cover'}}
-              priority
-              unoptimized={true}
-            />
-          </ProductImageWrapper>
-          <ProductDetails>
-            <ProductName>{listing.title}</ProductName>
-            <ProductPrice>{listing.askingPrice.toLocaleString()}원</ProductPrice>
-            <SellerInfo>판매자: {listing.seller?.nickname || '알 수 없음'}</SellerInfo>
-            <p style={{ fontSize: typography.fontSize.sm, color: colors.text.secondary, marginTop: spacing[2]}}>
-              {listing.listingDescription}
-            </p>
-          </ProductDetails>
-        </ProductInfoCard>
+    <>
+      <LoginModal
+        isOpen={isLoginModalOpen}
+        onClose={handleLoginClose}
+        onLoginSuccess={handleLoginSuccess}
+      />
+      <OrderPageContainer>
+        <MainContent>
+          <SectionTitle>주문서 작성</SectionTitle>
+          
+          <ProductInfoCard>
+            <ProductImageWrapper>
+              <Image 
+                src={PLACEHOLDER_THUMBNAIL}
+                alt={`${listing.title} 썸네일`} 
+                fill
+                style={{objectFit: 'cover'}}
+                priority
+                unoptimized={true}
+              />
+            </ProductImageWrapper>
+            <ProductDetails>
+              <ProductName>{listing.title}</ProductName>
+              <ProductPrice>{listing.askingPrice.toLocaleString()}원</ProductPrice>
+              <SellerInfo>판매자: {listing.seller?.nickname || '알 수 없음'}</SellerInfo>
+              <p style={{ fontSize: typography.fontSize.sm, color: colors.text.secondary, marginTop: spacing[2]}}>
+                {listing.listingDescription}
+              </p>
+            </ProductDetails>
+          </ProductInfoCard>
 
-        {hasPriceChanged && (
+          {hasPriceChanged && (
+            <ImportantNoticeSection>
+              <NoticeTitle>⚠️ 가격 변경 알림</NoticeTitle>
+              <NoticeList>
+                <NoticeListItem>
+                  상품 가격이 {initialListing.askingPrice.toLocaleString()}원에서 {listing.askingPrice.toLocaleString()}원으로 변경되었습니다.
+                  결제 전 최종 가격을 확인해주세요.
+                </NoticeListItem>
+              </NoticeList>
+            </ImportantNoticeSection>
+          )}
+
           <ImportantNoticeSection>
-            <NoticeTitle>⚠️ 가격 변경 알림</NoticeTitle>
+            <NoticeTitle>📢 중요 안내사항</NoticeTitle>
             <NoticeList>
               <NoticeListItem>
-                상품 가격이 {initialListing.askingPrice.toLocaleString()}원에서 {listing.askingPrice.toLocaleString()}원으로 변경되었습니다.
-                결제 전 최종 가격을 확인해주세요.
+                본 거래는 안전한 계정 거래를 위해 <strong>에스크로 방식</strong>으로 진행됩니다. 결제하신 금액은 소유권 이전이 완료될 때까지 안전하게 보관됩니다.
+              </NoticeListItem>
+              <NoticeListItem>
+                판매자는 결제 완료 후 구매자님을 해당 유튜브 채널의 <strong>공동 소유자로 초대</strong>해야 합니다.
+              </NoticeListItem>
+              <NoticeListItem>
+                구매자님께서 공동 소유자 초대를 수락하시면, <strong>7일의 소유권 이전 대기 기간</strong>이 시작됩니다. 이 기간 동안에는 거래 취소가 불가능합니다.
+              </NoticeListItem>
+              <NoticeListItem>
+                7일 후 유튜브 채널의 <strong>주 소유권이 구매자님께 완전히 이전</strong>되면 거래가 최종 완료되며, 이후 판매자에게 대금이 정산됩니다.
+              </NoticeListItem>
+              <NoticeListItem>
+                자세한 거래 절차 및 약관은 관련 페이지를 참고해주시기 바랍니다. 궁금한 점은 고객센터로 문의해주세요.
               </NoticeListItem>
             </NoticeList>
           </ImportantNoticeSection>
-        )}
+        </MainContent>
 
-        <ImportantNoticeSection>
-          <NoticeTitle>📢 중요 안내사항</NoticeTitle>
-          <NoticeList>
-            <NoticeListItem>
-              본 거래는 안전한 계정 거래를 위해 <strong>에스크로 방식</strong>으로 진행됩니다. 결제하신 금액은 소유권 이전이 완료될 때까지 안전하게 보관됩니다.
-            </NoticeListItem>
-            <NoticeListItem>
-              판매자는 결제 완료 후 구매자님을 해당 유튜브 채널의 <strong>공동 소유자로 초대</strong>해야 합니다.
-            </NoticeListItem>
-            <NoticeListItem>
-              구매자님께서 공동 소유자 초대를 수락하시면, <strong>7일의 소유권 이전 대기 기간</strong>이 시작됩니다. 이 기간 동안에는 거래 취소가 불가능합니다.
-            </NoticeListItem>
-            <NoticeListItem>
-              7일 후 유튜브 채널의 <strong>주 소유권이 구매자님께 완전히 이전</strong>되면 거래가 최종 완료되며, 이후 판매자에게 대금이 정산됩니다.
-            </NoticeListItem>
-            <NoticeListItem>
-              자세한 거래 절차 및 약관은 관련 페이지를 참고해주시기 바랍니다. 궁금한 점은 고객센터로 문의해주세요.
-            </NoticeListItem>
-          </NoticeList>
-        </ImportantNoticeSection>
-      </MainContent>
+        <Sidebar>
+          <OrderSummaryCard>
+            <SectionTitle>최종 결제 정보</SectionTitle>
+            <SummaryRow>
+              <SummaryLabel>상품명</SummaryLabel>
+              <SummaryValue>{listing.title}</SummaryValue>
+            </SummaryRow>
+            <SummaryRow>
+              <SummaryLabel>상품 금액</SummaryLabel>
+              <SummaryValue>{listing.askingPrice.toLocaleString()}원</SummaryValue>
+            </SummaryRow>
+            <SummaryRow style={{ paddingTop: spacing[4], marginTop:spacing[2] }}>
+              <TotalPriceLabel>총 결제 예정 금액</TotalPriceLabel>
+              <TotalPriceValue>{totalPrice.toLocaleString()}원</TotalPriceValue>
+            </SummaryRow>
+          </OrderSummaryCard>
 
-      <Sidebar>
-        <OrderSummaryCard>
-          <SectionTitle>최종 결제 정보</SectionTitle>
-          <SummaryRow>
-            <SummaryLabel>상품명</SummaryLabel>
-            <SummaryValue>{listing.title}</SummaryValue>
-          </SummaryRow>
-          <SummaryRow>
-            <SummaryLabel>상품 금액</SummaryLabel>
-            <SummaryValue>{listing.askingPrice.toLocaleString()}원</SummaryValue>
-          </SummaryRow>
-          <SummaryRow style={{ paddingTop: spacing[4], marginTop:spacing[2] }}>
-            <TotalPriceLabel>총 결제 예정 금액</TotalPriceLabel>
-            <TotalPriceValue>{totalPrice.toLocaleString()}원</TotalPriceValue>
-          </SummaryRow>
-        </OrderSummaryCard>
+          <TermsAgreementSection>
+            <SectionTitle>약관 동의</SectionTitle>
+            <AgreementCheckboxWrapper>
+              <input
+                type="checkbox"
+                checked={agreedToTerms}
+                onChange={(e) => setAgreedToTerms(e.target.checked)}
+              />
+              <span>구매 조건 및 이용약관에 모두 동의합니다. (필수)</span>
+            </AgreementCheckboxWrapper>
+            <a href="/terms" target="_blank" style={{fontSize: typography.fontSize.sm, color: colors.primary[600], textDecoration: 'underline'}}>이용약관 전체보기</a>
+          </TermsAgreementSection>
 
-        <TermsAgreementSection>
-          <SectionTitle>약관 동의</SectionTitle>
-          <AgreementCheckboxWrapper>
-            <input
-              type="checkbox"
-              checked={agreedToTerms}
-              onChange={(e) => setAgreedToTerms(e.target.checked)}
-            />
-            <span>구매 조건 및 이용약관에 모두 동의합니다. (필수)</span>
-          </AgreementCheckboxWrapper>
-          <a href="/terms" target="_blank" style={{fontSize: typography.fontSize.sm, color: colors.primary[600], textDecoration: 'underline'}}>이용약관 전체보기</a>
-        </TermsAgreementSection>
-
-        <Button 
-          variant="primary" 
-          size="large" 
-          fullWidth 
-          onClick={handlePayment}
-          disabled={!agreedToTerms || isLoading}
-          isLoading={isLoading}
-          loadingText="결제 진행 중..."
-          style={{ marginTop: spacing[4] }}
-        >
-          {totalPrice.toLocaleString()}원 결제하기
-        </Button>
-      </Sidebar>
-    </OrderPageContainer>
+          <Button 
+            variant="primary" 
+            size="large" 
+            fullWidth 
+            onClick={handlePayment}
+            disabled={!agreedToTerms || isLoading}
+            isLoading={isLoading}
+            loadingText="결제 진행 중..."
+            style={{ marginTop: spacing[4] }}
+          >
+            {totalPrice.toLocaleString()}원 결제하기
+          </Button>
+        </Sidebar>
+      </OrderPageContainer>
+    </>
   );
 } 

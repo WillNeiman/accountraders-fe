@@ -22,8 +22,11 @@ export default function LoginModal({ isOpen, onClose, onSignupClick, onLoginSucc
       await login({ email, password });
       const userData = await getCurrentUser();
       setUser(userData);
-      if (onLoginSuccess) onLoginSuccess();
-      onClose();
+      if (onLoginSuccess) {
+        onLoginSuccess();
+      } else {
+        onClose();
+      }
     } catch (error) {
       showToast(error instanceof Error ? error.message : '로그인 중 오류가 발생했습니다.');
     }

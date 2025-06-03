@@ -33,11 +33,20 @@ apiClient.interceptors.response.use(
   async error => {
     const originalRequest = error.config;
     
+    // 인증이 필요 없는 엔드포인트 예외 처리
+    const isAuthFreeEndpoint = (url: string) =>
+      url.includes('/auth/login') ||
+      url.includes('/auth/signup') ||
+      url.includes('/users') ||
+      url.includes('/auth/forgot-password') ||
+      url.includes('/auth/reset-password');
+
     // 토큰 갱신이 필요한 경우
     if (
       error.response?.status === 401 &&
       !originalRequest._retry &&
-      !(originalRequest.url && originalRequest.url.includes('/auth/refresh-token'))
+      !(originalRequest.url && originalRequest.url.includes('/auth/refresh-token')) &&
+      !(originalRequest.url && isAuthFreeEndpoint(originalRequest.url))
     ) {
       // 이미 갱신 중인 경우, 현재 요청을 대기열에 추가
       if (isRefreshing) {
