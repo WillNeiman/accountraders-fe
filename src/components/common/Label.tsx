@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import React from 'react';
 import { typography } from '@/styles/theme/typography';
-import { spacing } from '@/styles/theme/spacing';
+import { spacing, borderRadius } from '@/styles/theme/spacing';
 
 export type LabelColorType = 'success' | 'error' | 'warning';
 
@@ -34,7 +34,7 @@ const StyledLabel = styled.span<{ colorType: LabelColorType }>`
   padding: ${spacing[1]} ${spacing[3]};
   font-size: ${typography.fontSize.xs};
   font-weight: ${typography.fontWeight.medium};
-  border-radius: ${spacing[4]};
+  border-radius: ${borderRadius.full};
   background: ${({ colorType }) => colorMap[colorType].bg};
   color: ${({ colorType }) => colorMap[colorType].color};
   border: 1px solid ${({ colorType }) => colorMap[colorType].border};

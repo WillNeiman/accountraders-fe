@@ -1,3 +1,4 @@
+// src/app/listings/[id]/page.tsx
 import { notFound } from 'next/navigation';
 import { getListingDetail } from '@/services/api/listings';
 import ListingDetailPageClient from './ListingDetailPageClient';
