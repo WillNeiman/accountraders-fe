@@ -1,3 +1,4 @@
+// src/lib/api/apiClient.ts
 import axios from 'axios';
 import Cookies from 'js-cookie';
 
@@ -37,7 +38,6 @@ apiClient.interceptors.response.use(
     const isAuthFreeEndpoint = (url: string) =>
       url.includes('/auth/login') ||
       url.includes('/auth/signup') ||
-      url.includes('/users') ||
       url.includes('/auth/forgot-password') ||
       url.includes('/auth/reset-password');
 
@@ -79,26 +79,21 @@ apiClient.interceptors.response.use(
       } catch (refreshError) {
         isRefreshing = false;
         
-        // 갱신 실패 시 대기 중인 요청들 처리
         onRefreshFailed(refreshError instanceof Error ? refreshError : new Error('Token refresh failed'));
         
-        // 토큰 갱신 실패 시 로그아웃 처리
         if (typeof window !== 'undefined') {
           try {
-            await apiClient.post('/api/v1/auth/logout');
+            await apiClient.post('/api/v1/auth/logout'); 
           } catch (logoutError) {
-            console.error('Logout failed:', logoutError);
+            console.error('Logout failed after refresh failure:', logoutError);
           } finally {
             Cookies.remove('accessToken');
-            window.location.href = '/login';
           }
         }
-        return Promise.reject(refreshError);
+        return Promise.reject(refreshError); // 에러를 상위 호출자(AuthContext)로 전
       }
     }
     
     return Promise.reject(error);
   }
 );
-
-// 인터셉터 등 공통 설정은 여기서 추가 
