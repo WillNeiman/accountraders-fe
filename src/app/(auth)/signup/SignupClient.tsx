@@ -1,3 +1,4 @@
+// src/app/(auth)/signup/SignupClient.tsx
 'use client';
 
 import { useRouter } from 'next/navigation';
