@@ -69,10 +69,6 @@ apiClient.interceptors.response.use(
         
         // 새로운 액세스 토큰을 쿠키에 저장
         const newAccessToken = response.data.accessToken;
-        Cookies.set('accessToken', newAccessToken, {
-          secure: process.env.NODE_ENV === 'production',
-          sameSite: 'strict'
-        });
         
         // 갱신 성공 시 대기 중인 요청들 처리
         onRefreshed(newAccessToken);

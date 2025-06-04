@@ -1,3 +1,4 @@
+// src/contexts/AuthContext.tsx
 "use client";
 
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
@@ -78,4 +79,4 @@ export const useAuth = () => {
   const ctx = useContext(AuthContext);
   if (!ctx) throw new Error('useAuth must be used within AuthProvider');
   return ctx;
-}; 
+}; // TODO

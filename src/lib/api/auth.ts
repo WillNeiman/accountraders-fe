@@ -1,3 +1,4 @@
+// src/lib/api/auth.ts
 import { apiClient } from './apiClient';
 
 interface LoginRequest {

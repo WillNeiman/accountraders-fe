@@ -1,3 +1,4 @@
+// src/app/(auth)/signup/page.tsx
 export const metadata = {
   title: '회원가입 | 채널링크',
   description: '채널링크 회원가입 페이지입니다. 안전한 유튜브 채널 거래 플랫폼 채널링크에 가입하세요.',

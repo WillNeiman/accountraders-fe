@@ -361,7 +361,7 @@ export const createApiClient = () => {
       });
       return handleResponse(response);
     },
-    // ... 다른 HTTP 메서드들
+    // ... 다른 HTTP메서드들
   };
 };
-``` 
+```
