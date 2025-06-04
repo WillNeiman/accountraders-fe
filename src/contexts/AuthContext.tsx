@@ -1,4 +1,3 @@
-// src/contexts/AuthContext.tsx
 "use client";
 
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
@@ -25,25 +24,25 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const { showToast } = useToast();
 
   const checkAuth = useCallback(async () => {
-    // 힌트: accessToken 쿠키를 먼저 확인합니다.
-    const accessToken = Cookies.get('accessToken');
-
-    // 힌트가 아예 없으면, API 요청 없이 즉시 로그아웃 처리합니다.
-    if (!accessToken) {
-      setUser(null);
-      setIsLoading(false);
-      return; // 함수 종료
-    }
-
-    // 힌트(accessToken)가 존재할 경우에만, 서버를 통해 진짜 세션인지 검증합니다.
     try {
+      // 쿠키가 로드될 때까지 잠시 대기
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      const accessToken = Cookies.get('accessToken');
+      
+      if (!accessToken) {
+        setUser(null);
+        setIsLoading(false);
+        return;
+      }
+
       const userData = await getCurrentUser();
       setUser(userData);
       setError(null);
     } catch (err) {
-      // API 호출에 실패하면 (토큰 만료 등) 로그아웃 처리합니다.
-      setError(err instanceof Error ? err : new Error('인증 확인 중 오류가 발생했습니다.'));
       setUser(null);
+      setError(err instanceof Error ? err : new Error('인증 확인 중 오류가 발생했습니다.'));
+      Cookies.remove('accessToken');
     } finally {
       setIsLoading(false);
     }
