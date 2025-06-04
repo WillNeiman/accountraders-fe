@@ -1,9 +1,10 @@
 "use client";
 
 import styled from '@emotion/styled';
+import Image from 'next/image';
 import { colors } from '@/styles/theme/colors';
 import { typography } from '@/styles/theme/typography';
-import { spacing } from '@/styles/theme/spacing';
+import { spacing, borderRadius } from '@/styles/theme/spacing';
 import { mediaQueries } from '@/styles/theme/breakpoints';
 import { Listing } from '@/types/listings';
 import Link from 'next/link';
@@ -11,6 +12,8 @@ import Link from 'next/link';
 interface ListingCardProps {
   listing: Listing;
 }
+
+const PLACEHOLDER_THUMBNAIL = 'https://placeholderjs.com/400x225&text=No+Image&background=_F5F6FA&color=_888888&fontsize=24';
 
 const Card = styled.div`
   /* Layout */
@@ -40,48 +43,56 @@ const ThumbnailContainer = styled.div`
   width: 100%;
   padding-top: 56.25%; /* 16:9 비율 */
   background: ${colors.gray[100]};
+  overflow: hidden;
 `;
 
-const PlaceholderContent = styled.div`
+const Badge = styled.div<{ status: 'ACTIVE' | 'PENDING_SALE' | 'SOLD' }>`
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: ${colors.gray[100]};
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: ${spacing[2]};
-`;
-
-const PlaceholderIcon = styled.div`
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: ${colors.gray[200]};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: ${colors.gray[400]};
-`;
-
-const PlaceholderText = styled.div`
-  font-size: ${typography.fontSize.sm};
-  color: ${colors.gray[400]};
-`;
-
-const Badge = styled.span`
-  position: absolute;
-  top: ${spacing[3]};
-  right: ${spacing[3]};
-  background: ${colors.primary[600]};
-  color: white;
+  top: ${spacing[2]};
+  right: ${spacing[2]};
   padding: ${spacing[1]} ${spacing[2]};
-  border-radius: 20px;
-  font-size: ${typography.fontSize.sm};
+  border-radius: ${borderRadius.full};
+  font-size: ${typography.fontSize.xs};
   font-weight: ${typography.fontWeight.medium};
+  line-height: ${typography.lineHeight.tight};
+  color: ${({ status }) => {
+    switch (status) {
+      case 'ACTIVE':
+        return colors.success.dark;
+      case 'PENDING_SALE':
+        return colors.warning.dark;
+      case 'SOLD':
+        return colors.gray[600];
+      default:
+        return colors.gray[600];
+    }
+  }};
+  background-color: ${({ status }) => {
+    switch (status) {
+      case 'ACTIVE':
+        return colors.success.light;
+      case 'PENDING_SALE':
+        return colors.warning.light;
+      case 'SOLD':
+        return colors.gray[100];
+      default:
+        return colors.gray[100];
+    }
+  }};
+  border: 1px solid ${({ status }) => {
+    switch (status) {
+      case 'ACTIVE':
+        return colors.success.main;
+      case 'PENDING_SALE':
+        return colors.warning.main;
+      case 'SOLD':
+        return colors.gray[300];
+      default:
+        return colors.gray[300];
+    }
+  }};
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  backdrop-filter: blur(4px);
   z-index: 1;
 `;
 
@@ -187,30 +198,33 @@ const formatPrice = (price: number) => {
 };
 
 const ListingCard = ({ listing }: ListingCardProps) => {
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case 'ACTIVE':
+        return '거래가능';
+      case 'PENDING_SALE':
+        return '거래중';
+      case 'SOLD':
+        return '거래완료';
+      default:
+        return '거래가능';
+    }
+  };
+
   return (
     <Link href={`/listings/${listing.listingId}`}>
       <Card>
         <ThumbnailContainer>
-          <PlaceholderContent>
-            <PlaceholderIcon>
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15" />
-                <path d="M7 10L12 15L17 10" />
-                <path d="M12 15V3" />
-              </svg>
-            </PlaceholderIcon>
-            <PlaceholderText>채널 이미지</PlaceholderText>
-          </PlaceholderContent>
-          <Badge>{listing.status === 'ACTIVE' ? '판매중' : '판매완료'}</Badge>
+          <Image 
+            src={PLACEHOLDER_THUMBNAIL}
+            alt={`${listing.title} 썸네일`}
+            fill
+            style={{ objectFit: 'cover' }}
+            unoptimized={true}
+          />
+          <Badge status={listing.status as 'ACTIVE' | 'PENDING_SALE' | 'SOLD'}>
+            {getStatusText(listing.status)}
+          </Badge>
         </ThumbnailContainer>
         <Content>
           <Title>{listing.title}</Title>

@@ -3,7 +3,7 @@
 import { memo, useCallback, useState, KeyboardEvent, useEffect, useRef, useLayoutEffect } from 'react';
 import styled from "@emotion/styled";
 import { colors } from "@/styles/theme/colors";
-import { spacing } from "@/styles/theme/spacing";
+import { spacing, borderRadius } from "@/styles/theme/spacing";
 import { zIndex } from "@/styles/theme/zIndex";
 import { mediaQueries } from "@/styles/theme/breakpoints";
 import { FiMenu, FiUser, FiLogOut, FiActivity } from 'react-icons/fi';
@@ -234,7 +234,7 @@ const UserNameCard = styled.button`
   color: ${colors.primary[700]};
   font-weight: ${typography.fontWeight.bold};
   font-size: 1rem;
-  border-radius: 999px;
+  border-radius: ${borderRadius.full};
   cursor: pointer;
   border: 1.5px solid ${colors.primary[200]};
   transition: background 0.15s, color 0.15s;

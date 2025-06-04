@@ -1,3 +1,4 @@
+// src/app/listings/[id]/ListingDetailPageClient.tsx
 'use client';
 
 import PageHeader from '@/components/common/PageHeader';

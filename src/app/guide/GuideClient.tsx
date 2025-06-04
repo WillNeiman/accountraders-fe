@@ -2,7 +2,7 @@
 
 import styled from '@emotion/styled';
 import { colors } from '@/styles/theme/colors';
-import { spacing } from '@/styles/theme/spacing';
+import { spacing, borderRadius } from '@/styles/theme/spacing';
 import { typography } from '@/styles/theme/typography';
 import { FaShieldAlt, FaHandshake, FaChartLine, FaUserShield, FaUserCheck, FaHistory, FaBell } from 'react-icons/fa';
 
@@ -231,7 +231,7 @@ const PreparingBadge = styled.span`
   color: #fff;
   font-size: 0.8rem;
   font-weight: ${typography.fontWeight.bold};
-  border-radius: 999px;
+  border-radius: ${borderRadius.full};
   padding: 0.18em 0.9em;
   margin-left: 0.5em;
   letter-spacing: 0.02em;

@@ -1,6 +1,7 @@
 'use client';
 
 import styled from '@emotion/styled';
+import Image from 'next/image';
 import { colors } from '@/styles/theme/colors';
 import { spacing } from '@/styles/theme/spacing';
 import { typography } from '@/styles/theme/typography';
@@ -11,16 +12,20 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useState } from 'react';
 import LoginModal from '@/components/auth/LoginModal';
 
+const PLACEHOLDER_THUMBNAIL = 'https://placeholderjs.com/400x225&text=No+Image&background=_F5F6FA&color=_888888&fontsize=24';
+
 const Container = styled.div`
   display: flex;
   gap: ${spacing[12]};
   max-width: 1200px;
   margin: 0 auto;
-  padding: ${spacing[12]} 0;
+  padding: ${spacing[6]} ${spacing[4]};
   @media (max-width: 1024px) {
     flex-direction: column;
     gap: ${spacing[6]};
-    padding: ${spacing[6]} 0;
+  }
+  ${mediaQueries.lg} {
+    padding: ${spacing[8]} ${spacing[6]};
   }
 `;
 
@@ -49,12 +54,18 @@ const TopSection = styled.div`
   }
 `;
 
-const Thumbnail = styled.img`
-  width: 15rem;
-  height: 15rem;
+const ThumbnailWrapper = styled.div`
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16/9;
   border-radius: ${spacing[4]};
-  object-fit: cover;
+  overflow: hidden;
   background: ${colors.gray[100]};
+  
+  ${mediaQueries.md} {
+    width: 320px;
+    flex-shrink: 0;
+  }
 `;
 
 const InfoBlock = styled.div`
@@ -289,7 +300,15 @@ export default function ListingDetail({ listing }: Props) {
       <Container>
         <Main>
           <TopSection>
-            <Thumbnail src={placeholder.thumbnail || '/placeholder-thumbnail.png'} alt="채널 썸네일" />
+            <ThumbnailWrapper>
+              <Image 
+                src={PLACEHOLDER_THUMBNAIL}
+                alt="채널 썸네일"
+                fill
+                style={{ objectFit: 'cover' }}
+                unoptimized={true}
+              />
+            </ThumbnailWrapper>
             <InfoBlock>
               <Title>{placeholder.title}</Title>
               <Category>
