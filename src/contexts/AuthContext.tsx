@@ -25,17 +25,25 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const { showToast } = useToast();
 
   const checkAuth = useCallback(async () => {
+    // 힌트: accessToken 쿠키를 먼저 확인합니다.
+    const accessToken = Cookies.get('accessToken');
+
+    // 힌트가 아예 없으면, API 요청 없이 즉시 로그아웃 처리합니다.
+    if (!accessToken) {
+      setUser(null);
+      setIsLoading(false);
+      return; // 함수 종료
+    }
+
+    // 힌트(accessToken)가 존재할 경우에만, 서버를 통해 진짜 세션인지 검증합니다.
     try {
-      // 앱 로딩 시, 항상 getCurrentUser API를 호출하여 서버에 직접 인증 상태를 확인합니다.
-      // 이 요청이 401을 반환하면 apiClient 인터셉터가 자동으로 리프레시를 시도할 것입니다.
-      const userData = await getCurrentUser(); // services/auth에 정의된 API 함수
+      const userData = await getCurrentUser();
       setUser(userData);
       setError(null);
     } catch (err) {
-      // getCurrentUser 또는 리프레시 시도 자체가 실패한 경우 (예: 리프레시 토큰 만료)
+      // API 호출에 실패하면 (토큰 만료 등) 로그아웃 처리합니다.
+      setError(err instanceof Error ? err : new Error('인증 확인 중 오류가 발생했습니다.'));
       setUser(null);
-      // 로그인 페이지가 아닐 때만 에러를 표시하거나, 조용히 처리할 수 있습니다.
-      // setError(err instanceof Error ? err : new Error('인증 확인 실패'));
     } finally {
       setIsLoading(false);
     }
