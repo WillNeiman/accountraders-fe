@@ -5,7 +5,7 @@ import PasswordInput from '@/components/common/PasswordInput';
 import { spacing } from '@/styles/theme/spacing';
 import { colors } from '@/styles/theme/colors';
 import { typography } from '@/styles/theme/typography';
-import { apiClient } from '@/lib/api/apiClient';
+import { apiClient } from '@/services/api/client';
 import { FaSpinner, FaCheckCircle } from 'react-icons/fa';
 
 const Form = styled.form`

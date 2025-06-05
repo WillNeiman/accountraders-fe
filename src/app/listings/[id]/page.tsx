@@ -1,12 +1,12 @@
 // src/app/listings/[id]/page.tsx
 import { notFound } from 'next/navigation';
-import { getListingDetail } from '@/services/api/listings';
+import { getYoutubeListingDetail } from '@/services/api/youtubeListings';
 import ListingDetailPageClient from './ListingDetailPageClient';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function generateMetadata({ params }: any) {
   try {
-    const listing = await getListingDetail(params.id);
+    const listing = await getYoutubeListingDetail(params.id);
     return {
       title: `${listing.title} | 채널링크`,
       description: listing.youtubeChannel?.description,
@@ -33,7 +33,7 @@ export async function generateMetadata({ params }: any) {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default async function ListingDetailPage({ params }: any) {
   try {
-    const listing = await getListingDetail(params.id);
+    const listing = await getYoutubeListingDetail(params.id);
     return <ListingDetailPageClient listing={listing} />;
   } catch {
     notFound();

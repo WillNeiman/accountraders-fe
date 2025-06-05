@@ -10,8 +10,7 @@ import { spacing } from '@/styles/theme/spacing';
 import { typography } from '@/styles/theme/typography';
 import { mediaQueries } from '@/styles/theme/breakpoints';
 import { YoutubeListingDetail } from '@/types/features/listings';
-import { getListingDetail } from '@/services/api/listings';
-import { purchaseListing } from '@/services/api/listings';
+import { getYoutubeListingDetail, purchaseYoutubeListing } from '@/services/api/youtubeListings';
 import { useAuth } from '@/contexts/AuthContext';
 import LoginModal from '@/components/auth/LoginModal';
 
@@ -258,7 +257,7 @@ export default function OrderClient({ listing: initialListing }: OrderClientProp
   useEffect(() => {
     const fetchLatestListing = async () => {
       try {
-        const latestListing = await getListingDetail(initialListing.listingId);
+        const latestListing = await getYoutubeListingDetail(initialListing.listingId);
         setListing(latestListing);
         
         // 가격이 변경되었는지 확인
@@ -288,7 +287,7 @@ export default function OrderClient({ listing: initialListing }: OrderClientProp
 
     setIsLoading(true);
     try {
-      const result = await purchaseListing(listing.listingId, {
+      const result = await purchaseYoutubeListing(listing.listingId, {
         paymentMethod: 'INICIS', // 실제 구현 시 사용자가 선택한 결제 수단으로 변경
       });
       

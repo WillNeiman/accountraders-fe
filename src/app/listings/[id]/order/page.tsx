@@ -2,12 +2,12 @@
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import OrderClient from './OrderClient';
-import { getListingDetail } from '@/services/api/listings';
+import { getYoutubeListingDetail } from '@/services/api/youtubeListings';
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params;
   try {
-    const listing = await getListingDetail(id);
+    const listing = await getYoutubeListingDetail(id);
     return {
       title: `${listing.title} - 주문하기 | 채널링크`,
       description: `${listing.title} 상품을 주문하고 안전하게 거래하세요.`,
@@ -35,7 +35,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 export default async function OrderPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   try {
-    const listing = await getListingDetail(id);
+    const listing = await getYoutubeListingDetail(id);
     return <OrderClient listing={listing} />;
   } catch {
     notFound();

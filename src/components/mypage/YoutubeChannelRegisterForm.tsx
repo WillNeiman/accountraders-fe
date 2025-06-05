@@ -8,9 +8,10 @@ import { typography } from '@/styles/theme/typography';
 import Input from '@/components/common/Input';
 import Button from '@/components/common/Button';
 import { useToast } from '@/contexts/ToastContext';
-import { apiClient } from '@/lib/api/apiClient';
+import { apiClient } from '@/services/api/client';
 import { useRouter } from 'next/navigation';
-import { fetchYoutubeCategories, YoutubeCategory } from '@/lib/api/youtubeCategories';
+import { fetchYoutubeCategories } from '@/services/api/youtubeCategories';
+import { YoutubeCategory } from '@/types/features/youtube/category';
 
 const Form = styled.form`
   display: flex;

@@ -5,8 +5,9 @@ import { spacing } from '@/styles/theme/spacing';
 import Modal from '@/components/common/Modal';
 import Button from '@/components/common/Button';
 import { useState, useEffect, useRef } from 'react';
-import { fetchYoutubeCategories, YoutubeCategory } from '@/lib/api/youtubeCategories';
+import { fetchYoutubeCategories } from '@/services/api/youtubeCategories';
 import { theme } from '@/styles/theme';
+import { YoutubeCategory } from '@/types/features/youtube/category';
 
 interface FilterModalProps {
   isOpen: boolean;
