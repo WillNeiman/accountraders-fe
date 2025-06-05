@@ -4,7 +4,7 @@ import { keyframes } from '@emotion/react';
 import { colors } from '@/styles/theme/colors';
 import { spacing } from '@/styles/theme/spacing';
 import { typography } from '@/styles/theme/typography';
-import { ModalProps } from '@/types/components';
+import { ModalProps } from '@/types/features/components';
 
 const fadeIn = keyframes`
   from {

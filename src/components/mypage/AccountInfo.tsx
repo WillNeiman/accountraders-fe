@@ -5,7 +5,7 @@ import styled from '@emotion/styled';
 import { colors } from '@/styles/theme/colors';
 import { spacing } from '@/styles/theme/spacing';
 import { typography } from '@/styles/theme/typography';
-import { User } from '@/types/user';
+import { User } from '@/types/features/auth';
 import Input from '@/components/common/Input';
 import { useToast } from '@/contexts/ToastContext';
 import { useDupCheck } from '@/hooks/useDupCheck';

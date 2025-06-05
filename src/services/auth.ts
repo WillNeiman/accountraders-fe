@@ -1,7 +1,7 @@
 // src/services/auth.ts
 import { AxiosError } from 'axios';
 import { apiClient } from '@/lib/api/apiClient';
-import { User } from '@/types/user';
+import { User } from '@/types/features/auth';
 import { formatErrorMessage } from '@/utils/error';
 
 interface LoginRequest {

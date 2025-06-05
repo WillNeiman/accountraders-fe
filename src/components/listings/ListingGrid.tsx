@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import styled from '@emotion/styled';
 import { spacing } from '@/styles/theme/spacing';
-import { Listing, ListingParams } from '@/types/listings';
+import { Listing, ListingParams } from '@/types/features/listings';
 import { fetchYoutubeListings } from '@/lib/api/youtubeListings';
 import { fetchYoutubeCategories, YoutubeCategory } from '@/lib/api/youtubeCategories';
 import ListingCard from './ListingCard';

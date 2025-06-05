@@ -3,7 +3,7 @@
 
 import PageHeader from '@/components/common/PageHeader';
 import ListingDetail from '@/components/listings/ListingDetail';
-import { YoutubeListingDetail } from '@/types/listings';
+import { YoutubeListingDetail } from '@/types/features/listings';
 import { useRouter } from 'next/navigation';
 
 interface Props {

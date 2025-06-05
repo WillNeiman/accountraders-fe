@@ -6,7 +6,7 @@ import { colors } from '@/styles/theme/colors';
 import { typography } from '@/styles/theme/typography';
 import { spacing, borderRadius } from '@/styles/theme/spacing';
 import { mediaQueries } from '@/styles/theme/breakpoints';
-import { Listing } from '@/types/listings';
+import { Listing } from '@/types/features/listings';
 import Link from 'next/link';
 
 interface ListingCardProps {

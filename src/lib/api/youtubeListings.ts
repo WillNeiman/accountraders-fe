@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Listing, ListingParams, ListingResponse } from '@/types/listings';
+import { Listing, ListingParams, ListingResponse } from '@/types/features/listings';
 
 const apiClient = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_BASE_URL

@@ -1,4 +1,4 @@
-import { YoutubeListingDetail } from '@/types/listings';
+import { YoutubeListingDetail } from '@/types/features/listings';
 import { apiClient } from './client';
 
 export async function getListingDetail(listingId: string): Promise<YoutubeListingDetail> {

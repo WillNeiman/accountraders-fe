@@ -3,7 +3,7 @@ import { colors } from '@/styles/theme/colors';
 import { typography } from '@/styles/theme/typography';
 import { spacing } from '@/styles/theme/spacing';
 import { FiX, FiRefreshCw } from 'react-icons/fi';
-import { ListingParams } from '@/types/listings';
+import { ListingParams } from '@/types/features/listings';
 import { formatPrice, formatNumber } from '@/utils/formatters';
 import { theme } from '@/styles/theme';
 

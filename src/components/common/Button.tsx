@@ -3,7 +3,7 @@ import styled from '@emotion/styled';
 import { colors } from '@/styles/theme/colors';
 import { spacing } from '@/styles/theme/spacing';
 import { typography } from '@/styles/theme/typography';
-import { ButtonProps } from '@/types/components';
+import { ButtonProps } from '@/types/features/components';
 
 const StyledButton = styled.button<ButtonProps>`
   /* Layout */

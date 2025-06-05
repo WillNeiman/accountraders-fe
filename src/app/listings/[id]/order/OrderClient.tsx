@@ -9,7 +9,7 @@ import { colors } from '@/styles/theme/colors';
 import { spacing } from '@/styles/theme/spacing';
 import { typography } from '@/styles/theme/typography';
 import { mediaQueries } from '@/styles/theme/breakpoints';
-import { YoutubeListingDetail } from '@/types/listings';
+import { YoutubeListingDetail } from '@/types/features/listings';
 import { getListingDetail } from '@/services/api/listings';
 import { purchaseListing } from '@/services/api/listings';
 import { useAuth } from '@/contexts/AuthContext';
