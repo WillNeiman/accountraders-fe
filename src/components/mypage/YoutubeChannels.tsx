@@ -7,7 +7,7 @@ import { spacing } from '@/styles/theme/spacing';
 import { typography } from '@/styles/theme/typography';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/contexts/ToastContext';
-import { apiClient } from '@/lib/api/apiClient';
+import { apiClient } from '@/services/api/client';
 import Button from '@/components/common/Button';
 import { FaYoutube, FaPlus } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';

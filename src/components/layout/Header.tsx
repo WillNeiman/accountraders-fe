@@ -6,7 +6,7 @@ import { colors } from "@/styles/theme/colors";
 import { spacing, borderRadius } from "@/styles/theme/spacing";
 import { zIndex } from "@/styles/theme/zIndex";
 import { mediaQueries } from "@/styles/theme/breakpoints";
-import { FiMenu, FiUser, FiLogOut, FiActivity } from 'react-icons/fi';
+import { FiMenu, FiUser, FiLogOut, FiSettings, FiShield, FiYoutube, FiBarChart2, FiList, FiClock, FiCheckCircle } from 'react-icons/fi';
 import LoginModal from '../auth/LoginModal';
 import SignupModal from '../auth/SignupModal';
 import { useAuth } from '@/contexts/AuthContext';
@@ -14,6 +14,7 @@ import { typography } from "@/styles/theme/typography";
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import isPropValid from '@emotion/is-prop-valid';
+import { shadows } from "@/styles/theme/shadows";
 
 // 메뉴 아이템 타입 정의
 interface MenuItem {
@@ -222,11 +223,6 @@ const MobileMenuLinkWrapper = styled(Link)`
   width: 100%;
 `;
 
-const UserInfoTextWrapper = styled.span`
-  display: flex;
-  align-items: baseline;
-`;
-
 const UserNameCard = styled.button`
   display: inline-flex;
   align-items: center;
@@ -258,6 +254,11 @@ const UserNameCard = styled.button`
   }
 `;
 
+const UserInfoTextWrapper = styled.span`
+  display: flex;
+  align-items: baseline;
+`;
+
 const NicknameText = styled.span`
   color: ${colors.primary[600]};
   font-weight: ${typography.fontWeight.bold};
@@ -286,52 +287,74 @@ const UserIcon = styled(FiUser)`
 
 const DropdownMenu = styled.div<{ open: boolean }>`
   position: absolute;
-  top: calc(100% + ${spacing[2]});
+  top: 100%;
   right: 0;
-  min-width: 180px;
-  background: ${colors.background.paper};
-  border-radius: ${spacing[2]};
-  box-shadow: 0 4px 16px ${colors.gray[200]};
-  padding: ${spacing[2]} 0;
+  width: 280px;
+  background: white;
+  border-radius: ${borderRadius.md};
+  box-shadow: ${shadows.lg};
+  padding: ${spacing[4]};
+  margin-top: ${spacing[2]};
   opacity: ${({ open }) => (open ? 1 : 0)};
-  transform: ${({ open }) => (open ? 'translateY(0)' : 'translateY(-8px)')};
-  pointer-events: ${({ open }) => (open ? 'auto' : 'none')};
-  transition: opacity 0.2s, transform 0.2s;
-  z-index: 100;
+  visibility: ${({ open }) => (open ? 'visible' : 'hidden')};
+  transform: ${({ open }) => (open ? 'translateY(0)' : 'translateY(-10px)')};
+  transition: all 0.2s ease-in-out;
+  z-index: ${zIndex.dropdown};
+`;
+
+const DropdownMenuSection = styled.div`
+  margin-bottom: ${spacing[4]};
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+`;
+
+const DropdownMenuTitle = styled.h3`
   font-size: ${typography.fontSize.sm};
+  font-weight: ${typography.fontWeight.bold};
+  color: ${colors.gray[700]};
+  margin-bottom: ${spacing[2]};
+  padding: 0 ${spacing[2]};
 `;
 
 const DropdownMenuItem = styled.button`
-  width: 100%;
-  background: none;
-  border: none;
-  text-align: left;
-  padding: ${spacing[2]} ${spacing[4]};
-  font-size: ${typography.fontSize.sm};
-  color: ${colors.text.primary};
-  cursor: pointer;
-  font-weight: ${typography.fontWeight.medium};
-  border-radius: ${spacing[1]};
   display: flex;
   align-items: center;
-  gap: 10px;
-  transition: background 0.15s;
+  width: 100%;
+  padding: ${spacing[2]};
+  color: ${colors.gray[700]};
+  font-size: ${typography.fontSize.sm};
+  border: none;
+  background: none;
+  cursor: pointer;
+  border-radius: ${borderRadius.sm};
+  transition: all 0.2s ease-in-out;
+  gap: ${spacing[2]};
+
   &:hover {
-    background: ${colors.primary[50]};
+    background: ${colors.gray[50]};
+    color: ${colors.primary[600]};
   }
+
   &:disabled {
-    color: ${colors.text.disabled};
+    opacity: 0.5;
     cursor: not-allowed;
-    background: none;
   }
 `;
 
+const DropdownMenuDivider = styled.hr`
+  border: none;
+  border-bottom: 1px solid ${colors.gray[200]};
+  margin: ${spacing[4]} 0;
+`;
+
 const DropdownLogoutButton = styled(DropdownMenuItem)`
-  color: ${colors.error.main};
-  background: none;
+  color: ${colors.red[600]};
+  
   &:hover {
-    background: none;
-    color: ${colors.error.dark};
+    background: ${colors.red[50]};
+    color: ${colors.red[700]};
   }
 `;
 
@@ -409,6 +432,25 @@ const Header = memo(({ onHeightChange = () => {} }: HeaderProps) => {
   const menuRefs = useRef<(HTMLAnchorElement | null)[]>([]);
   const router = useRouter();
 
+  const navItems = {
+    account: [
+      { href: '/my/account', label: '로그인 정보', icon: FiUser },
+      { href: '/my/profile', label: '프로필 설정', icon: FiSettings },
+      { href: '/my/security', label: '보안 설정', icon: FiShield },
+    ],
+    seller: [
+      { href: '/my/seller-profile', label: '판매자 프로필', icon: FiUser },
+      { href: '/my/youtube-channels', label: '채널 관리', icon: FiYoutube },
+      { href: '/my/seller/settings', label: '판매자 설정', icon: FiSettings },
+      { href: '/my/seller/analytics', label: '판매자 통계', icon: FiBarChart2 },
+    ],
+    transactions: [
+      { href: '/my/transactions', label: '거래 내역', icon: FiList },
+      { href: '/my/transactions/pending', label: '진행중인 거래', icon: FiClock },
+      { href: '/my/transactions/completed', label: '완료된 거래', icon: FiCheckCircle },
+    ],
+  };
+
   // 헤더 높이 측정 및 전달
   useEffect(() => {
     const measureHeight = () => {
@@ -471,15 +513,27 @@ const Header = memo(({ onHeightChange = () => {} }: HeaderProps) => {
 
   // 바깥 클릭 시 드롭다운 닫기
   useEffect(() => {
-    if (!isDropdownOpen) return;
-    const handleClick = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsDropdownOpen(false);
       }
     };
-    document.addEventListener('mousedown', handleClick);
-    return () => document.removeEventListener('mousedown', handleClick);
-  }, [isDropdownOpen]);
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  const handleDropdownToggle = (e: React.MouseEvent | React.KeyboardEvent) => {
+    e.stopPropagation();
+    setIsDropdownOpen(!isDropdownOpen);
+  };
+
+  const handleMenuItemClick = (href: string) => {
+    setIsDropdownOpen(false);
+    router.push(href);
+  };
 
   // 메뉴 클릭 시 밑줄 이동
   const handleMenuClick = (targetIdx: number) => {
@@ -521,9 +575,9 @@ const Header = memo(({ onHeightChange = () => {} }: HeaderProps) => {
               <UserNameCard
                 aria-label={`${user.nickname}님`}
                 tabIndex={0}
-                onClick={() => setIsDropdownOpen(v => !v)}
-                onKeyDown={e => {
-                  if (e.key === 'Enter' || e.key === ' ') setIsDropdownOpen(v => !v);
+                onClick={handleDropdownToggle}
+                onKeyDown={(e: React.KeyboardEvent) => {
+                  if (e.key === 'Enter' || e.key === ' ') handleDropdownToggle(e);
                 }}
               >
                 <UserInfoTextWrapper>
@@ -533,12 +587,34 @@ const Header = memo(({ onHeightChange = () => {} }: HeaderProps) => {
                 <UserIcon />
               </UserNameCard>
               <DropdownMenu open={isDropdownOpen}>
-                <DropdownMenuItem onClick={() => router.push('/my/account')}>
-                  <FiUser style={{ minWidth: 18 }} /> 마이페이지
-                </DropdownMenuItem>
-                <DropdownMenuItem disabled>
-                  <FiActivity style={{ minWidth: 18 }} /> 거래현황 (준비중)
-                </DropdownMenuItem>
+                <DropdownMenuSection>
+                  <DropdownMenuTitle>계정 관리</DropdownMenuTitle>
+                  {navItems.account.map((item) => (
+                    <DropdownMenuItem key={item.href} onClick={() => handleMenuItemClick(item.href)}>
+                      <item.icon style={{ minWidth: 18 }} /> {item.label}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuSection>
+
+                <DropdownMenuSection>
+                  <DropdownMenuTitle>판매자 관리</DropdownMenuTitle>
+                  {navItems.seller.map((item) => (
+                    <DropdownMenuItem key={item.href} onClick={() => handleMenuItemClick(item.href)}>
+                      <item.icon style={{ minWidth: 18 }} /> {item.label}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuSection>
+
+                <DropdownMenuSection>
+                  <DropdownMenuTitle>거래 관리</DropdownMenuTitle>
+                  {navItems.transactions.map((item) => (
+                    <DropdownMenuItem key={item.href} onClick={() => handleMenuItemClick(item.href)}>
+                      <item.icon style={{ minWidth: 18 }} /> {item.label}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuSection>
+
+                <DropdownMenuDivider />
                 <DropdownLogoutButton onClick={logout} aria-label="로그아웃">
                   <FiLogOut style={{ minWidth: 18 }} /> 로그아웃
                 </DropdownLogoutButton>

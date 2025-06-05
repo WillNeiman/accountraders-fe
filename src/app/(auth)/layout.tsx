@@ -5,7 +5,7 @@ import { Suspense, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
 import styled from '@emotion/styled'
-import { LayoutProps } from '@/types/layout'
+import { LayoutProps } from '@/types/common/layout'
 import LoadingSpinner from '@/components/common/LoadingSpinner'
 
 const AuthLayoutContainer = styled.div`

@@ -7,7 +7,7 @@ import { spacing } from '@/styles/theme/spacing';
 import { typography } from '@/styles/theme/typography';
 import { FaCheckCircle, FaSpinner } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
-import { apiClient } from '@/lib/api/apiClient';
+import { apiClient } from '@/services/api/client';
 
 const Form = styled.form`
   display: flex;

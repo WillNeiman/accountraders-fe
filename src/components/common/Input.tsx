@@ -3,7 +3,7 @@ import styled from '@emotion/styled';
 import { colors } from '@/styles/theme/colors';
 import { spacing } from '@/styles/theme/spacing';
 import { typography } from '@/styles/theme/typography';
-import { InputProps } from '@/types/components';
+import { InputProps } from '@/types/features/components';
 import { mediaQueries } from '@/styles/theme/breakpoints';
 
 const InputWrapper = styled.div<{ fullWidth?: boolean }>`

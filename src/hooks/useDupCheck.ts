@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { apiClient } from '@/lib/api/apiClient';
+import { apiClient } from '@/services/api/client';
 
 export function useDupCheck(value: string, isValid: boolean) {
   const [status, setStatus] = useState<'idle'|'checking'|'valid'|'invalid'>('idle');

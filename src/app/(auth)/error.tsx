@@ -1,6 +1,6 @@
 'use client'
 
-import { ErrorProps } from '@/types/layout'
+import { ErrorProps } from '@/types/common/layout'
 import ErrorBoundary from '@/components/common/ErrorBoundary'
 
 export default function Error({ reset }: ErrorProps) {

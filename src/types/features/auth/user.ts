@@ -13,4 +13,7 @@ export interface User {
   profilePictureUrl: string;
   isEnabled: boolean;
   authorities: Authority[];
-} 
+}
+
+export type UserType = User['userType'];
+export type UserStatus = User['status']; 

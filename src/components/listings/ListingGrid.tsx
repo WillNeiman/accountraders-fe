@@ -3,9 +3,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import styled from '@emotion/styled';
 import { spacing } from '@/styles/theme/spacing';
-import { Listing, ListingParams } from '@/types/listings';
-import { fetchYoutubeListings } from '@/lib/api/youtubeListings';
-import { fetchYoutubeCategories, YoutubeCategory } from '@/lib/api/youtubeCategories';
+import { Listing, ListingParams } from '@/types/features/listings';
+import { fetchYoutubeListings } from '@/services/api/youtubeListings';
+import { fetchYoutubeCategories } from '@/services/api/youtubeCategories';
+import { YoutubeCategory } from '@/types/features/youtube/category';
 import ListingCard from './ListingCard';
 import FilterModal from './FilterModal';
 import { FilterHeader } from './FilterHeader';

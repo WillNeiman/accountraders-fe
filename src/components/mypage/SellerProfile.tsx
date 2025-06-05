@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Input from '@/components/common/Input';
 import { useToast } from '@/contexts/ToastContext';
-import { apiClient } from '@/lib/api/apiClient';
+import { apiClient } from '@/services/api/client';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   Section,

@@ -1,7 +1,7 @@
 'use client';
 
 import { useAuth } from '@/contexts/AuthContext';
-import { User } from '@/types/user';
+import { User } from '@/types/features/auth';
 import SidebarNav from '@/components/mypage/SidebarNav';
 import AccountInfo from '@/components/mypage/AccountInfo';
 import { useToast } from '@/contexts/ToastContext';

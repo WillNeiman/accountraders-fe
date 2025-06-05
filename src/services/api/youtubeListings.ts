@@ -1,10 +1,11 @@
-import axios from 'axios';
-import { Listing, ListingParams, ListingResponse } from '@/types/listings';
+import { ListingParams, ListingResponse, YoutubeListingDetail } from '@/types/features/listings';
+import { apiClient } from './client';
 
-const apiClient = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL
-});
-
+/**
+ * 유튜브 리스팅 목록을 조회합니다.
+ * @param params 검색 및 필터링 파라미터
+ * @returns 페이지네이션된 리스팅 목록
+ */
 export const fetchYoutubeListings = async (params: ListingParams): Promise<ListingResponse> => {
   const queryParams = new URLSearchParams();
 
@@ -57,7 +58,26 @@ export const fetchYoutubeListings = async (params: ListingParams): Promise<Listi
   return response.data;
 };
 
-export async function fetchYoutubeListingById(id: string): Promise<Listing> {
-  const response = await apiClient.get(`/api/v1/youtube-listings/${id}`);
+/**
+ * 특정 유튜브 리스팅의 상세 정보를 조회합니다.
+ * @param listingId 리스팅 ID
+ * @returns 리스팅 상세 정보
+ */
+export async function getYoutubeListingDetail(listingId: string): Promise<YoutubeListingDetail> {
+  const response = await apiClient.get<YoutubeListingDetail>(`/api/v1/youtube-listings/${listingId}`);
+  return response.data;
+}
+
+/**
+ * 유튜브 리스팅을 구매합니다.
+ * @param listingId 리스팅 ID
+ * @param paymentData 결제 정보
+ * @returns 구매 결과
+ */
+export async function purchaseYoutubeListing(listingId: string, paymentData: {
+  paymentMethod: string;
+  // 기타 결제 관련 정보
+}) {
+  const response = await apiClient.post(`/api/v1/youtube-listings/${listingId}/purchase`, paymentData);
   return response.data;
 } 
