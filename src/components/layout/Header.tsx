@@ -6,7 +6,7 @@ import { colors } from "@/styles/theme/colors";
 import { spacing, borderRadius } from "@/styles/theme/spacing";
 import { zIndex } from "@/styles/theme/zIndex";
 import { mediaQueries } from "@/styles/theme/breakpoints";
-import { FiMenu, FiUser, FiLogOut, FiActivity, FiSettings, FiShield, FiYoutube, FiBarChart2, FiList, FiClock, FiCheckCircle } from 'react-icons/fi';
+import { FiMenu, FiUser, FiLogOut, FiSettings, FiShield, FiYoutube, FiBarChart2, FiList, FiClock, FiCheckCircle } from 'react-icons/fi';
 import LoginModal from '../auth/LoginModal';
 import SignupModal from '../auth/SignupModal';
 import { useAuth } from '@/contexts/AuthContext';
@@ -285,29 +285,6 @@ const UserIcon = styled(FiUser)`
   align-items: center;
 `;
 
-const UserAvatar = styled.img`
-  width: 32px;
-  height: 32px;
-  border-radius: ${borderRadius.full};
-  object-fit: cover;
-`;
-
-const UserInfo = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
-
-const UserName = styled.span`
-  font-weight: ${typography.fontWeight.medium};
-  color: ${colors.gray[900]};
-  font-size: ${typography.fontSize.sm};
-`;
-
-const UserEmail = styled.span`
-  color: ${colors.gray[500]};
-  font-size: ${typography.fontSize.xs};
-`;
-
 const DropdownMenu = styled.div<{ open: boolean }>`
   position: absolute;
   top: 100%;
@@ -548,7 +525,7 @@ const Header = memo(({ onHeightChange = () => {} }: HeaderProps) => {
     };
   }, []);
 
-  const handleDropdownToggle = (e: React.MouseEvent) => {
+  const handleDropdownToggle = (e: React.MouseEvent | React.KeyboardEvent) => {
     e.stopPropagation();
     setIsDropdownOpen(!isDropdownOpen);
   };
@@ -600,7 +577,7 @@ const Header = memo(({ onHeightChange = () => {} }: HeaderProps) => {
                 tabIndex={0}
                 onClick={handleDropdownToggle}
                 onKeyDown={(e: React.KeyboardEvent) => {
-                  if (e.key === 'Enter' || e.key === ' ') handleDropdownToggle(e as any);
+                  if (e.key === 'Enter' || e.key === ' ') handleDropdownToggle(e);
                 }}
               >
                 <UserInfoTextWrapper>
