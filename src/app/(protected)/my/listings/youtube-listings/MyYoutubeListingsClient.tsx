@@ -2,13 +2,15 @@
 
 import { useRouter, useSearchParams } from 'next/navigation';
 import styled from '@emotion/styled';
-import { YoutubeListingResponse, ListingStatus } from '@/types/features/listings/listing';
+import { YoutubeListingResponse, ListingStatus, MyYoutubeListingParams } from '@/types/features/listings/listing';
 import { colors } from '@/styles/theme/colors';
 import { spacing } from '@/styles/theme/spacing';
 import { typography } from '@/styles/theme/typography';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Pagination } from '@/components/common/Pagination';
+import { useCallback, useEffect, useState } from 'react';
+import { fetchMyYoutubeListings } from '@/services/api/youtubeListings';
 
 const Container = styled.div`
   max-width: 1200px;
@@ -99,29 +101,49 @@ const FILTERS: { label: string; value: ListingStatus | 'ALL' }[] = [
   { label: '판매완료', value: 'SOLD' },
 ];
 
-export default function MyYoutubeListingsClient({ initialData }: { initialData: YoutubeListingResponse }) {
+export default function MyYoutubeListingsClient({ initialData }: { initialData: MyYoutubeListingParams }) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [listingsData, setListingsData] = useState<YoutubeListingResponse | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const handleStatusChange = (status: ListingStatus | 'ALL') => {
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await fetchMyYoutubeListings(initialData);
+        setListingsData(data);
+      } catch (error) {
+        console.error('Failed to fetch listings:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [initialData]);
+
+  const handleStatusChange = useCallback((status: ListingStatus | 'ALL') => {
     const params = new URLSearchParams(searchParams.toString());
     if (status === 'ALL') {
       params.delete('statuses');
     } else {
-      // For now, we only support single status selection
       params.set('statuses', status);
     }
     params.set('page', '1');
     router.push(`?${params.toString()}`);
-  };
+  }, [router, searchParams]);
 
-  const handlePageChange = (page: number) => {
+  const handlePageChange = useCallback((page: number) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set('page', String(page + 1));
     router.push(`?${params.toString()}`);
-  }
+  }, [router, searchParams]);
 
   const currentStatus = searchParams.get('statuses') || 'ALL';
+
+  if (isLoading || !listingsData) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <Container>
@@ -146,7 +168,7 @@ export default function MyYoutubeListingsClient({ initialData }: { initialData: 
           </tr>
         </thead>
         <tbody>
-          {initialData.content.map(listing => (
+          {listingsData.content.map(listing => (
             <tr key={listing.listingId}>
               <Td>
                 <Link href={`/my/listings/youtube-listings/${listing.listingId}`} passHref>
@@ -166,8 +188,8 @@ export default function MyYoutubeListingsClient({ initialData }: { initialData: 
         </tbody>
       </Table>
       <Pagination
-        currentPage={initialData.number}
-        totalPages={initialData.totalPages}
+        currentPage={listingsData.number}
+        totalPages={listingsData.totalPages}
         onPageChange={handlePageChange}
       />
     </Container>

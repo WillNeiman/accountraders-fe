@@ -1,4 +1,4 @@
-import { ListingParams, YoutubeListingResponse, YoutubeListingDetail } from '@/types/features/listings/listing';
+import { ListingParams, YoutubeListingResponse, YoutubeListingDetail, MyYoutubeListingParams, ListingStatus } from '@/types/features/listings/listing';
 import { apiClient } from './client';
 
 /**
@@ -80,4 +80,36 @@ export async function purchaseYoutubeListing(listingId: string, paymentData: {
 }) {
   const response = await apiClient.post(`/api/v1/youtube-listings/${listingId}/purchase`, paymentData);
   return response.data;
-} 
+}
+
+/**
+ * 내 유튜브 리스팅 목록을 조회합니다.
+ * @param params 검색 및 필터링 파라미터
+ * @returns 페이지네이션된 리스팅 목록
+ */
+export const fetchMyYoutubeListings = async (params: MyYoutubeListingParams): Promise<YoutubeListingResponse> => {
+  const queryParams = new URLSearchParams();
+
+  // 상태 필터
+  if (params.statuses && params.statuses.length > 0) {
+    params.statuses.forEach((status: ListingStatus) => {
+      queryParams.append('statuses', status);
+    });
+  }
+
+  // 정렬
+  if (params.sort && params.sort.length > 0) {
+    queryParams.append('sort', params.sort.join(','));
+  }
+
+  // 페이지네이션
+  if (params.page !== undefined) {
+    queryParams.append('page', params.page.toString());
+  }
+  if (params.size !== undefined) {
+    queryParams.append('size', params.size.toString());
+  }
+
+  const response = await apiClient.get<YoutubeListingResponse>(`/api/v1/my/youtube-listings?${queryParams.toString()}`);
+  return response.data;
+}; 

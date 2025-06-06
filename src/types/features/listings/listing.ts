@@ -54,4 +54,11 @@ export interface ListingParams {
   sort?: string[];
   page?: number;
   size?: number;
+}
+
+export interface MyYoutubeListingParams {
+  page?: number;
+  size?: number;
+  sort?: string[];
+  statuses?: ListingStatus[];
 } 
