@@ -10,6 +10,7 @@ interface PageHeaderProps {
   showBack?: boolean;
   backText?: string;
   onBack?: () => void;
+  children?: React.ReactNode;
 }
 
 const HeaderWrapper = styled.header`
@@ -84,7 +85,7 @@ const BackButton = styled.button`
   }
 `;
 
-export default function PageHeader({ title, showBack, backText = '뒤로가기', onBack }: PageHeaderProps) {
+export default function PageHeader({ title, showBack, backText = '뒤로가기', onBack, children }: PageHeaderProps) {
   return (
     <HeaderWrapper>
       <HeaderContainer>
@@ -98,6 +99,7 @@ export default function PageHeader({ title, showBack, backText = '뒤로가기',
             <BackButtonUnderline />
           </BackButtonWrapper>
         ) : null}
+        {children}
       </HeaderContainer>
     </HeaderWrapper>
   );

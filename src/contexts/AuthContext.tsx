@@ -10,7 +10,7 @@ import Cookies from 'js-cookie';
 
 interface AuthContextType {
   user: User | null;
-  isLoading: boolean;
+  isAuthLoading: boolean;
   error: Error | null;
   login: (userData: User) => void;
   logout: () => Promise<void>;
@@ -20,12 +20,12 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
-  // 초기 로딩 상태를 true로 설정하여, 인증 확인이 끝나기 전까지 로딩 UI 노출
-  const [isLoading, setIsLoading] = useState(true);
+  const [isAuthLoading, setIsAuthLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const { showToast } = useToast();
 
   const checkAuth = useCallback(async () => {
+    setIsAuthLoading(true);
     try {
       // 서버에 사용자 정보 요청. 유효한 토큰 쿠키가 있으면 사용자 정보 반환 (로그인 성공)
       const userData = await getCurrentUser();
@@ -37,7 +37,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setError(err instanceof Error ? err : new Error('인증 확인에 실패했습니다.'));
     } finally {
       // 로딩 상태를 종료
-      setIsLoading(false);
+      setIsAuthLoading(false);
     }
   }, []);
 
@@ -65,7 +65,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, [showToast]);
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, error, login, logout }}>
+    <AuthContext.Provider value={{ user, isAuthLoading, error, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

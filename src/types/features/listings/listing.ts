@@ -1,22 +1,49 @@
-import { YoutubeChannel } from '../youtube/channel';
 import { PageableResponse } from '../../common/api';
 
-export interface Listing {
-  listingId: string;
-  channelId: string;
-  sellerUserId: string;
-  title: string;
-  listingDescription: string;
-  askingPrice: number;
-  currency: string;
-  status: ListingStatus;
-  expiresAt: string;
-  viewCountOnPlatform: number;
-  updatedAt: string;
-  createdAt: string;
+export type ListingStatus = 'ACTIVE' | 'PENDING_SALE' | 'SOLD';
+
+export type MonetizationStatus = 'ENABLED' | 'LIMITED' | 'DISABLED';
+
+export interface SimpleUserDto {
+  userId: string;
+  nickname: string;
 }
 
-export type ListingStatus = 'ACTIVE' | 'INACTIVE' | 'PENDING_SALE' | 'SOLD' | 'WITHDRAWN' | 'EXPIRED';
+export interface CategoryDto {
+  categoryId: string;
+  categoryName: string;
+}
+
+export interface YoutubeListing {
+  listingId: string;
+  seller: SimpleUserDto;
+  status: ListingStatus;
+  listingTitle: string;
+  listingDescription: string | null;
+  askingPrice: number;
+  viewCountOnPlatform: number;
+  createdAt: string;
+  updatedAt: string;
+  thumbnailUrl: string;
+  channelId: string;
+  channelTitle: string;
+  subscriberCount: number;
+  totalViewCount: number;
+  totalVideoCount: number;
+  channelTopic: string | null;
+  channelPublishedAt: string;
+  monetizationStatus: MonetizationStatus;
+  isOriginalContent: boolean;
+  copyrightStrikeCount: number;
+  communityGuidelineStrikeCount: number;
+  averageMonthlyIncome: number | null;
+  categories: CategoryDto[];
+  imageUrls: string[];
+}
+
+export type YoutubeListingResponse = PageableResponse<YoutubeListing>;
+
+export type YoutubeListingDetail = YoutubeListing;
 
 export interface ListingParams {
   categoryIds?: string[];
@@ -29,26 +56,9 @@ export interface ListingParams {
   size?: number;
 }
 
-export type ListingResponse = PageableResponse<Listing>;
-
-export interface YoutubeListingDetail {
-  listingId: string;
-  channelId: string;
-  sellerUserId: string;
-  title: string;
-  listingDescription: string | null;
-  askingPrice: number;
-  currency: string | null;
-  status: ListingStatus | null;
-  expiresAt: string | null;
-  viewCountOnPlatform: number | null;
-  updatedAt: string | null;
-  createdAt: string | null;
-  youtubeChannel: YoutubeChannel;
-  seller: {
-    userId: string;
-    nickname: string;
-    rating?: number;
-    transactionCount?: number;
-  };
+export interface MyYoutubeListingParams {
+  page?: number;
+  size?: number;
+  sort?: string[];
+  statuses?: ListingStatus[];
 } 

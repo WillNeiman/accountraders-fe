@@ -423,7 +423,7 @@ const Header = memo(({ onHeightChange = () => {} }: HeaderProps) => {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isSignupModalOpen, setIsSignupModalOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { user, isLoading, logout } = useAuth();
+  const { user, isAuthLoading, logout } = useAuth();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLElement>(null);
@@ -622,7 +622,7 @@ const Header = memo(({ onHeightChange = () => {} }: HeaderProps) => {
             </DropdownContainer>
           ) : (
             <>
-              {isLoading && <span style={{ fontSize: '0.9em', color: colors.text.disabled, marginRight: spacing[2] }}>로딩중...</span>}
+              {isAuthLoading && <span style={{ fontSize: '0.9em', color: colors.text.disabled, marginRight: spacing[2] }}>로딩중...</span>}
               <NavLink 
                 onClick={handleLoginClick}
                 onKeyDown={(e) => handleKeyDown(e, handleLoginClick)}

@@ -8,17 +8,17 @@ export async function generateMetadata({ params }: any) {
   try {
     const listing = await getYoutubeListingDetail(params.id);
     return {
-      title: `${listing.title} | 채널링크`,
-      description: listing.youtubeChannel?.description,
+      title: `${listing.listingTitle} | 채널링크`,
+      description: listing.listingDescription,
       openGraph: {
-        title: listing.title,
-        description: listing.youtubeChannel?.description,
+        title: listing.listingTitle,
+        description: listing.listingDescription,
         images: [
           {
-            url: listing.youtubeChannel?.thumbnailUrl,
-            width: 1200,
-            height: 630,
-            alt: listing.title,
+            url: listing.thumbnailUrl,
+            width: 800,
+            height: 600,
+            alt: listing.listingTitle,
           },
         ],
       },
