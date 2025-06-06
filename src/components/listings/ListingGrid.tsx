@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import styled from '@emotion/styled';
 import { spacing } from '@/styles/theme/spacing';
-import { Listing, ListingParams } from '@/types/features/listings';
+import { YoutubeListing, ListingParams } from '@/types/features/listings';
 import { fetchYoutubeListings } from '@/services/api/youtubeListings';
 import { fetchYoutubeCategories } from '@/services/api/youtubeCategories';
 import { YoutubeCategory } from '@/types/features/youtube/category';
@@ -72,7 +72,7 @@ const ErrorMessage = styled.div`
 `;
 
 export const ListingGrid = () => {
-  const [listings, setListings] = useState<Listing[]>([]);
+  const [listings, setListings] = useState<YoutubeListing[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);

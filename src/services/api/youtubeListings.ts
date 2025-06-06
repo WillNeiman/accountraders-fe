@@ -1,4 +1,4 @@
-import { ListingParams, ListingResponse, YoutubeListingDetail } from '@/types/features/listings';
+import { ListingParams, YoutubeListingResponse, YoutubeListingDetail } from '@/types/features/listings/listing';
 import { apiClient } from './client';
 
 /**
@@ -6,7 +6,7 @@ import { apiClient } from './client';
  * @param params 검색 및 필터링 파라미터
  * @returns 페이지네이션된 리스팅 목록
  */
-export const fetchYoutubeListings = async (params: ListingParams): Promise<ListingResponse> => {
+export const fetchYoutubeListings = async (params: ListingParams): Promise<YoutubeListingResponse> => {
   const queryParams = new URLSearchParams();
 
   // 카테고리 ID 목록
@@ -54,7 +54,7 @@ export const fetchYoutubeListings = async (params: ListingParams): Promise<Listi
     queryParams.append('size', params.size.toString());
   }
 
-  const response = await apiClient.get<ListingResponse>(`/api/v1/youtube-listings?${queryParams.toString()}`);
+  const response = await apiClient.get<YoutubeListingResponse>(`/api/v1/youtube-listings?${queryParams.toString()}`);
   return response.data;
 };
 

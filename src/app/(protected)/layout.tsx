@@ -17,17 +17,17 @@ const ProtectedLayoutContainer = styled.div`
 
 export default function ProtectedLayout({ children }: LayoutProps) {
   const router = useRouter();
-  const { user, isLoading } = useAuth();
+  const { user, isAuthLoading } = useAuth();
 
   useEffect(() => {
-    if (!isLoading) {
+    if (!isAuthLoading) {
       if (!user) {
         router.replace('/login');
       }
     }
-  }, [isLoading, user, router]);
+  }, [isAuthLoading, user, router]);
 
-  if (isLoading) {
+  if (isAuthLoading) {
     return <LoadingSpinner />;
   }
 

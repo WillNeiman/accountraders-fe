@@ -9,17 +9,17 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   try {
     const listing = await getYoutubeListingDetail(id);
     return {
-      title: `${listing.title} - 주문하기 | 채널링크`,
-      description: `${listing.title} 상품을 주문하고 안전하게 거래하세요.`,
+      title: `${listing.listingTitle} - 주문하기 | 채널링크`,
+      description: `${listing.listingTitle} 상품을 주문하고 안전하게 거래하세요.`,
       openGraph: {
-        title: `${listing.title} - 주문하기 | 채널링크`,
-        description: `${listing.title} 상품을 주문하고 안전하게 거래하세요.`,
+        title: `${listing.listingTitle} - 주문하기 | 채널링크`,
+        description: `채널링크에서 안전하게 ${listing.listingTitle} 상품을 구매하세요.`,
         images: [
           {
-            url: 'https://placeholderjs.com/1200x630&text=Channel+Link',
-            width: 1200,
-            height: 630,
-            alt: listing.title,
+            url: listing.thumbnailUrl,
+            width: 800,
+            height: 600,
+            alt: `${listing.listingTitle} 썸네일`,
           },
         ],
       },

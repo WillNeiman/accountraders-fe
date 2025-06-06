@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { colors } from '@/styles/theme/colors';
 import { spacing } from '@/styles/theme/spacing';
 import { typography } from '@/styles/theme/typography';
-import { YoutubeListingDetail } from '@/types/features/listings';
+import { YoutubeListingDetail } from '@/types/features/listings/listing';
 import { mediaQueries } from '@/styles/theme/breakpoints';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
@@ -236,59 +236,35 @@ const Notice = styled.div`
   font-size: ${typography.fontSize.sm};
 `;
 
-interface Seller {
-  nickname: string;
-  rating: number;
-  transactionCount: number;
-}
-
 interface Props {
-  listing?: YoutubeListingDetail;
+  listing: YoutubeListingDetail;
 }
 
 export default function ListingDetail({ listing }: Props) {
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, isAuthLoading } = useAuth();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   const handleBuyClick = () => {
-    if (!user) {
+    if (!user && !isAuthLoading) {
       setIsLoginModalOpen(true);
-      return;
+    } else if (user) {
+      router.push(`/listings/${listing.listingId}/order`);
     }
-    router.push(`/listings/${listing?.listingId}/order`);
   };
 
   const handleLoginSuccess = () => {
     setIsLoginModalOpen(false);
-    router.push(`/listings/${listing?.listingId}/order`);
+    router.push(`/listings/${listing.listingId}/order`);
   };
 
   const handleLoginClose = () => {
     setIsLoginModalOpen(false);
   };
 
-  // 플레이스홀더 데이터
-  const placeholder = {
-    thumbnail: undefined,
-    title: listing?.title || '대회 경험 풍부! 프로게이머 FPS 채널 판매',
-    category: undefined,
-    channelUrl: undefined,
-    metrics: {
-      subscribers: undefined,
-      views: undefined,
-      income: undefined,
-    },
-    price: listing?.askingPrice ?? 50000000,
-    currency: listing?.currency || 'KRW',
-    description: listing?.listingDescription || '구독자 2.5만, 월 평균 수익 500만원 이상. 안정적인 운영. 모든 권한 양도. 직접 만나서 인증 가능.',
-    seller: (listing?.seller as Seller) || {
-      nickname: '홍길동',
-      rating: 4.8,
-      transactionCount: 12,
-    },
-    images: undefined,
-  };
+  if (!listing) {
+    return null;
+  }
 
   return (
     <>
@@ -302,29 +278,29 @@ export default function ListingDetail({ listing }: Props) {
           <TopSection>
             <ThumbnailWrapper>
               <Image 
-                src={PLACEHOLDER_THUMBNAIL}
-                alt="채널 썸네일"
+                src={listing.thumbnailUrl || PLACEHOLDER_THUMBNAIL}
+                alt={listing.listingTitle}
                 fill
                 style={{ objectFit: 'cover' }}
                 unoptimized={true}
               />
             </ThumbnailWrapper>
             <InfoBlock>
-              <Title>{placeholder.title}</Title>
+              <Title>{listing.listingTitle}</Title>
               <Category>
-                {(placeholder.category || '게임')} |
-                <ChannelLink href={placeholder.channelUrl || 'https://youtube.com/@placeholder'} target="_blank" rel="noopener noreferrer">채널 바로가기</ChannelLink>
+                {listing.categories.map(c => c.categoryName).join(', ')} |
+                <ChannelLink href={`https://www.youtube.com/channel/${listing.channelId}`} target="_blank" rel="noopener noreferrer">채널 바로가기</ChannelLink>
               </Category>
               <MetricsWrapper>
                 <MetricsLine />
                 <Metrics>
-                  <div>구독자: {(placeholder.metrics.subscribers ?? 25000).toLocaleString()}명</div>
-                  <div>조회수: {(placeholder.metrics.views ?? 1000000).toLocaleString()}회</div>
-                  <div>월수익: {(placeholder.metrics.income ?? 5000000).toLocaleString()}원</div>
+                  <div>구독자: {listing.subscriberCount.toLocaleString()}명</div>
+                  <div>조회수: {listing.totalViewCount.toLocaleString()}회</div>
+                  <div>월수익: {(listing.averageMonthlyIncome ?? 0).toLocaleString()}원</div>
                 </Metrics>
               </MetricsWrapper>
               <Price>
-                {placeholder.price.toLocaleString()} {placeholder.currency}
+                {listing.askingPrice.toLocaleString()}원
               </Price>
               <Actions>
                 <BuyButton onClick={handleBuyClick}>구매하기</BuyButton>
@@ -332,19 +308,19 @@ export default function ListingDetail({ listing }: Props) {
               </Actions>
             </InfoBlock>
           </TopSection>
-          <Description>{placeholder.description}</Description>
+          <Description>{listing.listingDescription}</Description>
         </Main>
         <Side>
           <SellerCard>
-            <SellerName>{(placeholder.seller?.nickname) || '홍길동'}</SellerName>
-            <SellerMeta>평점: {(placeholder.seller?.rating ?? 4.8)} / 거래 {(placeholder.seller?.transactionCount ?? 12)}건</SellerMeta>
+            <SellerName>{listing.seller.nickname}</SellerName>
+            <SellerMeta>채널링크 인증 판매자</SellerMeta>
             <SellerButton>판매자 문의</SellerButton>
           </SellerCard>
           <ImagesSection>
             <ImagesTitle>첨부 이미지</ImagesTitle>
             <ImagesGrid>
-              {(placeholder.images ?? ['/placeholder1.png', '/placeholder2.png', '/placeholder3.png', '/placeholder4.png']).map((img: string, idx: number) => (
-                <AttachImage key={idx} src={img} alt={`첨부${idx+1}`} />
+              {listing.imageUrls.map((img: string, idx: number) => (
+                <AttachImage key={idx} src={img} alt={`첨부이미지 ${idx+1}`} />
               ))}
             </ImagesGrid>
           </ImagesSection>

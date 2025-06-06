@@ -216,7 +216,7 @@ export default function OrderClient({ listing: initialListing }: OrderClientProp
   const [listing, setListing] = useState(initialListing);
   const [hasPriceChanged, setHasPriceChanged] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  const { user, isLoading: isAuthLoading } = useAuth();
+  const { user, isAuthLoading } = useAuth();
   const router = useRouter();
 
   // 로그인 체크
@@ -320,7 +320,7 @@ export default function OrderClient({ listing: initialListing }: OrderClientProp
               <ProductImageWrapper>
                 <Image 
                   src={PLACEHOLDER_THUMBNAIL}
-                  alt={`${listing.title} 썸네일`} 
+                  alt={`${listing.listingTitle} 썸네일`} 
                   fill
                   style={{objectFit: 'cover'}}
                   priority
@@ -328,7 +328,7 @@ export default function OrderClient({ listing: initialListing }: OrderClientProp
                 />
               </ProductImageWrapper>
               <ProductDetails>
-                <ProductName>{listing.title}</ProductName>
+                <ProductName>{listing.listingTitle}</ProductName>
                 <ProductPrice>{listing.askingPrice.toLocaleString()}원</ProductPrice>
                 <SellerInfo>판매자: {listing.seller?.nickname || '알 수 없음'}</SellerInfo>
                 <p style={{ fontSize: typography.fontSize.sm, color: colors.text.secondary, marginTop: spacing[2]}}>
@@ -376,7 +376,7 @@ export default function OrderClient({ listing: initialListing }: OrderClientProp
               <SectionTitle>최종 결제 정보</SectionTitle>
               <SummaryRow>
                 <SummaryLabel>상품명</SummaryLabel>
-                <SummaryValue>{listing.title}</SummaryValue>
+                <SummaryValue>{listing.listingTitle}</SummaryValue>
               </SummaryRow>
               <SummaryRow>
                 <SummaryLabel>상품 금액</SummaryLabel>
