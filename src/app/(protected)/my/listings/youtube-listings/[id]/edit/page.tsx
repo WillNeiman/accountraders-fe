@@ -1,12 +1,13 @@
 import { Metadata } from 'next';
-import MyYoutubeListingDetailClient from './MyYoutubeListingDetailClient';
+import MyYoutubeListingEditClient from './MyYoutubeListingEditClient';
 
+// 메타데이터 설정
 export const metadata: Metadata = {
-  title: '채널 상세 정보 | 채널링크',
-  description: '채널의 상세 정보를 확인하세요.',
+  title: '채널 정보 수정 | 채널링크',
+  description: '채널 정보를 수정하세요.',
   openGraph: {
-    title: '채널 상세 정보 | 채널링크',
-    description: '채널의 상세 정보를 확인하세요.',
+    title: '채널 정보 수정 | 채널링크',
+    description: '채널 정보를 수정하세요.',
     url: 'https://channelink.vercel.app/protected/my/listings/youtube-listings',
     siteName: '채널링크',
     images: [
@@ -25,13 +26,15 @@ export const metadata: Metadata = {
   },
 };
 
+// 페이지 컴포넌트의 props 타입 정의
 interface Props {
   params: Promise<{
     id: string;
   }>;
 }
 
-export default async function YoutubeListingDetailPage({ params }: Props) {
+// 채널 정보 수정 페이지 컴포넌트
+export default async function YoutubeListingEditPage({ params }: Props) {
   const { id } = await params;
-  return <MyYoutubeListingDetailClient id={id} />;
+  return <MyYoutubeListingEditClient id={id} />;
 } 

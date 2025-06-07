@@ -1,30 +1,29 @@
-'use client';
+export const metadata = {
+  title: '내 채널 관리 | 채널링크',
+  description: '회원님의 채널을 관리하세요.',
+  openGraph: {
+    title: '내 채널 관리 | 채널링크',
+    description: '회원님의 채널을 관리하세요.',
+    url: 'https://channelink.vercel.app/protected/my/listings/youtube-listings',
+    siteName: '채널링크',
+    images: [
+      {
+        url: 'https://channelink.vercel.app/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: '채널링크 마이페이지',
+      },
+    ],
+    type: 'website',
+  },
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
-import { Suspense } from 'react';
 import MyYoutubeListingsClient from './MyYoutubeListingsClient';
-import PageHeader from '@/components/common/PageHeader';
-import { MyYoutubeListingParams, ListingStatus } from '@/types/features/listings/listing';
-import { useSearchParams } from 'next/navigation';
 
-export default function MyYoutubeListingsPage() {
-  const searchParams = useSearchParams();
-  const statuses = searchParams.get('statuses')
-    ? (Array.isArray(searchParams.getAll('statuses')) ? searchParams.getAll('statuses') : [searchParams.get('statuses')]) as ListingStatus[]
-    : [];
-    
-  const params: MyYoutubeListingParams = {
-    page: searchParams.get('page') ? Number(searchParams.get('page')) - 1 : 0,
-    size: 10,
-    sort: searchParams.get('sort') ? [searchParams.get('sort')!] : ['createdAt,desc'],
-    statuses: statuses.length > 0 ? statuses : undefined,
-  };
-
-  return (
-    <main>
-      <PageHeader title="내 상품 관리" />
-      <Suspense fallback={<div>Loading...</div>}>
-        <MyYoutubeListingsClient initialData={params} />
-      </Suspense>
-    </main>
-  );
+export default function YoutubeListingsPage() {
+  return <MyYoutubeListingsClient />;
 } 

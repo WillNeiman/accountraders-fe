@@ -1,5 +1,9 @@
-import { ListingParams, YoutubeListingResponse, YoutubeListingDetail, MyYoutubeListingParams, ListingStatus } from '@/types/features/listings/listing';
+import { ListingParams, YoutubeListingResponse, YoutubeListingDetail, MyYoutubeListingParams, ListingStatus, YoutubeListingUpdateDto } from '@/types/features/listings/listing';
 import { apiClient } from './client';
+
+/**
+ * 공개 유튜브 리스팅 관련 API
+ */
 
 /**
  * 유튜브 리스팅 목록을 조회합니다.
@@ -63,10 +67,10 @@ export const fetchYoutubeListings = async (params: ListingParams): Promise<Youtu
  * @param listingId 리스팅 ID
  * @returns 리스팅 상세 정보
  */
-export async function getYoutubeListingDetail(listingId: string): Promise<YoutubeListingDetail> {
-  const response = await apiClient.get<YoutubeListingDetail>(`/api/v1/youtube-listings/${listingId}`);
-  return response.data;
-}
+export const getYoutubeListingDetail = async (listingId: string): Promise<YoutubeListingDetail> => {
+  const { data } = await apiClient.get<YoutubeListingDetail>(`/api/v1/youtube-listings/${listingId}`);
+  return data;
+};
 
 /**
  * 유튜브 리스팅을 구매합니다.
@@ -74,13 +78,17 @@ export async function getYoutubeListingDetail(listingId: string): Promise<Youtub
  * @param paymentData 결제 정보
  * @returns 구매 결과
  */
-export async function purchaseYoutubeListing(listingId: string, paymentData: {
+export const purchaseYoutubeListing = async (listingId: string, paymentData: {
   paymentMethod: string;
   // 기타 결제 관련 정보
-}) {
+}) => {
   const response = await apiClient.post(`/api/v1/youtube-listings/${listingId}/purchase`, paymentData);
   return response.data;
-}
+};
+
+/**
+ * 내 유튜브 리스팅 관련 API
+ */
 
 /**
  * 내 유튜브 리스팅 목록을 조회합니다.
@@ -112,4 +120,42 @@ export const fetchMyYoutubeListings = async (params: MyYoutubeListingParams): Pr
 
   const response = await apiClient.get<YoutubeListingResponse>(`/api/v1/my/youtube-listings?${queryParams.toString()}`);
   return response.data;
+};
+
+/**
+ * 내 유튜브 리스팅의 상세 정보를 조회합니다.
+ * @param listingId 리스팅 ID
+ * @returns 리스팅 상세 정보
+ */
+export const getMyYoutubeListingDetail = async (listingId: string): Promise<YoutubeListingDetail> => {
+  const { data } = await apiClient.get<YoutubeListingDetail>(`/api/v1/my/youtube-listings/${listingId}`);
+  return data;
+};
+
+/**
+ * 내 유튜브 리스팅을 수정합니다.
+ * @param listingId 리스팅 ID
+ * @param payload 수정할 데이터
+ * @returns 수정된 리스팅 정보
+ */
+export const updateMyYoutubeListing = async (listingId: string, payload: YoutubeListingUpdateDto): Promise<YoutubeListingDetail> => {
+  const { data } = await apiClient.put<YoutubeListingDetail>(`/api/v1/my/youtube-listings/${listingId}`, payload);
+  return data;
+};
+
+/**
+ * 내 유튜브 리스팅을 삭제합니다.
+ * @param listingId 리스팅 ID
+ */
+export const deleteMyYoutubeListing = async (listingId: string): Promise<void> => {
+  await apiClient.delete(`/api/v1/my/youtube-listings/${listingId}`);
+};
+
+export const updateYoutubeListing = async (listingId: string, payload: Partial<YoutubeListingDetail>): Promise<YoutubeListingDetail> => {
+  const { data } = await apiClient.put<YoutubeListingDetail>(`/api/v1/youtube-listings/${listingId}`, payload);
+  return data;
+};
+
+export const deleteYoutubeListing = async (listingId: string): Promise<void> => {
+  await apiClient.delete(`/api/v1/youtube-listings/${listingId}`);
 }; 
