@@ -45,6 +45,20 @@ export type YoutubeListingResponse = PageableResponse<YoutubeListing>;
 
 export type YoutubeListingDetail = YoutubeListing;
 
+export interface YoutubeListingUpdateDto {
+  listingTitle?: string;
+  listingDescription?: string;
+  askingPrice?: number;
+  channelTopic?: string;
+  monetizationStatus?: MonetizationStatus;
+  isOriginalContent?: boolean;
+  copyrightStrikeCount?: number;
+  communityGuidelineStrikeCount?: number;
+  averageMonthlyIncome?: number;
+  categoryIds?: string[];
+  imageUrls?: string[];
+}
+
 export interface ListingParams {
   categoryIds?: string[];
   minPrice?: number;

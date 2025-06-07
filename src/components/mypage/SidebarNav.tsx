@@ -111,7 +111,7 @@ const navItems = {
   ],
   seller: [
     { href: '/my/seller-profile', label: '판매자 프로필' },
-    { href: '/my/youtube-channels', label: '채널 관리' },
+    { href: '/my/listings/youtube-listings', label: '채널 관리' },
     { href: '/my/seller/settings', label: '판매자 설정' },
     { href: '/my/seller/analytics', label: '판매자 통계' },
   ],

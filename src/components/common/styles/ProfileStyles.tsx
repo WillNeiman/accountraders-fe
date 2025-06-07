@@ -29,7 +29,7 @@ export const Item = styled.li`
 `;
 
 export const ItemLabel = styled.div`
-  min-width: 120px;
+  min-width: 150px;
   font-size: ${typography.fontSize.sm};
   color: ${colors.gray[400]};
   font-weight: ${typography.fontWeight.medium};
