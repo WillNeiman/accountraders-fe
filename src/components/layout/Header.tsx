@@ -440,7 +440,7 @@ const Header = memo(({ onHeightChange = () => {} }: HeaderProps) => {
     ],
     seller: [
       { href: '/my/seller-profile', label: '판매자 프로필', icon: FiUser },
-      { href: '/my/youtube-channels', label: '채널 관리', icon: FiYoutube },
+      { href: '/my/listings/youtube-listings', label: '채널 관리', icon: FiYoutube },
       { href: '/my/seller/settings', label: '판매자 설정', icon: FiSettings },
       { href: '/my/seller/analytics', label: '판매자 통계', icon: FiBarChart2 },
     ],

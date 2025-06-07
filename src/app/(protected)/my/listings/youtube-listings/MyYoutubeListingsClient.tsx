@@ -171,7 +171,7 @@ export default function MyYoutubeListingsClient({ initialData }: { initialData: 
           {listingsData.content.map(listing => (
             <tr key={listing.listingId}>
               <Td>
-                <Link href={`/my/listings/youtube-listings/${listing.listingId}`} passHref>
+                <Link href={`/my/listings/youtube/${listing.listingId}`} passHref>
                   <ProductCell>
                     <Thumbnail src={listing.thumbnailUrl} alt={listing.listingTitle} width={80} height={45} />
                     <span>{listing.listingTitle}</span>
